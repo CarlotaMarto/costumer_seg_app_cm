@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Intelligence Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">Costumer Segmentation</span>
+        <span class="brand-text">Project</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="nav-link active" href="#introduction"><span class="nav-icon"></span>Introduction</a>
+        <a class="nav-link" href="#data-preprocessing"><span class="nav-icon"></span>Data preprocessing</a>
+        <a class="nav-link" href="#communities"><span class="nav-icon"></span>Communities</a>
+        <a class="nav-link" href="#people"><span class="nav-icon"></span>People</a>
+        <a class="nav-link" href="#behaviors"><span class="nav-icon"></span>Behaviors</a>
+        <a class="nav-link" href="#opportunities"><span class="nav-icon"></span>Opportunities</a>
+        <a class="nav-link" href="#campaigns"><span class="nav-icon"></span>Campaigns</a>
+        <a class="nav-link" href="#signals"><span class="nav-icon"></span>Signals</a>
+        <a class="nav-link" href="#data-sources"><span class="nav-icon"></span>Data sources</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-chip">
+          <div class="avatar">A</div>
+          <div>
+            <div class="user-name">Administrator</div>
+            <div class="user-role">Dashboard</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <header id="introduction" class="hero-card">
+        <div class="hero-copy">
+          <div class="eyebrow">Understand every customer. Grow with purpose.</div>
+          <h1>Customer segmentation insights for preprocessing and clean data.</h1>
+          <p>
+            This site highlights notebook-driven preprocessing insights for the customer information dataset.
+            It summarizes data cleaning, feature engineering, missing values handling, and anomaly detection.
+          </p>
+          <div class="hero-actions">
+            <button class="primary-btn">Explore insights</button>
+            <button class="secondary-btn">View preprocessing</button>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="stat-value">34,060</span>
+            <span class="stat-label">customers analyzed</span>
+          </div>
+          <div class="hero-stat">
+            <span class="stat-value">7</span>
+            <span class="stat-label">communities discovered</span>
+          </div>
+          <div class="hero-art">
+            <div class="hero-figure">
+              <div class="circle large"></div>
+              <div class="circle small"></div>
+              <div class="shape shape-a"></div>
+              <div class="shape shape-b"></div>
+              <div class="shape shape-c"></div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section id="data-preprocessing" class="data-panel">
+        <div class="panel-title">Data preprocessing</div>
+        <div class="data-copy">
+          <p>This section summarizes the notebook preprocessing workflow: handling invalid dates and negative values, cleaning customer names, engineering customer features, and protecting the dataset for segmentation.</p>
+          <ul>
+            <li>Future transaction years are identified and set to <code>NaN</code> instead of dropping rows.</li>
+            <li>Negative promotion percentage values are corrected and invalid identifiers are excluded.</li>
+            <li>Customer names are processed to extract education-level titles while preserving privacy.</li>
+            <li>Outliers and skewed spending patterns are inspected to avoid distortion in clustering.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="communities" class="communities-panel">
+        <div class="panel-title">Your 7 customer communities</div>
+        <div class="communities-grid">
+          <article class="community-card">
+            <div class="community-graphic graphic-1"></div>
+            <h3>Students</h3>
+            <p>23% · 7,821 customers</p>
+            <small>Young, price-sensitive and promotion-driven.</small>
+          </article>
+          <article class="community-card">
+            <div class="community-graphic graphic-2"></div>
+            <h3>Wellness Urbanites</h3>
+            <p>18% · 6,133 customers</p>
+            <small>Health-conscious shoppers valuing quality and sustainability.</small>
+          </article>
+          <article class="community-card">
+            <div class="community-graphic graphic-3"></div>
+            <h3>Tech Enthusiasts</h3>
+            <p>15% · 5,109 customers</p>
+            <small>Early adopters driven by technology and premium brands.</small>
+          </article>
+          <article class="community-card">
+            <div class="community-graphic graphic-4"></div>
+            <h3>Mature Independents</h3>
+            <p>14% · 4,769 customers</p>
+            <small>Independent and established customers valuing quality and convenience.</small>
+          </article>
+          <article class="community-card">
+            <div class="community-graphic graphic-5"></div>
+            <h3>Vegetarians</h3>
+            <p>12% · 4,086 customers</p>
+            <small>Plant-based shoppers with health-driven choices.</small>
+          </article>
+          <article class="community-card">
+            <div class="community-graphic graphic-6"></div>
+            <h3>Extended Households</h3>
+            <p>9% · 3,067 customers</p>
+            <small>Large families shopping for multiple generations.</small>
+          </article>
+          <article class="community-card">
+            <div class="community-graphic graphic-7"></div>
+            <h3>Makro Lovers</h3>
+            <p>9% · 3,075 customers</p>
+            <small>Bulk shoppers looking for value and practicality.</small>
+          </article>
+        </div>
+      </section>
+
+      <section class="overview-row">
+        <div class="metric-card">
+          <span class="metric-label">Revenue contribution</span>
+          <span class="metric-value">€2.48M</span>
+          <span class="metric-note">+18.7% vs Apr 1 - Apr 30</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Avg. order value</span>
+          <span class="metric-value">€68.21</span>
+          <span class="metric-note">+8.3% vs Apr 1 - Apr 30</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Repeat purchase rate</span>
+          <span class="metric-value">78%</span>
+          <span class="metric-note">+5.4% vs Apr 1 - Apr 30</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Retention rate</span>
+          <span class="metric-value">2.73</span>
+          <span class="metric-note">+6.1% vs Apr 1 - Apr 30</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">CLV (estimated)</span>
+          <span class="metric-value">€326</span>
+          <span class="metric-note">+11.8% vs Apr 1 - Apr 30</span>
+        </div>
+      </section>
+
+      <section class="insights-panel">
+        <div class="panel-header">
+          <h2>Preprocessing Insights</h2>
+          <p>Summarized from the notebook: data cleaning steps, feature engineering, and anomaly handling for customer segmentation.</p>
+        </div>
+        <div class="insights-grid">
+          <article class="insight-card">
+            <h3>Dataset Preparation</h3>
+            <p>The notebook loads and inspects <code>customer_info</code>, checks column types, and prepares a clean dataset for clustering.</p>
+          </article>
+          <article class="insight-card">
+            <h3>Missing Values</h3>
+            <p>Missing entries are identified and handled carefully. Future transaction years are set to <code>NaN</code> and later imputed instead of dropping rows.</p>
+          </article>
+          <article class="insight-card">
+            <h3>Invalid Data Fixes</h3>
+            <p>Negative promotion percentages and future years are corrected. Constant identifiers such as loyalty card numbers are removed from modeling.</p>
+          </article>
+          <article class="insight-card">
+            <h3>Feature Engineering</h3>
+            <p>Education level is extracted from customer name prefixes like <code>Bsc.</code>, <code>Msc.</code>, <code>Phd.</code>, then names are standardized to protect privacy.</p>
+          </article>
+          <article class="insight-card">
+            <h3>Outlier Detection</h3>
+            <p>Spending features show strong right skew and clear outliers. IQR capping is used to limit the influence of extreme values.</p>
+          </article>
+          <article class="insight-card">
+            <h3>Behavioral Patterns</h3>
+            <p>Temporal patterns such as typical transaction hour are preserved using angle-based transformations to keep cyclic proximity.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
