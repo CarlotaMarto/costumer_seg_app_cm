@@ -158,9 +158,8 @@ div[role="radiogroup"] label:hover {
     border-color: #ea580c !important;
 }
 .page-shell {
-    background: rgba(255, 255, 255, 0.7) !important;
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(226, 232, 240, 0.8);
+    background: #ffffff !important;
+    border: 1px solid rgba(163, 78, 35, 0.12);
     border-radius: 16px;
     padding: 24px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
@@ -169,11 +168,9 @@ div[role="radiogroup"] label:hover {
 .page-title-box {
     display: block;
     width: 100%;
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(12px);
-    color: #0f172a;
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    border-left: 6px solid #ea580c;
+    background: #f8e6d5 !important;
+    color: #3b2720 !important;
+    border: 1px solid rgba(163, 78, 35, 0.18) !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
     border-radius: 12px;
     padding: 16px 24px;
@@ -454,9 +451,9 @@ st.markdown("### Average spend per category")
 st.altair_chart(spend_chart, width=1080)
 
 st.markdown("""
-    <div style='padding: 24px; border-radius: 16px; background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(226, 232, 240, 0.8); border-left: 4px solid #ea580c; backdrop-filter: blur(10px);'>
-      <h3 style='font-family:"Inter", sans-serif; color:#0f172a; margin-bottom:12px; font-weight:700; font-size:20px;'>Key insights from the initial dataset review</h3>
-      <ul style='color:#334155; line-height:1.8; margin-left:18px; font-family:"Inter", sans-serif;'>
+    <div style='padding: 24px; border-radius: 16px; background: #fff4ed; border: 1px solid rgba(209,115,70,0.18);'>
+      <h3 style='font-family:"Inter", sans-serif; color:#3b2720; margin-bottom:12px; font-weight:700; font-size:20px;'>Key insights from the initial dataset review</h3>
+      <ul style='color:#5f4635; line-height:1.8; margin-left:18px; font-family:"Inter", sans-serif;'>
         <li>The dataset includes <strong>33,038 customers</strong> and <strong>100,000 purchase invoices</strong>, based on the raw customer profile and basket data.</li>
         <li>Gender balance is nearly even, which supports representative customer profiling.</li>
         <li>Average promotion-driven purchases are around <strong>32%</strong>, highlighting early signs of promotional sensitivity.</li>
@@ -519,9 +516,9 @@ st.markdown("### Distinct products after cleaning")
 st.altair_chart(box_chart, width=1080)
 
 st.markdown("""
-    <div style='padding: 24px; border-radius: 16px; background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(226, 232, 240, 0.8); border-left: 4px solid #ea580c; backdrop-filter: blur(10px);'>
-      <h3 style='font-family:"Inter", sans-serif; color:#0f172a; margin-bottom:12px; font-weight:700; font-size:20px;'>Preprocessing conclusions</h3>
-      <ul style='color:#334155; line-height:1.8; margin-left:18px; font-family:"Inter", sans-serif;'>
+    <div style='padding: 24px; border-radius: 16px; background: #fff4ed; border: 1px solid rgba(209,115,70,0.18);'>
+      <h3 style='font-family:"Inter", sans-serif; color:#3b2720; margin-bottom:12px; font-weight:700; font-size:20px;'>Preprocessing conclusions</h3>
+      <ul style='color:#5f4635; line-height:1.8; margin-left:18px; font-family:"Inter", sans-serif;'>
         <li>The data was cleaned while preserving the customer base, applying only logical corrections without abrupt removals.</li>
         <li>Spending and promotion variables remain skewed but are now consistent for modeling.</li>
         <li>Age and promotion fields were prepared to support segmentation and campaign analytics.</li>
@@ -609,9 +606,9 @@ st.subheader("Hotspot profile vs outside")
 st.altair_chart(compare_chart, width=1080)
 
 st.markdown("""
-    <div style='padding: 24px; border-radius: 16px; background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(226, 232, 240, 0.8); border-left: 4px solid #ea580c; backdrop-filter: blur(10px);'>
-      <h3 style='font-family:"Inter", sans-serif; color:#0f172a; margin-bottom:12px; font-weight:700; font-size:20px;'>Geography conclusions</h3>
-      <ul style='color:#334155; line-height:1.8; margin-left:18px; font-family:"Inter", sans-serif;'>
+    <div style='padding: 24px; border-radius: 16px; background: #fff4ed; border: 1px solid rgba(209,115,70,0.18);'>
+      <h3 style='font-family:"Inter", sans-serif; color:#3b2720; margin-bottom:12px; font-weight:700; font-size:20px;'>Geography conclusions</h3>
+      <ul style='color:#5f4635; line-height:1.8; margin-left:18px; font-family:"Inter", sans-serif;'>
         <li>The scatter map shows the customer base concentrated along the main urban corridor.</li>
         <li>The density map highlights a high-concentration cluster near a university area.</li>
         <li>Hotspot customers are more likely to make promotional purchases and visit more distinct stores.</li>
