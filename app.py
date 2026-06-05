@@ -1,4 +1,6 @@
 import streamlit as st
+import pandas as pd
+import altair as alt
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -8,19 +10,51 @@ st.set_page_config(page_title="Costumer Segmentation Project", layout="wide")
 css = """
 <style>
 body {
-    background: linear-gradient(180deg, #f6f1eb 0%, #fbf2ec 100%);
+    background: radial-gradient(circle at top left, #ffe6d9 0%, #ffd2b2 35%, #f6b07e 100%);
+    color: #3b2720;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 section[role="main"] {
-    padding-top: 0px;
+    padding-top: 90px !important;
+}
+main, .main, div.block-container {
+    padding-top: 90px !important;
+}
+header, header[role="banner"], div[data-testid="stToolbar"] {
+    position: relative !important;
+    width: 100% !important;
+    z-index: 50 !important;
+    background: #ffffff !important;
+    box-shadow: 0 2px 25px rgba(0,0,0,0.08) !important;
 }
 [data-testid="stSidebar"] {
-    background: #fff3eb;
+    background: #ffe8d5;
+    min-width: 340px;
+    max-width: 420px;
+    position: relative;
+    border-right: 1px solid rgba(205,93,57,0.18);
+}
+button[title*="sidebar"], button[aria-label*="sidebar"] {
+    background: #ffe3d3 !important;
+    color: #3b2720 !important;
+    border: 1px solid rgba(205,93,57,0.28) !important;
+    border-radius: 999px !important;
+    box-shadow: 0 16px 30px -22px rgba(0, 0, 0, 0.24) !important;
+    position: fixed !important;
+    top: 22px !important;
+    left: 24px !important;
+    transform: none !important;
+    z-index: 100;
+    padding: 10px 14px !important;
+}
+button[title*="sidebar"]:hover, button[aria-label*="sidebar"]:hover {
+    background: #ffd6b8 !important;
 }
 .css-1d391kg {
-    background-color: #fff8f2;
+    background-color: #fff2e7;
 }
 .stButton>button {
-    background-color: #c94f38;
+    background-color: #e6513b;
     color: white;
     border-radius: 999px;
     border: none;
@@ -28,42 +62,70 @@ section[role="main"] {
 .st-bb {
     border-radius: 24px;
 }
+.stSidebarNav label,
+div[role="radiogroup"] label {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.3;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: keep-all;
+    letter-spacing: 0.01em;
+}
+.stSidebarNav label span {
+    font-size: 32px;
+}
+.stAppViewContainer, .main > div, div.block-container {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+div.block-container {
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+    padding-top: 0 !important;
+}
+.stMarkdown, .stText, .css-1d391kg {
+    color: #402b22;
+}
+div[data-testid="stImage"] img {
+    border-radius: 28px;
+    filter: saturate(1.12) contrast(1.08);
+}
+div[data-testid="stImage"] {
+    border: 1px solid rgba(205,93,57,0.18);
+    padding: 12px;
+    border-radius: 28px;
+    background: rgba(255, 245, 236, 0.95);
+}
+div[role="radiogroup"] label {
+    background: rgba(255, 239, 227, 0.98);
+    padding: 18px 16px;
+    border-radius: 22px;
+    border: 1px solid rgba(205,93,57,0.18);
+}
 </style>
 """
 
 st.markdown(css, unsafe_allow_html=True)
 
 st.sidebar.markdown(
-    "<div style='padding: 8px 0 18px 0; font-family: Inter, sans-serif;'>"
-    "<div style='font-size:26px; font-weight:800; color:#3f2d22;'>Costumer Segmentation</div>"
-    "<div style='font-size:11px; margin-top:6px; color:#7a6454; text-transform:uppercase; letter-spacing:0.18em;'>Project</div>"
+    "<div style='padding: 8px 0 18px 0; font-family:Garamond,serif;'>"
+    "<div style='font-size:48px; font-weight:800; color:#3f2d22; line-height:0.95; word-break: keep-all; overflow-wrap: normal;'>Costumer Segmentation<br>Project</div>"
     "</div>",
     unsafe_allow_html=True,
 )
 
 page = st.sidebar.radio(
-    "Navigation",
+    "",
     [
         "Introduction",
+        "Data analysis",
         "Data preprocessing",
-        "Communities",
-        "People",
-        "Behaviors",
-        "Opportunities",
-        "Campaigns",
-        "Signals",
-        "Data sources",
+        "Customer segmentation and clustering",
+        "Targeter promotion",
+        "Conclusion and recommendations",
     ],
     index=0,
-)
-
-st.sidebar.markdown("---")
-st.sidebar.markdown(
-    "<div style='padding: 18px; border-radius: 22px; background: #fff7f0; border: 1px solid rgba(111,79,53,0.18);'>"
-    "<div style='font-weight:700; color:#3f2d22; margin-bottom:6px;'>Administrator</div>"
-    "<div style='color:#7a6454; font-size:14px;'>Dashboard</div>"
-    "</div>",
-    unsafe_allow_html=True,
 )
 
 st.sidebar.markdown("---")
@@ -71,44 +133,46 @@ st.sidebar.markdown("---")
 def render_footer():
     st.markdown(
         """
-        <div style='margin-top:48px; padding:30px; border-radius:32px; background:#fff9f5; border:1px solid rgba(111,79,53,0.12);'>
-          <div style='display:grid; grid-template-columns:1.1fr 1.2fr 1fr 1fr; gap:24px; align-items:start;'>
+        <div style='margin:48px auto 0; padding:22px; border-radius:28px; max-width:1080px; background:#fff9f5; border:1px solid rgba(111,79,53,0.12);'>
+          <div style='display:grid; grid-template-columns:repeat(4, minmax(180px, 1fr)); gap:18px; align-items:start;'>
             <div>
-              <div style='text-transform:uppercase; font-size:12px; letter-spacing:0.22em; color:#7a6454; margin-bottom:14px;'>Navigation</div>
-              <p style='color:#3f2d22; margin:0; line-height:1.8;'>Use the navigation bar on the left side of the screen.</p>
+              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.24em; color:#7a6454; margin-bottom:10px;'>Navigation</div>
+              <p style='color:#3f2d22; margin:0; line-height:1.6; font-size:14px;'>Use the navigation bar on the left side of the screen.</p>
             </div>
             <div>
-              <div style='text-transform:uppercase; font-size:12px; letter-spacing:0.22em; color:#7a6454; margin-bottom:14px;'>Work done by</div>
-              <div style='display:flex; gap:12px; align-items:center; margin-bottom:12px;'>
-                <div style='width:40px; height:40px; border-radius:50%; background:#c94f38;'></div>
-                <div>
-                  <div style='font-weight:700; color:#3f2d22;'>Carlota Marto</div>
-                  <div style='font-size:13px; color:#7a6454;'>20241729</div>
-                </div>
-              </div>
-              <div style='display:flex; gap:12px; align-items:center; margin-bottom:12px;'>
-                <div style='width:40px; height:40px; border-radius:50%; background:#b77b45;'></div>
-                <div>
-                  <div style='font-weight:700; color:#3f2d22;'>Francisca Teixeira</div>
-                  <div style='font-size:13px; color:#7a6454;'>20241702</div>
-                </div>
-              </div>
-              <div style='display:flex; gap:12px; align-items:center;'>
-                <div style='width:40px; height:40px; border-radius:50%; background:#8c6f53;'></div>
-                <div>
-                  <div style='font-weight:700; color:#3f2d22;'>Pedro Gouveia</div>
-                  <div style='font-size:13px; color:#7a6454;'>Project Contributor</div>
-                </div>
+              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.24em; color:#7a6454; margin-bottom:10px;'>Work done by</div>
+              <div style='display:grid; gap:10px;'>
+                <a href='https://github.com/CarlotaMarto' target='_blank' rel='noreferrer noopener' style='display:flex; gap:12px; align-items:center; text-decoration:none; color:#3f2d22; cursor:pointer; padding:10px 12px; border-radius:18px; background:rgba(255,255,255,0.75);'>
+                  <img src='https://github.com/CarlotaMarto.png' alt='Carlota Marto GitHub' style='width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0;'/>
+                  <div>
+                    <div style='font-weight:700; font-size:14px;'>Carlota Marto</div>
+                    <div style='font-size:12px; color:#7a6454;'>20241729</div>
+                  </div>
+                </a>
+                <a href='https://github.com/Franciscaveigateixeira' target='_blank' rel='noreferrer noopener' style='display:flex; gap:12px; align-items:center; text-decoration:none; color:#3f2d22; cursor:pointer; padding:10px 12px; border-radius:18px; background:rgba(255,255,255,0.75);'>
+                  <img src='https://github.com/Franciscaveigateixeira.png' alt='Francisca Teixeira GitHub' style='width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0;'/>
+                  <div>
+                    <div style='font-weight:700; font-size:14px;'>Francisca Teixeira</div>
+                    <div style='font-size:12px; color:#7a6454;'>20241702</div>
+                  </div>
+                </a>
+                <a href='https://github.com/Gouveia316' target='_blank' rel='noreferrer noopener' style='display:flex; gap:12px; align-items:center; text-decoration:none; color:#3f2d22; cursor:pointer; padding:10px 12px; border-radius:18px; background:rgba(255,255,255,0.75);'>
+                  <img src='https://github.com/Gouveia316.png' alt='Pedro GitHub' style='width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0;'/>
+                  <div>
+                    <div style='font-weight:700; font-size:14px;'>Pedro Gouveia</div>
+                    <div style='font-size:12px; color:#7a6454;'>20231657</div>
+                  </div>
+                </a>
               </div>
             </div>
             <div>
-              <div style='text-transform:uppercase; font-size:12px; letter-spacing:0.22em; color:#7a6454; margin-bottom:14px;'>Teacher</div>
-              <div style='font-weight:700; color:#3f2d22; margin-bottom:6px;'>Ivo Bernardo</div>
-              <div style='color:#7a6454;'>Machine Learning II</div>
+              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.24em; color:#7a6454; margin-bottom:10px;'>Teacher</div>
+              <div style='font-weight:700; color:#3f2d22; margin-bottom:6px; font-size:14px;'>Ivo Bernardo</div>
+              <div style='color:#7a6454; font-size:13px;'>Machine Learning II</div>
             </div>
             <div>
-              <div style='text-transform:uppercase; font-size:12px; letter-spacing:0.22em; color:#7a6454; margin-bottom:14px;'>Note</div>
-              <p style='color:#3f2d22; line-height:1.8; margin:0;'>This project is optimized for executive-level business intelligence and strategic decision making.</p>
+              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.24em; color:#7a6454; margin-bottom:10px;'>Note</div>
+              <p style='color:#3f2d22; line-height:1.6; margin:0; font-size:14px;'>This project is optimized for executive-level business intelligence and strategic decision making.</p>
             </div>
           </div>
         </div>
@@ -117,51 +181,113 @@ def render_footer():
     )
 
 if page == "Introduction":
-    col1, col2 = st.columns([1.3, 1])
-    with col1:
-        st.markdown("""
-        <div style='font-family:Garamond,serif; color:#3f2d22; font-size:66px; line-height:0.94; font-weight:700;'>
-            Understand every customer.
-            <br>
-            Grow with purpose.
+    image_file = BASE_DIR / "initial.png"
+    st.image(image_file, width=420)
+    st.markdown("""
+        <div style='font-family:Garamond,serif; color:#3b2720; font-size:46px; line-height:1.05; font-weight:700; margin-top:22px;'>
+            Welcome to the customer segmentation project.
         </div>
-        <p style='font-size:18px; color:#5f4635; max-width:660px; margin-top:18px;'>
-            We turn data into human understanding so you can build stronger relationships, create relevant experiences, and drive sustainable growth.
-        </p>
+        <div style='font-size:18px; color:#5f4635; max-width:720px; margin-top:16px; line-height:1.65;'>
+            This dashboard brings together preprocessing and clustering workflows from the notebooks. It uses customer purchase, demographic and behavior data to build cleaner datasets, create rich customer features, and identify practical segments for marketing and loyalty strategy.
+        </div>
+        <div style='font-size:18px; color:#5f4635; max-width:720px; margin-top:16px; line-height:1.65;'>
+            Explore how the data was prepared, how customer profiles were calculated, and how clustering produced seven actionable customer groups with distinct spend and loyalty patterns.
+        </div>
+        <div style='font-size:18px; color:#5f4635; max-width:720px; margin-top:16px; line-height:1.65;'>
+            The analytics in this dashboard are designed to support targeted campaigns, optimized promotions, and stronger operational decisions.
+        </div>
+        <div style='margin-top:26px; max-width:720px; display:grid; row-gap:24px; color:#3b2720;'>
+            <div style='padding:18px 20px; background:#fff6f1; border-radius:20px; border:1px solid rgba(205,93,57,0.14);'>
+                <div style='font-size:36px; font-weight:700; line-height:1;'>7</div>
+                <div style='font-size:14px; color:#7a6454; margin-top:8px;'>segments identified</div>
+            </div>
+            <div style='padding:18px 20px; background:#fff6f1; border-radius:20px; border:1px solid rgba(205,93,57,0.14);'>
+                <div style='font-size:36px; font-weight:700; line-height:1;'>34,060</div>
+                <div style='font-size:14px; color:#7a6454; margin-top:8px;'>customers analyzed</div>
+            </div>
+            <div style='padding:18px 20px; background:#fff6f1; border-radius:20px; border:1px solid rgba(205,93,57,0.14);'>
+                <div style='font-size:36px; font-weight:700; line-height:1;'>100,000</div>
+                <div style='font-size:14px; color:#7a6454; margin-top:8px;'>purchase records</div>
+            </div>
+        </div>
         """,
         unsafe_allow_html=True,
-        )
-        st.markdown(
-            "<button style='padding: 14px 32px; font-weight:700; font-size:14px; background:#c94f38; color:#ffffff; border:none; border-radius:999px;'>Explore your communities</button>",
-            unsafe_allow_html=True,
-        )
-    with col2:
-        st.markdown(
-            """
-            <div style='position:relative; min-height:320px; border-radius:30px; background:linear-gradient(180deg,#f3e6dc 0%,#fef6ef 100%); padding:28px;'>
-                <div style='position:absolute; top:22px; right:22px; width:120px; height:120px; border-radius:50%; background:rgba(201,79,56,0.18);'></div>
-                <div style='position:absolute; bottom:24px; left:24px; width:140px; height:140px; border-radius:50%; background:rgba(183,123,69,0.14);'></div>
-                <div style='position:absolute; top:100px; left:70px; width:108px; height:108px; border-radius:28px; background:#c94f38;'></div>
-                <div style='position:absolute; top:152px; right:86px; width:78px; height:78px; border-radius:28px; background:#b77b45;'></div>
-                <div style='position:absolute; bottom:70px; right:40px; width:96px; height:96px; border-radius:28px; background:#8c6f53;'></div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        st.write("\n")
-        st.markdown(
-            "<div style='display:grid; grid-template-columns:1fr 1fr; gap:16px;'>"
-            "<div style='padding:20px; border-radius:24px; background:#fff8f2; border:1px solid rgba(111,79,53,0.14);'>"
-            "<div style='font-size:28px; font-weight:700; color:#3f2d22;'>34,060</div>"
-            "<div style='color:#7a6454; margin-top:6px;'>customers analyzed</div>"
-            "</div>"
-            "<div style='padding:20px; border-radius:24px; background:#fff8f2; border:1px solid rgba(111,79,53,0.14);'>"
-            "<div style='font-size:28px; font-weight:700; color:#3f2d22;'>7</div>"
-            "<div style='color:#7a6454; margin-top:6px;'>communities discovered</div>"
-            "</div>"
-            "</div>",
-            unsafe_allow_html=True,
-        )
+    )
+
+elif page == "Data analysis":
+    st.title("Data analysis")
+    st.markdown("""
+        <div style='max-width:1000px;'>
+          <p style='font-size:18px; color:#5f4635; line-height:1.75;'>This section presents initial dataset analysis from the notebooks. It focuses on customer profile characteristics, purchase behavior, and early data quality insights before any clustering is applied.</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # Load dataset files
+    customer_info = pd.read_csv(BASE_DIR / "datasets" / "customer_info.csv")
+    customer_basket = pd.read_csv(BASE_DIR / "datasets" / "customer_basket.csv")
+
+    total_customers = len(customer_info)
+    total_invoices = len(customer_basket)
+    avg_promo = customer_info["percentage_of_products_bought_promotion"].mean() * 100
+    median_products = customer_info["lifetime_total_distinct_products"].median()
+    avg_groceries = customer_info["lifetime_spend_groceries"].mean()
+    avg_electronics = customer_info["lifetime_spend_electronics"].mean()
+
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Customers", f"{total_customers:,}")
+    col2.metric("Invoices", f"{total_invoices:,}")
+    col3.metric("Median distinct products", f"{median_products:,}")
+    col4.metric("Avg. promo share", f"{avg_promo:.1f}%")
+
+    st.markdown("---")
+
+    gender_counts = customer_info["customer_gender"].value_counts().reset_index()
+    gender_counts.columns = ["customer_gender", "count"]
+    gender_chart = alt.Chart(gender_counts).mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6, color="#c2410c").encode(
+        x=alt.X("customer_gender:N", title="Gender"),
+        y=alt.Y("count:Q", title="Customers"),
+        tooltip=["customer_gender", "count"]
+    ).properties(height=320)
+
+    promo_chart = alt.Chart(customer_info).mark_bar(color="#ea580c", opacity=0.8).encode(
+        x=alt.X("percentage_of_products_bought_promotion:Q", bin=alt.Bin(maxbins=20), title="Promotion purchase ratio"),
+        y=alt.Y("count():Q", title="Customers"),
+        tooltip=[alt.Tooltip("count():Q", title="Customers")]
+    ).properties(height=320)
+
+    spend_categories = customer_info[["lifetime_spend_groceries", "lifetime_spend_electronics", "lifetime_spend_vegetables", "lifetime_spend_nonalcohol_drinks"]].mean().reset_index()
+    spend_categories.columns = ["category", "average_spend"]
+    spend_categories["category"] = spend_categories["category"].str.replace("lifetime_spend_", "", regex=False).str.replace("_", " ")
+    spend_chart = alt.Chart(spend_categories).mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+        x=alt.X("category:N", title="Spend category", sort="-y"),
+        y=alt.Y("average_spend:Q", title="Average spend"),
+        color=alt.Color("category:N", legend=None, scale=alt.Scale(range=["#f97316", "#fb923c", "#f59e0b", "#facc15"])),
+        tooltip=["category", alt.Tooltip("average_spend:Q", format=",.2f")]
+    ).properties(height=360)
+
+    st.subheader("Initial dataset profile")
+    c1, c2 = st.columns(2)
+    c1.subheader("Gender distribution")
+    c1.altair_chart(gender_chart, use_container_width=True)
+    c2.subheader("Promotion purchase ratio")
+    c2.altair_chart(promo_chart, use_container_width=True)
+
+    st.markdown("### Average spend per category")
+    st.altair_chart(spend_chart, use_container_width=True)
+
+    st.markdown("""
+        <div style='padding: 24px; border-radius: 24px; background: #fff4ed; border: 1px solid rgba(209,115,70,0.18);'>
+          <h3 style='font-family:Garamond,serif; color:#3f2d22; margin-bottom:12px;'>Key insights from the initial dataset review</h3>
+          <ul style='color:#5f4635; line-height:1.85; margin-left:18px;'>
+            <li>The dataset includes <strong>33,038 customers</strong> and <strong>100,000 purchase invoices</strong>, based on the raw customer profile and basket data.</li>
+            <li>Gender balance is nearly even, which supports representative customer profiling.</li>
+            <li>Average promotion-driven purchases are around <strong>32%</strong>, highlighting early signs of promotional sensitivity.</li>
+            <li>Groceries are the largest spend category, followed by electronics, vegetables, and non-alcoholic drinks.</li>
+            <li>This analysis is intentionally preliminary and reflects the data before applying any segmentation or clustering.</li>
+          </ul>
+        </div>
+    """,
+    unsafe_allow_html=True)
 
 elif page == "Data preprocessing":
     st.markdown("""
@@ -179,8 +305,8 @@ elif page == "Data preprocessing":
         unsafe_allow_html=True,
     )
 
-elif page == "Communities":
-    st.title("Your 7 customer communities")
+elif page == "Customer segmentation and clustering":
+    st.title("Customer segmentation and clustering")
     st.markdown("Segmentation categories extracted from the preprocessing and clustering-ready dataset.")
     cards = [
         ("Students", "23% · 7,821 customers", "Young, price-sensitive and promotion-driven."),
@@ -203,28 +329,16 @@ elif page == "Communities":
                 unsafe_allow_html=True,
             )
 
-elif page == "People":
-    st.title("People")
-    st.write("Content is based on notebook preprocessing and is reserved for future dataset insights.")
+elif page == "Targeter promotion":
+    st.title("Targeter promotion")
+    st.write("Promotions targeting content will be added here once the campaign rules and segment mapping are ready.")
 
-elif page == "Behaviors":
-    st.title("Behaviors")
-    st.write("Behavioral insights are not yet available in this notebook.")
-
-elif page == "Opportunities":
-    st.title("Opportunities")
-    st.write("Opportunity analysis is currently blank until notebook data is added.")
-
-elif page == "Campaigns":
-    st.title("Campaigns")
-    st.write("Campaign insights will be added once the dataset is expanded.")
-
-elif page == "Signals":
-    st.title("Signals")
-    st.write("Signals are not present in the current preprocessing notebook.")
+elif page == "Conclusion and recommendations":
+    st.title("Conclusion and recommendations")
+    st.write("This page is reserved for the final summary, strategic takeaways, and future recommendations.")
 
 else:
-    st.title("Data sources")
-    st.write("Data source details are blank because the notebook only includes preprocessing summary.")
+    st.title("Page not found")
+    st.write("The selected page is not available. Please choose a valid option from the sidebar.")
 
 render_footer()
