@@ -13,53 +13,67 @@ if INITIAL_BG_PATH.exists():
         data = base64.b64encode(img_file.read()).decode("utf-8")
         INITIAL_BG_URI = f"data:image/png;base64,{data}"
 
+# Car image logic removed
+
 st.set_page_config(page_title="Costumer Segmentation Project", layout="wide")
 
-css = f"""
+css = """
 <style>
+html {
+    background-color: #f7f1ec !important;
+}
 body {
-    background: #ffffff;
+    background-color: transparent !important;
     color: #3b2720;
     font-family: 'Inter', 'Segoe UI', sans-serif;
-    background-image:
-      url('{INITIAL_BG_URI}'),
-      radial-gradient(circle at 30% 20%, rgba(255,255,255,0.18), transparent 20%),
-      radial-gradient(circle at 70% 10%, rgba(248, 225, 200, 0.18), transparent 22%),
-      linear-gradient(180deg, rgba(247,241,236,0.9), rgba(255,255,255,0.98));
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-attachment: fixed;
+}
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      linear-gradient(180deg, rgba(247, 241, 236, 0.35), rgba(247, 241, 236, 0.55)),
+      url('{INITIAL_BG_URI}') no-repeat center center;
     background-size: cover;
+    filter: saturate(35%) contrast(98%);
+    opacity: 0.9;
+    z-index: -1;
+    pointer-events: none;
+}
+.stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"], [data-testid="stMainContainer"], [data-testid="stAppViewBlockContainer"], main, .main, div.block-container {
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
 }
 section[role="main"] {
     padding-top: 90px !important;
-}
-main, .main, div.block-container {
-    padding-top: 90px !important;
-    background: rgba(255,255,255,0.86) !important;
-    backdrop-filter: blur(10px);
 }
 header, header[role="banner"], div[data-testid="stToolbar"] {
     position: relative !important;
     width: 100% !important;
     z-index: 50 !important;
-    background: #ffffff !important;
-    box-shadow: 0 2px 25px rgba(0,0,0,0.08) !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(8px) !important;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.05) !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
 }
 [data-testid="stSidebar"] {
-    background: rgba(255,255,255,0.94);
+    background: rgba(255, 255, 255, 0.92) !important;
     min-width: 340px;
     max-width: 420px;
     position: relative;
-    border-right: 1px solid rgba(205,93,57,0.12);
+    border-right: 1px solid rgba(226, 232, 240, 0.8) !important;
     backdrop-filter: blur(14px);
 }
 button[title*="sidebar"], button[aria-label*="sidebar"] {
     background: #ffffff !important;
-    color: #3b2720 !important;
-    border: 1px solid rgba(205,93,57,0.28) !important;
+    color: #0f172a !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
     border-radius: 999px !important;
-    box-shadow: 0 16px 30px -22px rgba(0, 0, 0, 0.24) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04) !important;
     position: fixed !important;
     top: 22px !important;
     left: 24px !important;
@@ -68,96 +82,112 @@ button[title*="sidebar"], button[aria-label*="sidebar"] {
     padding: 10px 14px !important;
 }
 button[title*="sidebar"]:hover, button[aria-label*="sidebar"]:hover {
-    background: #ffd6b8 !important;
+    background: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
 }
 .css-1d391kg {
-    background-color: #fff2e7;
+    background-color: #f1f5f9;
 }
 .stButton>button {
-    background-color: #e6513b;
-    color: white;
-    border-radius: 999px;
-    border: none;
+    background-color: #ea580c !important;
+    color: white !important;
+    border-radius: 8px !important;
+    border: none !important;
+    font-weight: 600 !important;
+    transition: background-color 0.2s ease, transform 0.1s ease !important;
+}
+.stButton>button:hover {
+    background-color: #f97316 !important;
+    transform: translateY(-1px);
 }
 .st-bb {
-    border-radius: 24px;
+    border-radius: 12px;
 }
-.stSidebarNav label,
-div[role="radiogroup"] label {
-    font-size: 32px;
+.stSidebarNav label {
+    font-size: 14px;
     font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #64748b;
+}
+div[role="radiogroup"] label {
+    font-size: 16px !important;
+    font-weight: 600 !important;
     line-height: 1.3;
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: keep-all;
-    letter-spacing: 0.01em;
-}
-.stSidebarNav label span {
-    font-size: 32px;
+    letter-spacing: -0.01em;
 }
 .stAppViewContainer, .main > div, div.block-container {
     max-width: 100% !important;
     width: 100% !important;
 }
-div.block-container {
+div.block-container, [data-testid="stAppViewBlockContainer"] {
     padding-left: 2rem !important;
     padding-right: 2rem !important;
     padding-top: 0 !important;
-    background: rgba(255,255,255,0.8) !important;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.04);
-    border-radius: 26px;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
 }
 .stMarkdown, .stText, .css-1d391kg {
-    color: #402b22;
+    color: #1e293b;
 }
 div[data-testid="stImage"] img {
-    border-radius: 28px;
-    filter: saturate(1.12) contrast(1.08);
+    border-radius: 12px;
+    filter: saturate(1.05) contrast(1.05);
 }
 div[data-testid="stImage"] {
-    border: 1px solid rgba(205,93,57,0.18);
-    padding: 12px;
-    border-radius: 28px;
-    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 8px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
 }
 div[role="radiogroup"] label {
-    background: rgba(255, 239, 227, 0.98);
-    padding: 18px 16px;
-    border-radius: 22px;
-    border: 1px solid rgba(205,93,57,0.18);
+    background: rgba(255, 255, 255, 0.6) !important;
+    padding: 12px 16px !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    transition: all 0.2s ease !important;
+}
+div[role="radiogroup"] label:hover {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-color: #ea580c !important;
 }
 .page-shell {
-    background: #ffffff;
-    border-radius: 28px;
-    padding: 32px;
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.06);
-    margin-bottom: 36px;
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+    margin-bottom: 28px;
 }
 .page-title-box {
-    display: inline-flex;
-    align-items: center;
-    width: calc(100% + 4rem);
-    max-width: none;
-    margin-left: -2rem;
-    margin-right: -2rem;
-    background: #f8e6d5;
-    color: #3b2720;
-    border: 1px solid rgba(163,78,35,0.18);
-    box-shadow: 0 18px 40px rgba(0,0,0,0.06);
-    border-radius: 24px;
-    padding: 28px 38px;
-    box-sizing: border-box;
-    font-size: 52px;
-    font-weight: 800;
-    margin-bottom: 36px;
-    letter-spacing: -0.03em;
     display: block;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    color: #0f172a;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-left: 6px solid #ea580c;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    border-radius: 12px;
+    padding: 16px 24px;
+    box-sizing: border-box;
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
 }
 .page-text {
-    color: #5f4635;
-    line-height: 1.85;
+    color: #334155;
+    line-height: 1.75;
     text-align: justify;
-    font-size: 18px;
+    font-size: 16px;
 }
 .page-next {
     margin-top: 32px;
@@ -184,23 +214,24 @@ div[role="radiogroup"] label {
     transition: color 0.2s ease, transform 0.2s ease;
 }
 .sidebar-item .sidebar-link:hover {
-    color: #93350f;
+    color: #ea580c;
     transform: translateX(2px);
 }
 .sidebar-item.active .sidebar-link {
-    color: #a34e23;
-    background: rgba(163,78,35,0.22);
-    border-radius: 14px;
-    padding: 10px 14px;
-    font-weight: 700;
+    color: #ea580c !important;
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    font-weight: 800 !important;
+    text-decoration: underline !important;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 3px;
     pointer-events: none;
     cursor: default;
-    border-left: 4px solid #a34e23;
 }
 .sidebar-item.active .sidebar-link::before {
-    content: "➤";
-    margin-right: 10px;
-    color: #a34e23;
+    content: "" !important;
+    margin: 0 !important;
 }
 .section-anchor {
     display: block;
@@ -209,7 +240,7 @@ div[role="radiogroup"] label {
     visibility: hidden;
 }
 </style>
-"""
+""".replace('{INITIAL_BG_URI}', INITIAL_BG_URI)
 
 st.markdown(css, unsafe_allow_html=True)
 
@@ -231,89 +262,115 @@ st.sidebar.markdown(
 )
 
 js_script = """
-<script>
-(function() {
+<img src="x" onerror="(function() {
   const SECTION_IDS = ['introduction', 'data-analysis', 'data-preprocessing', 'data-in-geography', 'customer-segmentation', 'targeter-promotion', 'conclusion'];
   const activateLink = id => {
     document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
-    const target = document.querySelector(`.sidebar-item[data-section="${id}"]`);
+    const target = document.querySelector(`.sidebar-item[data-section='${id}']`);
     if (target) target.classList.add('active');
   };
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        activateLink(entry.target.id);
-      }
-    });
-  }, {root: null, rootMargin: '-40% 0px -55% 0px', threshold: 0});
-  const init = () => {
+
+  let observer;
+  const setupObserver = () => {
+    if (observer) observer.disconnect();
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          activateLink(entry.target.id);
+        }
+      });
+    }, {root: null, rootMargin: '-40% 0px -55% 0px', threshold: 0});
+
     SECTION_IDS.forEach(id => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
-    if (window.location.hash) {
-      activateLink(window.location.hash.slice(1));
-    }
   };
-  const waitForSections = () => {
-    const ready = SECTION_IDS.every(id => document.getElementById(id));
+
+  const setupClickListeners = () => {
+    const items = document.querySelectorAll('.sidebar-item');
+    items.forEach(item => {
+      const link = item.querySelector('.sidebar-link');
+      if (link) {
+        link.style.cursor = 'pointer';
+        item.onclick = (e) => {
+          e.preventDefault();
+          const sectionId = item.getAttribute('data-section');
+          const el = document.getElementById(sectionId);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+            activateLink(sectionId);
+          }
+        };
+      }
+    });
+  };
+
+  const runSetup = () => {
+    const ready = SECTION_IDS.every(id => document.getElementById(id)) && document.querySelector('.sidebar-item');
     if (ready) {
-      init();
-    } else {
-      window.setTimeout(waitForSections, 200);
+      setupObserver();
+      setupClickListeners();
+      if (window.location.hash) {
+        activateLink(window.location.hash.slice(1));
+      }
     }
   };
-  waitForSections();
-  window.addEventListener('hashchange', () => {
-    activateLink(window.location.hash.slice(1));
-  });
-})();
-</script>
+
+  if (!window.hasSetupSidebarObserver) {
+    window.hasSetupSidebarObserver = true;
+    const mutObserver = new MutationObserver(() => {
+      runSetup();
+    });
+    mutObserver.observe(document.body, { childList: true, subtree: true });
+    runSetup();
+  }
+})()"/>
 """
 
 def render_footer():
     st.markdown(
         """
-        <div style='margin:48px auto 0; padding:22px; border-radius:28px; max-width:1080px; background:#fff9f5; border:1px solid rgba(111,79,53,0.12);'>
+        <div style='margin:48px auto 0; padding:24px; border-radius:16px; max-width:1080px; background:rgba(255,255,255,0.7); border:1px solid rgba(226,232,240,0.8); backdrop-filter:blur(10px); font-family:"Inter", sans-serif;'>
           <div style='display:grid; grid-template-columns:repeat(4, minmax(180px, 1fr)); gap:18px; align-items:start;'>
             <div>
-              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.24em; color:#7a6454; margin-bottom:10px;'>Navigation</div>
-              <p style='color:#3f2d22; margin:0; line-height:1.6; font-size:14px;'>Use the navigation bar on the left side of the screen.</p>
+              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.15em; color:#64748b; margin-bottom:10px; font-weight:700;'>Navigation</div>
+              <p style='color:#475569; margin:0; line-height:1.6; font-size:14px;'>Use the navigation bar on the left side of the screen.</p>
             </div>
             <div>
-              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.24em; color:#7a6454; margin-bottom:10px;'>Work done by</div>
+              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.15em; color:#64748b; margin-bottom:10px; font-weight:700;'>Work done by</div>
               <div style='display:grid; gap:10px;'>
-                <a href='https://github.com/CarlotaMarto' target='_blank' rel='noreferrer noopener' style='display:flex; gap:12px; align-items:center; text-decoration:none; color:#3f2d22; cursor:pointer; padding:10px 12px; border-radius:18px; background:rgba(255,255,255,0.75);'>
+                <a href='https://github.com/CarlotaMarto' target='_blank' rel='noreferrer noopener' style='display:flex; gap:12px; align-items:center; text-decoration:none; color:#0f172a; cursor:pointer; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,0.8); border:1px solid rgba(226,232,240,0.5);'>
                   <img src='https://github.com/CarlotaMarto.png' alt='Carlota Marto GitHub' style='width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0;'/>
                   <div>
                     <div style='font-weight:700; font-size:14px;'>Carlota Marto</div>
-                    <div style='font-size:12px; color:#7a6454;'>20241729</div>
+                    <div style='font-size:12px; color:#64748b;'>20241729</div>
                   </div>
                 </a>
-                <a href='https://github.com/Franciscaveigateixeira' target='_blank' rel='noreferrer noopener' style='display:flex; gap:12px; align-items:center; text-decoration:none; color:#3f2d22; cursor:pointer; padding:10px 12px; border-radius:18px; background:rgba(255,255,255,0.75);'>
+                <a href='https://github.com/Franciscaveigateixeira' target='_blank' rel='noreferrer noopener' style='display:flex; gap:12px; align-items:center; text-decoration:none; color:#0f172a; cursor:pointer; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,0.8); border:1px solid rgba(226,232,240,0.5);'>
                   <img src='https://github.com/Franciscaveigateixeira.png' alt='Francisca Teixeira GitHub' style='width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0;'/>
                   <div>
                     <div style='font-weight:700; font-size:14px;'>Francisca Teixeira</div>
-                    <div style='font-size:12px; color:#7a6454;'>20241702</div>
+                    <div style='font-size:12px; color:#64748b;'>20241702</div>
                   </div>
                 </a>
-                <a href='https://github.com/Gouveia316' target='_blank' rel='noreferrer noopener' style='display:flex; gap:12px; align-items:center; text-decoration:none; color:#3f2d22; cursor:pointer; padding:10px 12px; border-radius:18px; background:rgba(255,255,255,0.75);'>
+                <a href='https://github.com/Gouveia316' target='_blank' rel='noreferrer noopener' style='display:flex; gap:12px; align-items:center; text-decoration:none; color:#0f172a; cursor:pointer; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,0.8); border:1px solid rgba(226,232,240,0.5);'>
                   <img src='https://github.com/Gouveia316.png' alt='Pedro GitHub' style='width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0;'/>
                   <div>
                     <div style='font-weight:700; font-size:14px;'>Pedro Gouveia</div>
-                    <div style='font-size:12px; color:#7a6454;'>20231657</div>
+                    <div style='font-size:12px; color:#64748b;'>20231657</div>
                   </div>
                 </a>
               </div>
             </div>
             <div>
-              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.24em; color:#7a6454; margin-bottom:10px;'>Teacher</div>
-              <div style='font-weight:700; color:#3f2d22; margin-bottom:6px; font-size:14px;'>Ivo Bernardo</div>
-              <div style='color:#7a6454; font-size:13px;'>Machine Learning II</div>
+              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.15em; color:#64748b; margin-bottom:10px; font-weight:700;'>Teacher</div>
+              <div style='font-weight:700; color:#0f172a; margin-bottom:6px; font-size:14px;'>Ivo Bernardo</div>
+              <div style='color:#64748b; font-size:13px;'>Machine Learning II</div>
             </div>
             <div>
-              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.24em; color:#7a6454; margin-bottom:10px;'>Note</div>
-              <p style='color:#3f2d22; line-height:1.6; margin:0; font-size:14px;'>This project is optimized for executive-level business intelligence and strategic decision making.</p>
+              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.15em; color:#64748b; margin-bottom:10px; font-weight:700;'>Note</div>
+              <p style='color:#475569; line-height:1.6; margin:0; font-size:14px;'>This project is optimized for executive-level business intelligence and strategic decision making.</p>
             </div>
           </div>
         </div>
@@ -324,19 +381,15 @@ def render_footer():
 st.markdown("<div class='page-title-box'>Customer Segmentation Project</div>", unsafe_allow_html=True)
 st.markdown("<a id='introduction' class='section-anchor'></a>", unsafe_allow_html=True)
 st.markdown("<div class='page-title-box'>Introduction</div>", unsafe_allow_html=True)
-col1, col2 = st.columns([1, 1])
-with col1:
-    st.image(BASE_DIR / "imagens" / "initial.png", width=520)
-with col2:
-    st.markdown("""
-    <div class='page-shell'>
-      <div class='page-text'>
-        <p>This introduction presents the customer segmentation project overview, combining initial analysis, data cleaning, and geographic insights. The goal is to show how each step contributes to a cleaner dataset, a stronger customer profile, and useful business segmentation.</p>
-        <p>The report brings together exploratory analysis, preprocessing, and geographic investigation, with clear charts and maps that highlight real customer patterns.</p>
-        <p>The left navigation takes you directly to each section, while the content remains on a single continuous page.</p>
-      </div>
-    </div>
-    """, unsafe_allow_html=True)
+st.markdown("""
+<div class='page-shell'>
+  <div class='page-text'>
+    <p>This introduction presents the customer segmentation project overview, combining initial analysis, data cleaning, and geographic insights. The goal is to show how each step contributes to a cleaner dataset, a stronger customer profile, and useful business segmentation.</p>
+    <p>The report brings together exploratory analysis, preprocessing, and geographic investigation, with clear charts and maps that highlight real customer patterns.</p>
+    <p>The left navigation takes you directly to each section, while the content remains on a single continuous page.</p>
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("<a id='data-analysis' class='section-anchor'></a>", unsafe_allow_html=True)
 st.markdown("<div class='page-title-box'>Data analysis</div>", unsafe_allow_html=True)
@@ -401,9 +454,9 @@ st.markdown("### Average spend per category")
 st.altair_chart(spend_chart, width=1080)
 
 st.markdown("""
-    <div style='padding: 24px; border-radius: 24px; background: #fff4ed; border: 1px solid rgba(209,115,70,0.18);'>
-      <h3 style='font-family:Garamond,serif; color:#3f2d22; margin-bottom:12px;'>Key insights from the initial dataset review</h3>
-      <ul style='color:#5f4635; line-height:1.85; margin-left:18px;'>
+    <div style='padding: 24px; border-radius: 16px; background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(226, 232, 240, 0.8); border-left: 4px solid #ea580c; backdrop-filter: blur(10px);'>
+      <h3 style='font-family:"Inter", sans-serif; color:#0f172a; margin-bottom:12px; font-weight:700; font-size:20px;'>Key insights from the initial dataset review</h3>
+      <ul style='color:#334155; line-height:1.8; margin-left:18px; font-family:"Inter", sans-serif;'>
         <li>The dataset includes <strong>33,038 customers</strong> and <strong>100,000 purchase invoices</strong>, based on the raw customer profile and basket data.</li>
         <li>Gender balance is nearly even, which supports representative customer profiling.</li>
         <li>Average promotion-driven purchases are around <strong>32%</strong>, highlighting early signs of promotional sensitivity.</li>
@@ -466,9 +519,9 @@ st.markdown("### Distinct products after cleaning")
 st.altair_chart(box_chart, width=1080)
 
 st.markdown("""
-    <div style='padding: 22px; border-radius: 24px; background: #fff4ed; border: 1px solid rgba(209,115,70,0.18);'>
-      <h3 style='font-family:Garamond,serif; color:#3f2d22; margin-bottom:12px;'>Preprocessing conclusions</h3>
-      <ul style='color:#5f4635; line-height:1.85; margin-left:18px;'>
+    <div style='padding: 24px; border-radius: 16px; background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(226, 232, 240, 0.8); border-left: 4px solid #ea580c; backdrop-filter: blur(10px);'>
+      <h3 style='font-family:"Inter", sans-serif; color:#0f172a; margin-bottom:12px; font-weight:700; font-size:20px;'>Preprocessing conclusions</h3>
+      <ul style='color:#334155; line-height:1.8; margin-left:18px; font-family:"Inter", sans-serif;'>
         <li>The data was cleaned while preserving the customer base, applying only logical corrections without abrupt removals.</li>
         <li>Spending and promotion variables remain skewed but are now consistent for modeling.</li>
         <li>Age and promotion fields were prepared to support segmentation and campaign analytics.</li>
@@ -556,9 +609,9 @@ st.subheader("Hotspot profile vs outside")
 st.altair_chart(compare_chart, width=1080)
 
 st.markdown("""
-    <div style='padding: 22px; border-radius: 24px; background: #fff4ed; border: 1px solid rgba(209,115,70,0.18);'>
-      <h3 style='font-family:Garamond,serif; color:#3f2d22; margin-bottom:12px;'>Geography conclusions</h3>
-      <ul style='color:#5f4635; line-height:1.85; margin-left:18px;'>
+    <div style='padding: 24px; border-radius: 16px; background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(226, 232, 240, 0.8); border-left: 4px solid #ea580c; backdrop-filter: blur(10px);'>
+      <h3 style='font-family:"Inter", sans-serif; color:#0f172a; margin-bottom:12px; font-weight:700; font-size:20px;'>Geography conclusions</h3>
+      <ul style='color:#334155; line-height:1.8; margin-left:18px; font-family:"Inter", sans-serif;'>
         <li>The scatter map shows the customer base concentrated along the main urban corridor.</li>
         <li>The density map highlights a high-concentration cluster near a university area.</li>
         <li>Hotspot customers are more likely to make promotional purchases and visit more distinct stores.</li>
