@@ -9,10 +9,46 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib.colors import LinearSegmentedColormap, ListedColormap
 from sklearn.cluster import DBSCAN, KMeans
 from sklearn.impute import KNNImputer
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
+
+PROJECT_PALETTE = [
+    "#B87540",
+    "#B2543D",
+    "#7E6A43",
+    "#A8B7BA",
+    "#D8C0B4",
+    "#C8AB8C",
+    "#5A3516",
+    "#B98F70",
+]
+MAIN_COLOR = "#B87540"
+ACCENT_COLOR = "#B2543D"
+NOTE_COLOR = "#7E6A43"
+SECONDARY_COLOR = "#A8B7BA"
+LIGHT_COLOR = "#F3EEE6"
+DARK_COLOR = "#5A3516"
+
+
+def sequential_cmap():
+    return LinearSegmentedColormap.from_list(
+        "project_sequential",
+        [LIGHT_COLOR, "#C8AB8C", MAIN_COLOR, ACCENT_COLOR, DARK_COLOR],
+    )
+
+
+def diverging_cmap():
+    return LinearSegmentedColormap.from_list(
+        "project_diverging",
+        [ACCENT_COLOR, LIGHT_COLOR, SECONDARY_COLOR],
+    )
+
+
+def cluster_cmap():
+    return ListedColormap(PROJECT_PALETTE)
 
 
 def get_missing_percent(df):
@@ -72,6 +108,59 @@ def get_education_info(row):
             return pd.Series([years, clean_name])
 
     return pd.Series([12, name])
+
+
+def surname_summary(df, name_col="customer_name", top_n=20):
+    """Summarise repeated surnames from the customer name column."""
+    names = df[name_col].dropna().astype(str).str.strip()
+    surnames = names.str.split().str[-1].str.lower()
+    counts = surnames.value_counts()
+    repeated = counts[counts > 1]
+
+    summary = pd.DataFrame(
+        {
+            "total_customers_with_name": [len(names)],
+            "unique_surnames": [surnames.nunique()],
+            "repeated_surnames": [len(repeated)],
+            "customers_with_repeated_surname": [int(repeated.sum())],
+            "share_with_repeated_surname_%": [
+                round(float(repeated.sum() / len(names) * 100), 2)
+            ],
+        }
+    )
+
+    top = (
+        repeated.head(top_n)
+        .rename_axis("surname")
+        .reset_index(name="customers")
+    )
+    return summary, top
+
+
+def surname_location_proxy(df, name_col="customer_name", decimals=4):
+    """Check repeated surnames at approximately the same location."""
+    required = {name_col, "latitude", "longitude"}
+    if not required.issubset(df.columns):
+        missing = ", ".join(sorted(required - set(df.columns)))
+        raise ValueError(f"Missing columns: {missing}")
+
+    temp = df[[name_col, "latitude", "longitude"]].dropna().copy()
+    temp["surname"] = temp[name_col].astype(str).str.strip().str.split().str[-1].str.lower()
+    temp["lat_round"] = temp["latitude"].round(decimals)
+    temp["lon_round"] = temp["longitude"].round(decimals)
+
+    group_sizes = temp.groupby(["surname", "lat_round", "lon_round"]).size()
+    repeated_groups = group_sizes[group_sizes >= 2]
+    return pd.DataFrame(
+        {
+            "rounding_decimals": [decimals],
+            "groups_with_same_surname_location": [len(repeated_groups)],
+            "customers_in_groups": [int(repeated_groups.sum())],
+            "share_of_named_customers_%": [
+                round(float(repeated_groups.sum() / len(temp) * 100), 2)
+            ],
+        }
+    )
 
 
 def apply_cyclic_transformation(df, col, max_val=24):
@@ -477,7 +566,8 @@ def test_scalers_kmeans(
 
 def set_plot_style(figsize=(10, 6)):
     """Apply the visual style used across the preprocessing notebook."""
-    sns.set_theme(style="whitegrid")
+    sns.set_theme(style="whitegrid", palette=PROJECT_PALETTE)
+    sns.set_palette(PROJECT_PALETTE)
     plt.rcParams["figure.figsize"] = figsize
 
 
@@ -491,7 +581,7 @@ def get_column_groups(df):
 def plot_missing_percent(missing_df):
     """Plot missing-value percentages by column."""
     plt.figure(figsize=(10, 6))
-    sns.barplot(x="Missing_Percent", y="Column", data=missing_df)
+    sns.barplot(x="Missing_Percent", y="Column", data=missing_df, color=MAIN_COLOR)
     plt.title("Missing Values Percentage by Column")
     plt.xlabel("Percentage (%)")
     plt.ylabel("Column")
@@ -508,7 +598,7 @@ def numeric_columns_for_eda(df, exclude_cols=None):
     ]
 
 
-def plot_numeric_distributions(df, columns, color="#1B4F72"):
+def plot_numeric_distributions(df, columns, color=MAIN_COLOR):
     """Plot histograms for numerical variables."""
     if not columns:
         print("No numerical columns available for plotting.")
@@ -557,7 +647,7 @@ def plot_numeric_boxplots(df, columns):
     axes = np.ravel(axes)
 
     for i, col in enumerate(columns):
-        sns.boxplot(x=df[col], ax=axes[i])
+        sns.boxplot(x=df[col], ax=axes[i], color=SECONDARY_COLOR)
         axes[i].set_title(f"{col} boxplot")
 
     for j in range(i + 1, len(axes)):
@@ -602,7 +692,7 @@ def coerce_numeric_columns(df, columns):
 def plot_cyclic_hour(df):
     """Plot the sine/cosine representation of the typical purchase hour."""
     plt.figure(figsize=(6, 6))
-    plt.scatter(df["typical_hour_sin"], df["typical_hour_cos"])
+    plt.scatter(df["typical_hour_sin"], df["typical_hour_cos"], color=MAIN_COLOR, alpha=0.75)
     plt.title("Typical Hour Representation")
     plt.xlabel("sin")
     plt.ylabel("cos")
@@ -649,7 +739,7 @@ def add_customer_age(df, current_date=None, birthdate_col="customer_birthdate"):
 def plot_age_distribution(df):
     """Plot the customer age distribution."""
     plt.figure(figsize=(8, 4))
-    sns.histplot(df["customer_age"], kde=True)
+    sns.histplot(df["customer_age"], kde=True, color=MAIN_COLOR)
     plt.title("Customer Age Distribution")
     plt.tight_layout()
     plt.show()
@@ -708,7 +798,7 @@ def make_absolute_spend_view(df):
     return out[selected_cols]
 
 
-def plot_outlier_diagnostics(df, columns, color="#1B4F72"):
+def plot_outlier_diagnostics(df, columns, color=MAIN_COLOR):
     """Plot boxplot and histogram diagnostics for selected columns."""
     columns = [col for col in columns if col in df.columns]
     if not columns:
@@ -726,8 +816,8 @@ def plot_outlier_diagnostics(df, columns, color="#1B4F72"):
             color=color,
             flierprops={
                 "marker": "o",
-                "markerfacecolor": "red",
-                "markeredgecolor": "red",
+                "markerfacecolor": ACCENT_COLOR,
+                "markeredgecolor": ACCENT_COLOR,
                 "markersize": 5,
                 "alpha": 0.5,
             },
@@ -856,13 +946,13 @@ def export_preprocessing_outputs(regular_df, outlier_df=None, output_dir="../dat
 def plot_missing_heatmap(df, title="Missing Values Heatmap"):
     """Plot a heatmap showing the location of missing values in the dataset."""
     plt.figure(figsize=(10, 5))
-    sns.heatmap(df.isnull(), cbar=False, yticklabels=False, cmap="viridis")
+    sns.heatmap(df.isnull(), cbar=False, yticklabels=False, cmap=sequential_cmap())
     plt.title(title)
     plt.tight_layout()
     plt.show()
 
 
-def cor_heatmap(corr_matrix, color="#1B4F72"):
+def cor_heatmap(corr_matrix, color=MAIN_COLOR):
     """Plot a triangular correlation heatmap."""
     plt.figure(figsize=(20, 15))
 
@@ -1013,7 +1103,7 @@ def plot_hotspot_comparison(hotspot_df, outside_df, cols, title="Hotspot vs outs
 
     height = max(4, 0.45 * len(cols))
     plt.figure(figsize=(10, height))
-    sns.barplot(data=plot_df, y="feature", x="average", hue="area", palette=["#B2543D", "#7E6A43"])
+    sns.barplot(data=plot_df, y="feature", x="average", hue="area", palette=[ACCENT_COLOR, NOTE_COLOR])
     plt.title(title)
     plt.xlabel("Average value")
     plt.ylabel("")
@@ -1035,7 +1125,7 @@ def plot_hotspot_age_distribution(hotspot_df, outside_df, age_col="customer_age"
     })
 
     plt.figure(figsize=(9, 5))
-    sns.barplot(data=plot_df, x="age_band", y="share_%", hue="area", palette=["#B2543D", "#7E6A43"])
+    sns.barplot(data=plot_df, x="age_band", y="share_%", hue="area", palette=[ACCENT_COLOR, NOTE_COLOR])
     plt.title("Age distribution: hotspot vs outside")
     plt.xlabel("Age band")
     plt.ylabel("Share of customers (%)")
@@ -1072,7 +1162,7 @@ def plot_categorical_summary(df, cols):
 
     for ax, col in zip(axes, cols):
         order = df[col].value_counts(dropna=False).index
-        sns.countplot(data=df, x=col, order=order, ax=ax, color="#B77A45")
+        sns.countplot(data=df, x=col, order=order, ax=ax, color=MAIN_COLOR)
         ax.set_title(col)
         ax.set_xlabel("")
         ax.set_ylabel("Customers")
@@ -1100,4 +1190,3 @@ def preprocessing_summary_table(raw_df, regular_df, outlier_df=None, exported_fi
         {"item": "Exported files", "value": ", ".join(exported_files)},
     ]
     return pd.DataFrame(rows)
-
