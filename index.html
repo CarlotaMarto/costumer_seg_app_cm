@@ -15,7 +15,9 @@
       </div>
       <nav class="sidebar-nav">
         <a class="nav-link active" href="#introduction"><span class="nav-icon"></span>Introduction</a>
+        <a class="nav-link" href="#data-analysis"><span class="nav-icon"></span>Data analysis</a>
         <a class="nav-link" href="#data-preprocessing"><span class="nav-icon"></span>Data preprocessing</a>
+        <a class="nav-link" href="#data-geography"><span class="nav-icon"></span>Data In Geography</a>
         <a class="nav-link" href="#communities"><span class="nav-icon"></span>Communities</a>
         <a class="nav-link" href="#people"><span class="nav-icon"></span>People</a>
         <a class="nav-link" href="#behaviors"><span class="nav-icon"></span>Behaviors</a>
@@ -45,7 +47,7 @@
             It summarizes data cleaning, feature engineering, missing values handling, and anomaly detection.
           </p>
           <div class="hero-actions">
-            <button class="primary-btn">Explore insights</button>
+            <a class="primary-btn" href="http://localhost:8501" target="_blank" rel="noopener noreferrer">Open app</a>
             <button class="secondary-btn">View preprocessing</button>
           </div>
         </div>
@@ -70,15 +72,41 @@
         </div>
       </header>
 
+      <section id="data-analysis" class="analysis-panel">
+        <div class="panel-title">Data analysis</div>
+        <div class="data-copy">
+          <p>This section summarizes the raw dataset exploration: shape, data types, missing values, duplicates, categorical distributions and numeric skewness.</p>
+          <ul>
+            <li>Gráficos de distribuição mostram que as variáveis de gasto têm forte assimetria à direita.</li>
+            <li>O relatório de valores em falta identifica features com menos de 30% de ausência, mantendo a base de clientes.</li>
+            <li>A análise de duplicados e de repetição de apelidos valida a qualidade dos registros sem descartar sinais de cluster.</li>
+            <li>O principal insight é que os dados brutos requerem limpeza e categorização antes da modelagem.</li>
+          </ul>
+        </div>
+      </section>
+
       <section id="data-preprocessing" class="data-panel">
         <div class="panel-title">Data preprocessing</div>
         <div class="data-copy">
           <p>This section summarizes the notebook preprocessing workflow: handling invalid dates and negative values, cleaning customer names, engineering customer features, and protecting the dataset for segmentation.</p>
           <ul>
-            <li>Future transaction years are identified and set to <code>NaN</code> instead of dropping rows.</li>
-            <li>Negative promotion percentage values are corrected and invalid identifiers are excluded.</li>
-            <li>Customer names are processed to extract education-level titles while preserving privacy.</li>
-            <li>Outliers and skewed spending patterns are inspected to avoid distortion in clustering.</li>
+            <li>Gráficos: plots de hora cíclica, distribuição de idade, resumos categóricos e boxplots de outliers.</li>
+            <li>Transformações: correção de datas futuras, ajuste de valores negativos e fixação de tipos de dados.</li>
+            <li>Engenharia de atributos: educação, presença de crianças e adolescentes, número de reclamações e visitas distintas.</li>
+            <li>Conclusão: o dataset foi preparado para clustering e exportado como conjunto não escalado para análise posterior.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="data-geography" class="geography-panel">
+        <div class="panel-title">Data In Geography</div>
+        <div class="data-copy">
+          <p>This section uses geographic analysis to map customer location, density, and hotspot behavior.</p>
+          <ul>
+            <li>Mapas: scatter geográfico, mapa interativo de clientes e mapa de densidade hexagonal.</li>
+            <li>O padrão espacial confirma agrupamentos próximos a centros urbanos e à universidade.</li>
+            <li>O hotspot apresenta clientes mais jovens, maior uso de promoções e mais produtos distintos.</li>
+            <li>Este relatório reforça a importância de incluir localização na segmentação.</li>
           </ul>
         </div>
       </section>
