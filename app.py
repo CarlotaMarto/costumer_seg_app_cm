@@ -587,10 +587,9 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# Overview Section Header with Icon
-st.markdown(f"""
-<div style='display: flex; align-items: center; gap: 16px; margin-top: 48px; margin-bottom: 24px;'>
-    <img src='{ICON_INTRO_URI}' style='width: 32px; height: 32px; object-fit: contain;' />
+# Overview Section Header
+st.markdown("""
+<div style='margin-top: 48px; margin-bottom: 24px;'>
     <h2 style='font-size: 28px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.02em;'>Overview</h2>
 </div>
 """, unsafe_allow_html=True)
@@ -606,9 +605,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("<a id='data-analysis' class='section-anchor'></a>", unsafe_allow_html=True)
-st.markdown(f"""
-<div style='display: flex; align-items: center; gap: 16px; margin-top: 48px; margin-bottom: 24px;'>
-    <img src='{ICON_ANALYSIS_URI}' style='width: 32px; height: 32px; object-fit: contain;' />
+st.markdown("""
+<div style='margin-top: 48px; margin-bottom: 24px;'>
     <h2 style='font-size: 28px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.02em;'>Data Analysis</h2>
 </div>
 """, unsafe_allow_html=True)
@@ -694,9 +692,8 @@ st.markdown("""
 unsafe_allow_html=True)
 
 st.markdown("<a id='data-preprocessing' class='section-anchor'></a>", unsafe_allow_html=True)
-st.markdown(f"""
-<div style='display: flex; align-items: center; gap: 16px; margin-top: 48px; margin-bottom: 24px;'>
-    <img src='{ICON_PREPROCESS_URI}' style='width: 32px; height: 32px; object-fit: contain;' />
+st.markdown("""
+<div style='margin-top: 48px; margin-bottom: 24px;'>
     <h2 style='font-size: 28px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.02em;'>Data Preprocessing</h2>
 </div>
 """, unsafe_allow_html=True)
@@ -767,9 +764,8 @@ st.markdown("""
 unsafe_allow_html=True)
 
 st.markdown("<a id='data-in-geography' class='section-anchor'></a>", unsafe_allow_html=True)
-st.markdown(f"""
-<div style='display: flex; align-items: center; gap: 16px; margin-top: 48px; margin-bottom: 24px;'>
-    <img src='{ICON_GEOGRAPHY_URI}' style='width: 32px; height: 32px; object-fit: contain;' />
+st.markdown("""
+<div style='margin-top: 48px; margin-bottom: 24px;'>
     <h2 style='font-size: 28px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.02em;'>Data In Geography</h2>
 </div>
 """, unsafe_allow_html=True)
@@ -862,9 +858,8 @@ st.markdown("""
 unsafe_allow_html=True)
 
 st.markdown("<a id='customer-segmentation' class='section-anchor'></a>", unsafe_allow_html=True)
-st.markdown(f"""
-<div style='display: flex; align-items: center; gap: 16px; margin-top: 48px; margin-bottom: 24px;'>
-    <img src='{ICON_CLUSTERING_URI}' style='width: 32px; height: 32px; object-fit: contain;' />
+st.markdown("""
+<div style='margin-top: 48px; margin-bottom: 24px;'>
     <h2 style='font-size: 28px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.02em;'>Customer Communities</h2>
 </div>
 """, unsafe_allow_html=True)
@@ -1054,9 +1049,8 @@ except Exception as e:
     st.info("Dynamic cluster files not fully loaded. Displaying static mockup.")
 
 st.markdown("<a id='targeter-promotion' class='section-anchor'></a>", unsafe_allow_html=True)
-st.markdown(f"""
-<div style='display: flex; align-items: center; gap: 16px; margin-top: 48px; margin-bottom: 24px;'>
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style='object-fit: contain;'><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+st.markdown("""
+<div style='margin-top: 48px; margin-bottom: 24px;'>
     <h2 style='font-size: 28px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.02em;'>Targeter Promotion</h2>
 </div>
 """, unsafe_allow_html=True)
@@ -1108,9 +1102,8 @@ except Exception as e:
     st.info("No campaign rules CSV found. Add datasets/segment_campaign_rules.csv to enable targeter simulation.")
 
 st.markdown("<a id='conclusion' class='section-anchor'></a>", unsafe_allow_html=True)
-st.markdown(f"""
-<div style='display: flex; align-items: center; gap: 16px; margin-top: 48px; margin-bottom: 24px;'>
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style='object-fit: contain;'><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+st.markdown("""
+<div style='margin-top: 48px; margin-bottom: 24px;'>
     <h2 style='font-size: 28px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.02em;'>Conclusion & Recommendations</h2>
 </div>
 """, unsafe_allow_html=True)
