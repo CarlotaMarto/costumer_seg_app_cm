@@ -275,7 +275,7 @@ js_script = """
   const SECTION_IDS = ['introduction', 'data-analysis', 'data-preprocessing', 'data-in-geography', 'customer-segmentation', 'targeter-promotion', 'conclusion'];
   const activateLink = id => {
     document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
-    const target = document.querySelector(`.sidebar-item[data-section='${id}']`);
+    const target = document.querySelector(".sidebar-item[data-section='" + id + "']");
     if (target) target.classList.add('active');
   };
 
@@ -371,47 +371,51 @@ js_script = """
 def render_footer():
     st.markdown(
         """
-        <div style='margin:48px auto 0; padding:24px; border-radius:16px; max-width:1080px; background:rgba(255,255,255,0.7); border:1px solid rgba(226,232,240,0.8); backdrop-filter:blur(10px); font-family:"Inter", sans-serif;'>
-          <div style='display:grid; grid-template-columns:repeat(4, minmax(180px, 1fr)); gap:18px; align-items:start;'>
+        <div style='margin-top: 60px; font-family:"Plus Jakarta Sans", "Inter", sans-serif;'>
+          <hr style='border: 0; border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 0 0 32px 0;' />
+          <div style='max-width:1080px; margin: 0 auto; display:grid; grid-template-columns:repeat(4, minmax(180px, 1fr)); gap:24px; align-items:start;'>
             <div>
-              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.15em; color:#64748b; margin-bottom:10px; font-weight:700;'>Navigation</div>
-              <p style='color:#475569; margin:0; line-height:1.6; font-size:14px;'>Use the navigation bar on the left side of the screen.</p>
+              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.15em; color:#8c8c8c; margin-bottom:16px; font-weight:700;'>Navigation</div>
+              <p style='color:#3b2720; margin:0; line-height:1.6; font-size:14px;'>Use the navigation bar on the left side of the screen.</p>
             </div>
             <div>
-              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.15em; color:#64748b; margin-bottom:10px; font-weight:700;'>Work done by</div>
-              <div style='display:grid; gap:10px;'>
-                <a href='https://github.com/CarlotaMarto' target='_blank' rel='noreferrer noopener' style='display:flex; gap:12px; align-items:center; text-decoration:none; color:#0f172a; cursor:pointer; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,0.8); border:1px solid rgba(226,232,240,0.5);'>
+              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.15em; color:#8c8c8c; margin-bottom:16px; font-weight:700;'>Work done by</div>
+              <div style='display:grid; gap:12px;'>
+                <a href='https://github.com/CarlotaMarto' target='_blank' rel='noreferrer noopener' style='display:flex; gap:12px; align-items:center; text-decoration:none; color:#0f172a; cursor:pointer; padding:0;'>
                   <img src='https://github.com/CarlotaMarto.png' alt='Carlota Marto GitHub' style='width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0;'/>
                   <div>
-                    <div style='font-weight:700; font-size:14px;'>Carlota Marto</div>
-                    <div style='font-size:12px; color:#64748b;'>20241729</div>
+                    <div style='font-weight:700; font-size:14px; color:#3b2720;'>Carlota Marto</div>
+                    <div style='font-size:12px; color:#8c8c8c;'>20241729</div>
                   </div>
                 </a>
-                <a href='https://github.com/Franciscaveigateixeira' target='_blank' rel='noreferrer noopener' style='display:flex; gap:12px; align-items:center; text-decoration:none; color:#0f172a; cursor:pointer; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,0.8); border:1px solid rgba(226,232,240,0.5);'>
+                <a href='https://github.com/Franciscaveigateixeira' target='_blank' rel='noreferrer noopener' style='display:flex; gap:12px; align-items:center; text-decoration:none; color:#0f172a; cursor:pointer; padding:0;'>
                   <img src='https://github.com/Franciscaveigateixeira.png' alt='Francisca Teixeira GitHub' style='width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0;'/>
                   <div>
-                    <div style='font-weight:700; font-size:14px;'>Francisca Teixeira</div>
-                    <div style='font-size:12px; color:#64748b;'>20241702</div>
+                    <div style='font-weight:700; font-size:14px; color:#3b2720;'>Francisca Teixeira</div>
+                    <div style='font-size:12px; color:#8c8c8c;'>20241702</div>
                   </div>
                 </a>
-                <a href='https://github.com/Gouveia316' target='_blank' rel='noreferrer noopener' style='display:flex; gap:12px; align-items:center; text-decoration:none; color:#0f172a; cursor:pointer; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,0.8); border:1px solid rgba(226,232,240,0.5);'>
+                <a href='https://github.com/Gouveia316' target='_blank' rel='noreferrer noopener' style='display:flex; gap:12px; align-items:center; text-decoration:none; color:#0f172a; cursor:pointer; padding:0;'>
                   <img src='https://github.com/Gouveia316.png' alt='Pedro GitHub' style='width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0;'/>
                   <div>
-                    <div style='font-weight:700; font-size:14px;'>Pedro Gouveia</div>
-                    <div style='font-size:12px; color:#64748b;'>20231657</div>
+                    <div style='font-weight:700; font-size:14px; color:#3b2720;'>Pedro Gouveia</div>
+                    <div style='font-size:12px; color:#8c8c8c;'>20231657</div>
                   </div>
                 </a>
               </div>
             </div>
             <div>
-              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.15em; color:#64748b; margin-bottom:10px; font-weight:700;'>Teacher</div>
-              <div style='font-weight:700; color:#0f172a; margin-bottom:6px; font-size:14px;'>Ivo Bernardo</div>
-              <div style='color:#64748b; font-size:13px;'>Machine Learning II</div>
+              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.15em; color:#8c8c8c; margin-bottom:16px; font-weight:700;'>Teacher</div>
+              <div style='font-weight:700; color:#3b2720; margin-bottom:4px; font-size:14px;'>Ivo Bernardo</div>
+              <div style='color:#8c8c8c; font-size:13px;'>Machine Learning II</div>
             </div>
             <div>
-              <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.15em; color:#64748b; margin-bottom:10px; font-weight:700;'>Note</div>
-              <p style='color:#475569; line-height:1.6; margin:0; font-size:14px;'>This project is optimized for executive-level business intelligence and strategic decision making.</p>
+              <p style='color:#64748b; line-height:1.6; margin:0; font-size:14px; padding-top: 27px;'>This project is optimized for executive-level business intelligence and strategic decision making.</p>
             </div>
+          </div>
+          <div style='background-color: #000000; color: #ffffff; padding: 18px 32px; margin-top: 48px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; box-sizing: border-box;'>
+            <span>&copy; 2026 Customer Segmentation Project - Academic Use Only</span>
+            <span style='color: #a3a3a3;'>Built for Machine Learning II</span>
           </div>
         </div>
         """,
