@@ -28,6 +28,7 @@ ICON_ANALYSIS_URI = load_image_as_base64(IMAGENS_DIR / "icon_analysis.png")
 ICON_PREPROCESS_URI = load_image_as_base64(IMAGENS_DIR / "icon_preprocess.png")
 ICON_GEOGRAPHY_URI = load_image_as_base64(IMAGENS_DIR / "icon_geography.png")
 ICON_CLUSTERING_URI = load_image_as_base64(IMAGENS_DIR / "icon_clustering.png")
+BRAND_ICON_URI = load_image_as_base64(IMAGENS_DIR / "brand_icon.png")
 
 SYMBOL_URIS = [load_image_as_base64(IMAGENS_DIR / f"symbol_{i}.png") for i in range(1, 8)]
 
@@ -358,9 +359,12 @@ div[role="radiogroup"] label:hover {
 st.markdown(css, unsafe_allow_html=True)
 
 st.sidebar.markdown(
-    """
+    f"""
     <div style='padding: 12px 0 18px 0; font-family:"Plus Jakarta Sans", "Inter", sans-serif;'>
-      <div style='font-size:24px; font-weight:800; color:#000000; line-height:1.1; margin-bottom:28px; font-family:"Playfair Display", serif;'>Customer Intelligence</div>
+      <div style='display: flex; align-items: center; gap: 12px; margin-bottom: 28px;'>
+        <img src='{BRAND_ICON_URI}' style='width: 38px; height: 38px; object-fit: contain; border-radius: 8px;' />
+        <div style='font-size: 22px; font-weight: 800; color: #000000; line-height: 1.1; font-family:"Playfair Display", serif;'>Customer Intelligence</div>
+      </div>
       <div style='font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:#8c8c8c; margin-bottom:16px; font-weight:700;'>Section Index</div>
       <div class='sidebar-item' data-section='introduction'>
         <span class='sidebar-link'>
