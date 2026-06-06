@@ -19,13 +19,17 @@ st.set_page_config(page_title="Costumer Segmentation Project", layout="wide")
 
 css = """
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+html, body, [class*="css"], .stApp, p, span, div, h1, h2, h3, h4, h5, h6, li, a, label, button, input {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
 html {
     background-color: #f7f1ec !important;
 }
 body {
     background-color: transparent !important;
     color: #3b2720;
-    font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 body::before {
     content: "";
@@ -251,7 +255,7 @@ st.markdown(css, unsafe_allow_html=True)
 
 st.sidebar.markdown(
     """
-    <div style='padding: 12px 0 18px 0; font-family:Garamond,serif;'>
+    <div style='padding: 12px 0 18px 0; font-family:"Plus Jakarta Sans", "Inter", sans-serif;'>
       <div style='font-size:36px; font-weight:800; color:#3f2d22; line-height:1.05; margin-bottom:18px;'>Customer Segmentation Project</div>
       <div style='font-size:16px; color:#5f4635; margin-bottom:18px;'>Section index</div>
       <div class='sidebar-item' data-section='introduction'><span class='sidebar-link'>Introduction</span></div>
