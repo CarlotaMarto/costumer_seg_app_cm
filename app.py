@@ -76,17 +76,8 @@ header, header[role="banner"], div[data-testid="stToolbar"] {
     position: relative;
     border-right: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
-button[title*="sidebar"], button[aria-label*="sidebar"] {
-    background: #ffffff !important;
-    color: #0f172a !important;
-    border: 1px solid rgba(0, 0, 0, 0.06) !important;
-    border-radius: 999px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
-    position: fixed !important;
-    top: 22px !important;
-    left: 24px !important;
-    transform: none !important;
-    z-index: 100;
+button[title*="sidebar"], button[aria-label*="sidebar"], [data-testid="stSidebarCollapseButton"] {
+    display: none !important;
 }
 .css-1d391kg {
     background-color: #f1f5f9;
@@ -361,6 +352,25 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     display: none !important;
     visibility: hidden !important;
 }
+
+/* Restore Streamlit's native Material Icons */
+.material-icons,
+[class*="material-symbols"],
+[data-testid="stIconMaterial"],
+span[data-testid="stIconMaterial"] {
+    font-family: 'Material Symbols Outlined', 'Material Symbols Rounded', 'Material Symbols Sharp', 'Material Icons' !important;
+}
+
+/* Custom scroll margins for headers with section IDs to account for fixed header */
+#introduction, 
+#data-analysis, 
+#data-preprocessing, 
+#data-in-geography, 
+#customer-segmentation, 
+#targeter-promotion, 
+#conclusion {
+    scroll-margin-top: 100px !important;
+}
 </style>
 """.replace('{INITIAL_BG_URI}', INITIAL_BG_URI)
 
@@ -421,8 +431,9 @@ st.sidebar.markdown(
     unsafe_allow_html=True,
 )
 
+import time
 js_script = """
-<img src="x" onerror="(function() {
+<img src="x?t={TIMESTAMP}" onerror="(function() {
   const SECTION_IDS = ['introduction', 'data-analysis', 'data-preprocessing', 'data-in-geography', 'customer-segmentation', 'targeter-promotion', 'conclusion'];
   
   const activateLink = id => {
@@ -431,90 +442,137 @@ js_script = """
     if (target) target.classList.add('active');
   };
 
-  const handleScroll = (e) => {
-    const mainContainer = document.querySelector('.main') || document.querySelector('[data-testid="stAppViewContainer"]');
-    const scrollContainer = (e && e.target && e.target !== document) ? e.target : (mainContainer || window);
+  const scrollToElement = (el) => {
+    if (!el) return;
     
-    let activeSectionId = SECTION_IDS[0];
-    const containerTop = (mainContainer) ? mainContainer.getBoundingClientRect().top : 0;
-    const threshold = 180; /* Offset in pixels from top */
+    /* Fallback 1: Native scrollIntoView */
+    try {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) {
+      console.error("scrollIntoView failed:", err);
+    }
+    
+    /* Fallback 2: Manual scroll on all possible scrollable containers */
+    const rect = el.getBoundingClientRect();
+    const containers = [
+      document.querySelector('.main'),
+      document.querySelector('[data-testid="stAppViewContainer"]'),
+      document.querySelector('[data-testid="stMain"]'),
+      document.querySelector('.stApp'),
+      document.body,
+      document.documentElement
+    ];
+    
+    containers.forEach(container => {
+      if (container && container.scrollHeight > container.clientHeight) {
+        const currentScroll = container.scrollTop || window.scrollY;
+        const targetScroll = currentScroll + rect.top - 100;
+        try {
+          container.scrollTo({
+            top: targetScroll,
+            behavior: 'smooth'
+          });
+        } catch (err) {
+          container.scrollTop = targetScroll;
+        }
+      }
+    });
+  };
 
+  const handleScroll = () => {
+    let activeSectionId = SECTION_IDS[0];
+    const threshold = 200; /* pixels from the top of the viewport */
+    
+    /* Find which section has crossed the threshold */
     for (const id of SECTION_IDS) {
       const el = document.getElementById(id);
       if (el) {
         const rect = el.getBoundingClientRect();
-        const relativeTop = rect.top - containerTop;
-        if (relativeTop <= threshold) {
+        if (rect.top <= threshold) {
           activeSectionId = id;
         }
       }
     }
-
-    /* Check if scrolled to the bottom */
-    let isAtBottom = false;
-    if (scrollContainer === window || scrollContainer === document) {
-      isAtBottom = (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80);
-    } else if (scrollContainer && scrollContainer.scrollHeight) {
-      isAtBottom = (scrollContainer.scrollHeight - scrollContainer.scrollTop <= scrollContainer.clientHeight + 80);
-    }
-
-    if (isAtBottom) {
+    
+    /* Check if we are near the bottom of the page to highlight the last section */
+    const mainContainer = document.querySelector('.main') || document.querySelector('[data-testid="stAppViewContainer"]');
+    const isAtBottomWin = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 120;
+    const isAtBottomContainer = mainContainer && (mainContainer.scrollHeight - mainContainer.scrollTop <= mainContainer.clientHeight + 120);
+    
+    if (isAtBottomWin || isAtBottomContainer) {
       activeSectionId = SECTION_IDS[SECTION_IDS.length - 1];
     }
-
-    if (activeSectionId) {
-      activateLink(activeSectionId);
-    }
+    
+    activateLink(activeSectionId);
   };
 
   const setupScrollListeners = () => {
+    /* Bind to window */
     if (!window.hasAttachedScrollListener) {
       window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
       window.hasAttachedScrollListener = true;
     }
+    
+    /* Bind directly to any potential scrollable container in Streamlit */
+    const containers = [
+      document.querySelector('.main'),
+      document.querySelector('[data-testid="stAppViewContainer"]'),
+      document.querySelector('[data-testid="stMain"]'),
+      document.querySelector('.stApp'),
+      document.body,
+      document
+    ];
+    
+    containers.forEach(c => {
+      if (c && !c.hasScrollSpyListener) {
+        c.addEventListener('scroll', handleScroll, { passive: true });
+        c.hasScrollSpyListener = true;
+      }
+    });
   };
 
   const setupClickListeners = () => {
     const items = document.querySelectorAll('.sidebar-item');
     items.forEach(item => {
       const link = item.querySelector('.sidebar-link');
-      if (link) {
+      if (link && !item.hasClickSpyListener) {
         link.style.cursor = 'pointer';
         item.onclick = (e) => {
           e.preventDefault();
           const sectionId = item.getAttribute('data-section');
           const el = document.getElementById(sectionId);
           if (el) {
-            el.scrollIntoView({ behavior: 'smooth' });
+            scrollToElement(el);
             activateLink(sectionId);
           }
         };
+        item.hasClickSpyListener = true;
       }
     });
   };
 
   const runSetup = () => {
-    const ready = SECTION_IDS.every(id => document.getElementById(id)) && document.querySelector('.sidebar-item');
-    if (ready) {
+    const hasSidebar = document.querySelector('.sidebar-item');
+    if (hasSidebar) {
       setupScrollListeners();
       setupClickListeners();
       handleScroll();
-      if (window.location.hash) {
-        activateLink(window.location.hash.slice(1));
-      }
     }
   };
 
+  /* Setup mutation observer to watch for Streamlit re-renders and apply fixes */
   if (!window.hasSetupSidebarObserver) {
     window.hasSetupSidebarObserver = true;
     const mutObserver = new MutationObserver(() => {
       runSetup();
     });
     mutObserver.observe(document.body, { childList: true, subtree: true });
-    runSetup();
   }
+  
+  /* Run once immediately */
+  runSetup();
 })()"/>
-"""
+""".replace('{TIMESTAMP}', str(time.time()))
 
 def render_footer():
     st.markdown(
@@ -570,11 +628,9 @@ def render_footer():
         unsafe_allow_html=True,
     )
 
-st.markdown("<a id='introduction' class='section-anchor'></a>", unsafe_allow_html=True)
-
 # Render Mockup Top Banner
 st.markdown(f"""
-<div style='display: flex; justify-content: space-between; align-items: center; gap: 40px; margin-bottom: 48px; font-family: "Plus Jakarta Sans", "Inter", sans-serif;'>
+<div id='introduction' style='display: flex; justify-content: space-between; align-items: center; gap: 40px; margin-bottom: 48px; font-family: "Plus Jakarta Sans", "Inter", sans-serif;'>
     <div style='flex: 1.5;'>
         <h1 style='font-size: 48px; font-weight: 800; color: #000000; line-height: 1.1; margin: 0 0 24px 0; letter-spacing: -0.03em;'>Understand every customer. <br/>Grow with purpose.</h1>
         <p style='font-size: 16px; color: #5f6368; line-height: 1.6; margin: 0 0 32px 0; max-width: 540px;'>We turn data into human understanding so you can build stronger relationships, create relevant experiences and drive sustainable growth.</p>
@@ -613,9 +669,8 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("<a id='data-analysis' class='section-anchor'></a>", unsafe_allow_html=True)
 st.markdown("""
-<div style='margin-top: 48px; margin-bottom: 24px;'>
+<div id='data-analysis' style='margin-top: 48px; margin-bottom: 24px;'>
     <h2 style='font-size: 28px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.02em;'>Data Analysis</h2>
 </div>
 """, unsafe_allow_html=True)
@@ -700,9 +755,8 @@ st.markdown("""
 """,
 unsafe_allow_html=True)
 
-st.markdown("<a id='data-preprocessing' class='section-anchor'></a>", unsafe_allow_html=True)
 st.markdown("""
-<div style='margin-top: 48px; margin-bottom: 24px;'>
+<div id='data-preprocessing' style='margin-top: 48px; margin-bottom: 24px;'>
     <h2 style='font-size: 28px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.02em;'>Data Preprocessing</h2>
 </div>
 """, unsafe_allow_html=True)
@@ -772,9 +826,8 @@ st.markdown("""
 """,
 unsafe_allow_html=True)
 
-st.markdown("<a id='data-in-geography' class='section-anchor'></a>", unsafe_allow_html=True)
 st.markdown("""
-<div style='margin-top: 48px; margin-bottom: 24px;'>
+<div id='data-in-geography' style='margin-top: 48px; margin-bottom: 24px;'>
     <h2 style='font-size: 28px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.02em;'>Data In Geography</h2>
 </div>
 """, unsafe_allow_html=True)
@@ -866,9 +919,8 @@ st.markdown("""
 """,
 unsafe_allow_html=True)
 
-st.markdown("<a id='customer-segmentation' class='section-anchor'></a>", unsafe_allow_html=True)
 st.markdown("""
-<div style='margin-top: 48px; margin-bottom: 24px;'>
+<div id='customer-segmentation' style='margin-top: 48px; margin-bottom: 24px;'>
     <h2 style='font-size: 28px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.02em;'>Customer Communities</h2>
 </div>
 """, unsafe_allow_html=True)
@@ -1057,9 +1109,8 @@ try:
 except Exception as e:
     st.info("Dynamic cluster files not fully loaded. Displaying static mockup.")
 
-st.markdown("<a id='targeter-promotion' class='section-anchor'></a>", unsafe_allow_html=True)
 st.markdown("""
-<div style='margin-top: 48px; margin-bottom: 24px;'>
+<div id='targeter-promotion' style='margin-top: 48px; margin-bottom: 24px;'>
     <h2 style='font-size: 28px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.02em;'>Targeter Promotion</h2>
 </div>
 """, unsafe_allow_html=True)
@@ -1110,9 +1161,8 @@ try:
 except Exception as e:
     st.info("No campaign rules CSV found. Add datasets/segment_campaign_rules.csv to enable targeter simulation.")
 
-st.markdown("<a id='conclusion' class='section-anchor'></a>", unsafe_allow_html=True)
 st.markdown("""
-<div style='margin-top: 48px; margin-bottom: 24px;'>
+<div id='conclusion' style='margin-top: 48px; margin-bottom: 24px;'>
     <h2 style='font-size: 28px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.02em;'>Conclusion & Recommendations</h2>
 </div>
 """, unsafe_allow_html=True)
