@@ -221,8 +221,8 @@ div[role="radiogroup"] label:hover {
     border-radius: 12px;
 }
 .sidebar-item .sidebar-link:hover {
-    color: #1a1a1a;
-    background-color: #f3f2f0;
+    color: #c2410c;
+    background-color: rgba(194, 65, 12, 0.04);
     transform: none;
     text-decoration: none !important;
 }
@@ -231,8 +231,8 @@ div[role="radiogroup"] label:hover {
     cursor: default;
 }
 .sidebar-item.active .sidebar-link {
-    color: #000000 !important;
-    background-color: #ebeae6 !important;
+    color: #c2410c !important;
+    background-color: rgba(194, 65, 12, 0.08) !important;
     font-weight: 700 !important;
     text-decoration: none !important;
     pointer-events: none;
@@ -401,7 +401,7 @@ st.sidebar.markdown(
       <div class='sidebar-item' data-section='conclusion'>
         <span class='sidebar-link'>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
-          Recommendations
+          Conclusion & Recommendations
         </span>
       </div>
     </div>
@@ -422,7 +422,7 @@ js_script = """
     const scrollContainer = document.querySelector('.main') || document.querySelector('[data-testid="stAppViewContainer"]') || window;
     let activeSectionId = SECTION_IDS[0];
     const containerTop = (scrollContainer === window) ? 0 : scrollContainer.getBoundingClientRect().top;
-    const threshold = 180; // Offset in pixels from top
+    const threshold = 180; /* Offset in pixels from top */
 
     for (const id of SECTION_IDS) {
       const el = document.getElementById(id);
@@ -435,7 +435,7 @@ js_script = """
       }
     }
 
-    // Check if scrolled to the bottom
+    /* Check if scrolled to the bottom */
     const isAtBottom = (scrollContainer === window)
       ? (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 60)
       : (scrollContainer.scrollHeight - scrollContainer.scrollTop <= scrollContainer.clientHeight + 60);
@@ -1130,4 +1130,4 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 render_footer()
-st.markdown(js_script, unsafe_allow_html=True)
+st.markdown(f"<div style='display:none;'>{js_script}</div>", unsafe_allow_html=True)
