@@ -416,16 +416,19 @@ st.sidebar.markdown(
 js_script = """
 <img src="x" onerror="(function() {
   const SECTION_IDS = ['introduction', 'data-analysis', 'data-preprocessing', 'data-in-geography', 'customer-segmentation', 'targeter-promotion', 'conclusion'];
+  
   const activateLink = id => {
     document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
     const target = document.querySelector(".sidebar-item[data-section='" + id + "']");
     if (target) target.classList.add('active');
   };
 
-  const handleScroll = () => {
-    const scrollContainer = document.querySelector('.main') || document.querySelector('[data-testid="stAppViewContainer"]') || window;
+  const handleScroll = (e) => {
+    const mainContainer = document.querySelector('.main') || document.querySelector('[data-testid="stAppViewContainer"]');
+    const scrollContainer = (e && e.target && e.target !== document) ? e.target : (mainContainer || window);
+    
     let activeSectionId = SECTION_IDS[0];
-    const containerTop = (scrollContainer === window) ? 0 : scrollContainer.getBoundingClientRect().top;
+    const containerTop = (mainContainer) ? mainContainer.getBoundingClientRect().top : 0;
     const threshold = 180; /* Offset in pixels from top */
 
     for (const id of SECTION_IDS) {
@@ -440,9 +443,12 @@ js_script = """
     }
 
     /* Check if scrolled to the bottom */
-    const isAtBottom = (scrollContainer === window)
-      ? (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 60)
-      : (scrollContainer.scrollHeight - scrollContainer.scrollTop <= scrollContainer.clientHeight + 60);
+    let isAtBottom = false;
+    if (scrollContainer === window || scrollContainer === document) {
+      isAtBottom = (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80);
+    } else if (scrollContainer && scrollContainer.scrollHeight) {
+      isAtBottom = (scrollContainer.scrollHeight - scrollContainer.scrollTop <= scrollContainer.clientHeight + 80);
+    }
 
     if (isAtBottom) {
       activeSectionId = SECTION_IDS[SECTION_IDS.length - 1];
@@ -453,20 +459,11 @@ js_script = """
     }
   };
 
-  let attachedContainers = new Set();
   const setupScrollListeners = () => {
-    const containers = [
-      document.querySelector('.main'),
-      document.querySelector('[data-testid="stAppViewContainer"]'),
-      window
-    ].filter(Boolean);
-
-    containers.forEach(c => {
-      if (!attachedContainers.has(c)) {
-        c.addEventListener('scroll', handleScroll, { passive: true });
-        attachedContainers.add(c);
-      }
-    });
+    if (!window.hasAttachedScrollListener) {
+      window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
+      window.hasAttachedScrollListener = true;
+    }
   };
 
   const setupClickListeners = () => {
