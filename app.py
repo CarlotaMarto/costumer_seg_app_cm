@@ -201,6 +201,7 @@ div[role="radiogroup"] label:hover {
 }
 .sidebar-item {
     margin-bottom: 14px;
+    cursor: pointer;
 }
 .sidebar-item .sidebar-link {
     display: block;
@@ -209,10 +210,17 @@ div[role="radiogroup"] label:hover {
     font-size: 18px;
     line-height: 1.5;
     transition: color 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
 }
 .sidebar-item .sidebar-link:hover {
     color: #ea580c;
     transform: translateX(2px);
+    text-decoration: underline;
+    text-underline-offset: 6px;
+}
+.sidebar-item.active {
+    pointer-events: none;
+    cursor: default;
 }
 .sidebar-item.active .sidebar-link {
     color: #ea580c !important;
