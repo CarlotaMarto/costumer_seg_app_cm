@@ -353,6 +353,14 @@ div[role="radiogroup"] label:hover {
         grid-template-columns: 1fr;
     }
 }
+/* Hide heading anchor/link icons */
+.anchor-link, 
+.header-anchor, 
+[data-testid="stHeaderActionElements"],
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    display: none !important;
+    visibility: hidden !important;
+}
 </style>
 """.replace('{INITIAL_BG_URI}', INITIAL_BG_URI)
 
