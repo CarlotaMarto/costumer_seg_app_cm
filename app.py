@@ -279,20 +279,50 @@ js_script = """
     if (target) target.classList.add('active');
   };
 
-  let observer;
-  const setupObserver = () => {
-    if (observer) observer.disconnect();
-    observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          activateLink(entry.target.id);
-        }
-      });
-    }, {root: null, rootMargin: '-40% 0px -55% 0px', threshold: 0});
+  const handleScroll = () => {
+    const scrollContainer = document.querySelector('.main') || document.querySelector('[data-testid="stAppViewContainer"]') || window;
+    let activeSectionId = SECTION_IDS[0];
+    const containerTop = (scrollContainer === window) ? 0 : scrollContainer.getBoundingClientRect().top;
+    const threshold = 180; // Offset in pixels from top
 
-    SECTION_IDS.forEach(id => {
+    for (const id of SECTION_IDS) {
       const el = document.getElementById(id);
-      if (el) observer.observe(el);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        const relativeTop = rect.top - containerTop;
+        if (relativeTop <= threshold) {
+          activeSectionId = id;
+        }
+      }
+    }
+
+    // Check if scrolled to the bottom
+    const isAtBottom = (scrollContainer === window)
+      ? (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 60)
+      : (scrollContainer.scrollHeight - scrollContainer.scrollTop <= scrollContainer.clientHeight + 60);
+
+    if (isAtBottom) {
+      activeSectionId = SECTION_IDS[SECTION_IDS.length - 1];
+    }
+
+    if (activeSectionId) {
+      activateLink(activeSectionId);
+    }
+  };
+
+  let attachedContainers = new Set();
+  const setupScrollListeners = () => {
+    const containers = [
+      document.querySelector('.main'),
+      document.querySelector('[data-testid="stAppViewContainer"]'),
+      window
+    ].filter(Boolean);
+
+    containers.forEach(c => {
+      if (!attachedContainers.has(c)) {
+        c.addEventListener('scroll', handleScroll, { passive: true });
+        attachedContainers.add(c);
+      }
     });
   };
 
@@ -318,8 +348,9 @@ js_script = """
   const runSetup = () => {
     const ready = SECTION_IDS.every(id => document.getElementById(id)) && document.querySelector('.sidebar-item');
     if (ready) {
-      setupObserver();
+      setupScrollListeners();
       setupClickListeners();
+      handleScroll();
       if (window.location.hash) {
         activateLink(window.location.hash.slice(1));
       }
