@@ -8,14 +8,61 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.colors import LinearSegmentedColormap, ListedColormap
 from IPython.display import display
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.cluster import KMeans, AgglomerativeClustering, DBSCAN
-from sklearn.metrics import silhouette_score, confusion_matrix
+from sklearn.impute import KNNImputer
+from sklearn.metrics import silhouette_score, silhouette_samples, confusion_matrix
 from scipy.cluster.hierarchy import dendrogram
+
+PROJECT_PALETTE = [
+    "#B87540",
+    "#B2543D",
+    "#7E6A43",
+    "#A8B7BA",
+    "#D8C0B4",
+    "#C8AB8C",
+    "#5A3516",
+    "#B98F70",
+]
+CLUSTER_PALETTE = [
+    "#B87540",
+    "#B2543D",
+    "#7E6A43",
+    "#78969B",
+    "#D08F78",
+    "#C09A72",
+    "#5A3516",
+    "#2F2116",
+]
+MAIN_COLOR = "#B87540"
+ACCENT_COLOR = "#B2543D"
+NOTE_COLOR = "#7E6A43"
+SECONDARY_COLOR = "#A8B7BA"
+LIGHT_COLOR = "#F3EEE6"
+DARK_COLOR = "#5A3516"
+
+
+def sequential_cmap():
+    return LinearSegmentedColormap.from_list(
+        "project_sequential",
+        [LIGHT_COLOR, "#C8AB8C", MAIN_COLOR, ACCENT_COLOR, DARK_COLOR],
+    )
+
+
+def diverging_cmap():
+    return LinearSegmentedColormap.from_list(
+        "project_diverging",
+        [ACCENT_COLOR, LIGHT_COLOR, SECONDARY_COLOR],
+    )
+
+
+def cluster_cmap():
+    return ListedColormap(CLUSTER_PALETTE)
 
 
 # ============================================================
@@ -41,7 +88,7 @@ def transform_with_scaler(df, feature_cols, scaler):
 # Choosing the number of clusters
 # ============================================================
 
-def kmeans_elbow(X, k_range=range(1, 11), random_state=0, n_init=10):
+def kmeans_elbow(X, k_range=range(1, 11), random_state=0, n_init=30):
     """Compute KMeans inertia across k (the elbow / dispersion curve)."""
     inertia = []
     for k in k_range:
@@ -53,14 +100,14 @@ def kmeans_elbow(X, k_range=range(1, 11), random_state=0, n_init=10):
 def plot_elbow(k_values, inertia, cutoffs=None):
     """Plot the inertia elbow, optionally marking candidate cut points."""
     plt.figure(figsize=(9, 5))
-    plt.plot(k_values, inertia, marker="o")
+    plt.plot(k_values, inertia, marker="o", color=MAIN_COLOR)
     plt.xlabel("Number of clusters (k)")
     plt.ylabel("Dispersion (inertia)")
     plt.title("Elbow Method - K-Means")
     plt.xticks(list(k_values))
     if cutoffs:
         for c in cutoffs:
-            plt.axvline(c, color="red", linestyle="--", alpha=0.7)
+            plt.axvline(c, color=ACCENT_COLOR, linestyle="--", alpha=0.7)
     plt.grid(True, alpha=0.3)
     plt.show()
 
@@ -69,7 +116,7 @@ def plot_elbow(k_values, inertia, cutoffs=None):
 # Fitting the final solutions
 # ============================================================
 
-def fit_kmeans(X, k, random_state=0, n_init=10):
+def fit_kmeans(X, k, random_state=0, n_init=30):
     """Fit and return a KMeans model (use .labels_ / .predict / .cluster_centers_)."""
     return KMeans(n_clusters=k, random_state=random_state, n_init=n_init).fit(X)
 
@@ -248,7 +295,7 @@ def centroid_ward_k_benchmark(X, macro_k_range=range(2, 11), micro_k=20,
 def plot_method_k_benchmark(results_df, title="Method benchmark by k"):
     """Line plot of silhouette by k for several clustering methods."""
     plt.figure(figsize=(10, 5))
-    sns.lineplot(data=results_df, x="k", y="silhouette", hue="method", marker="o")
+    sns.lineplot(data=results_df, x="k", y="silhouette", hue="method", marker="o", palette=PROJECT_PALETTE)
     plt.title(title)
     plt.xlabel("Number of clusters")
     plt.ylabel("Silhouette")
@@ -347,7 +394,7 @@ def hierarchical_r2_grid(X, k_range=range(2, 11), linkages=None,
 def plot_hierarchical_r2(r2_df, title="Hierarchical R2 comparison"):
     """Line plot of hierarchical R2 values by k and linkage method."""
     plt.figure(figsize=(9, 5))
-    sns.lineplot(data=r2_df, x="k", y="r2", hue="linkage", marker="o")
+    sns.lineplot(data=r2_df, x="k", y="r2", hue="linkage", marker="o", palette=PROJECT_PALETTE)
     plt.title(title)
     plt.xlabel("Number of clusters")
     plt.ylabel("R2 = between-cluster SS / total SS")
@@ -398,7 +445,7 @@ def plot_cluster_sizes(df, label_col):
     """Bar chart of cluster sizes."""
     sizes = df[label_col].value_counts().sort_index()
     plt.figure(figsize=(8, 4))
-    sns.barplot(x=sizes.index.astype(str), y=sizes.values, color="#1B4F72")
+    sns.barplot(x=sizes.index.astype(str), y=sizes.values, color=MAIN_COLOR)
     plt.xlabel("Cluster")
     plt.ylabel("Number of customers")
     plt.title("Customers per cluster")
@@ -409,7 +456,7 @@ def plot_profile_heatmap(profile_df, title="Cluster profile"):
     """Heatmap of a profile table (clusters x features). Drop OVERALL row first."""
     data = profile_df.drop(index="OVERALL", errors="ignore")
     plt.figure(figsize=(max(8, data.shape[1] * 0.9), max(4, data.shape[0] * 0.7)))
-    sns.heatmap(data, annot=True, fmt=".1f", cmap="Blues", linewidths=0.5,
+    sns.heatmap(data, annot=True, fmt=".1f", cmap=sequential_cmap(), linewidths=0.5,
                 cbar_kws={"shrink": 0.6})
     plt.title(title)
     plt.ylabel("Cluster")
@@ -448,7 +495,7 @@ def plot_cluster_mean_comparison(profile_df, title="Cluster mean comparison"):
 
 
 def plot_boxplot_grid(data, variables, label_col="cluster", max_cols=3,
-                      color="#7FB3D5"):
+                      color=SECONDARY_COLOR):
     """Grid of boxplots for selected variables by cluster."""
     variables = [v for v in variables if v in data.columns]
     if not variables:
@@ -475,11 +522,6 @@ def plot_boxplot_grid(data, variables, label_col="cluster", max_cols=3,
 # ============================================================
 # Re-attaching the held-aside outliers and exporting
 # ============================================================
-
-def assign_outliers(outlier_df, feature_cols, scaler, kmeans_model):
-    """Assign held-aside outliers to their nearest KMeans centroid."""
-    Xo = transform_with_scaler(outlier_df, feature_cols, scaler)
-    return kmeans_model.predict(Xo)
 
 
 def build_full_assignment(regular_df, regular_labels,
@@ -523,9 +565,9 @@ def plot_scaler_comparison(scaler_df, mark_k=None):
     """Plot silhouette-vs-k, one line per scaler."""
     plt.figure(figsize=(9, 5))
     for name, g in scaler_df.groupby("scaler"):
-        plt.plot(g["k"], g["silhouette"], marker="o", label=name)
+        plt.plot(g["k"], g["silhouette"], marker="o", label=name, color=PROJECT_PALETTE[len(plt.gca().lines) % len(PROJECT_PALETTE)])
     if mark_k is not None:
-        plt.axvline(mark_k, color="red", linestyle="--", alpha=0.6,
+        plt.axvline(mark_k, color=ACCENT_COLOR, linestyle="--", alpha=0.6,
                     label=f"chosen k={mark_k}")
     plt.xlabel("Number of clusters (k)")
     plt.ylabel("Mean silhouette")
@@ -561,12 +603,12 @@ def plot_silhouette_blades(X, labels, sample_size=10000, random_state=0,
         vals = np.sort(sample_sil[labels == ci])
         size = len(vals)
         y_upper = y_lower + size
-        color = cm.tab10(ci % 10)
+        color = PROJECT_PALETTE[ci % len(PROJECT_PALETTE)]
         plt.fill_betweenx(np.arange(y_lower, y_upper), 0, vals,
                           facecolor=color, edgecolor=color, alpha=0.8)
         plt.text(-0.02, y_lower + size / 2, str(ci))
         y_lower = y_upper + 10
-    plt.axvline(avg, color="red", linestyle="--", label=f"Avg = {avg:.2f}")
+    plt.axvline(avg, color=ACCENT_COLOR, linestyle="--", label=f"Avg = {avg:.2f}")
     plt.xlabel("Silhouette coefficient values")
     plt.ylabel("Cluster label")
     plt.title(title)
@@ -600,37 +642,85 @@ def embed_umap(X, n_neighbors=15, min_dist=0.1, random_state=0):
         return emb, "t-SNE (UMAP fallback)"
 
 
-def plot_embedding(embedding, labels, title="Embedding", method_name=None):
-    """Scatter a 2-D embedding coloured by cluster label."""
-    labels = np.asarray(labels)
+def embed_tsne(X, perplexity=30, random_state=0):
+    """2-D t-SNE embedding for local neighbourhood visual inspection."""
+    from sklearn.manifold import TSNE
+    return TSNE(
+        n_components=2,
+        perplexity=perplexity,
+        init="pca",
+        learning_rate="auto",
+        random_state=random_state,
+    ).fit_transform(X)
+
+
+def visualize_dimensionality_reduction(transformation, labels, title="Embedding", cmap_name=None):
+    """Plot a 2-D dimensionality reduction coloured by cluster labels."""
+    labels = np.asarray(labels).astype(int)
+    transformation = np.asarray(transformation)
+    unique_labels = np.unique(labels)
+    default_cmap = "tab10" if len(unique_labels) <= 10 else "tab20"
+    cmap = plt.get_cmap(cmap_name or default_cmap, len(unique_labels))
+
     plt.figure(figsize=(9, 7))
-    for ci in sorted(np.unique(labels)):
-        m = labels == ci
-        plt.scatter(embedding[m, 0], embedding[m, 1], s=6, alpha=0.5,
-                    label=f"Cluster {ci}")
-    plt.title(title if not method_name else f"{title} ({method_name})")
+    for i, label in enumerate(unique_labels):
+        mask = labels == label
+        plt.scatter(
+            transformation[mask, 0],
+            transformation[mask, 1],
+            s=8,
+            alpha=0.65,
+            color=cmap(i),
+            label=f"Cluster {label}",
+        )
+
+    plt.legend(title="Clusters", fontsize=8, loc="best", frameon=True)
     plt.xlabel("Component 1")
     plt.ylabel("Component 2")
-    plt.legend(markerscale=2, fontsize=8, loc="best")
+    plt.title(title)
     plt.show()
+
+
+def plot_embedding(embedding, labels, title="Embedding", method_name=None):
+    """Scatter a 2-D embedding coloured by cluster label."""
+    final_title = title if not method_name else f"{title} ({method_name})"
+    visualize_dimensionality_reduction(embedding, labels, title=final_title)
+
+def plot_umap_label_comparison(X_sample, labels_a, labels_b,
+                               title_a="UMAP - KMeans labels",
+                               title_b="UMAP - Hierarchical labels",
+                               random_state=0):
+    """Plot the same UMAP projection twice using two alternative label sets."""
+    embedding, method = embed_umap(X_sample, random_state=random_state)
+    plot_embedding(embedding, labels_a, title=title_a, method_name=method)
+    plot_embedding(embedding, labels_b, title=title_b, method_name=method)
+    return embedding, method
 
 
 # ============================================================
 # Feature-set comparison (which columns to cluster on)
 # ============================================================
 
+
 def build_candidate_feature_sets(df):
     """Return candidate feature spaces to evaluate for clustering."""
-    abss = [c for c in df.columns if c.startswith("lifetime_spend_")]
+    granular = {"lifetime_spend_electronics", "lifetime_spend_videogames"}
+    abss = [c for c in df.columns if c.startswith("lifetime_spend_") and c not in granular]
     abss_no_groceries = [c for c in abss if c != "lifetime_spend_groceries"]
-    eng = [c for c in ["log_total_spend", "distinct_stores_visited",
-                       "percentage_of_products_bought_promotion", "tenure",
-                       "number_complaints", "lifetime_total_distinct_products"]
-           if c in df.columns]
-    demo = [c for c in ["customer_age", "education_level", "total_children"]
-            if c in df.columns]
-    promo = [c for c in ["percentage_of_products_bought_promotion"] if c in df.columns]
-    return {
+    abss_granular = [c for c in df.columns if c.startswith("lifetime_spend_")
+                     and c != "lifetime_spend_technology" and c not in {"lifetime_spend_groceries"}]
+    annual = [c for c in df.columns if c.startswith("annual_spend_")]
+    annual_no_groceries = [c for c in annual if c != "annual_spend_groceries"]
+    shares_no_groceries = [c for c in df.columns if c.endswith("_share")
+                           and not c.startswith("grocery")]
+    eng = [
+        "log_total_spend", "distinct_stores_visited",
+        "percentage_of_products_bought_promotion", "tenure",
+        "number_complaints", "lifetime_total_distinct_products",
+    ]
+    demo = ["total_children"]
+    promo = ["percentage_of_products_bought_promotion"]
+    sets = {
         # ---- value-based: absolute lifetime spend ----
         "lifetime_spend": (abss, False),
         "lifetime_spend no groceries": (abss_no_groceries, False),
@@ -641,38 +731,22 @@ def build_candidate_feature_sets(df):
         "spend + promo no groceries": (abss_no_groceries + promo, False),
         "log_spend + promo": (abss + promo, True),
         "log_spend + promo no groceries": (abss_no_groceries + promo, True),
+        # ---- preference-based: category shares (relative spend) ----
+        "shares no groceries": (shares_no_groceries + promo, False),
         # ---- value + demographics / engagement ----
         "log_spend + demo": (abss + demo, True),
         "log_spend + demo no groceries": (abss_no_groceries + demo, True),
         "log_spend + engagement + demo": (abss + eng + demo, True),
         "log_spend + engagement + demo no groceries": (abss_no_groceries + eng + demo, True),
     }
-
-
-def compare_feature_sets(df, candidate_sets, k=8, scaler=None,
-                         random_state=0, n_init=10, sample_size=8000):
-    """Silhouette at a fixed k for each candidate feature set (same scaler).
-
-    candidate_sets : dict name -> (columns, log_absolute_spend_flag)
-    """
-    from sklearn.preprocessing import MinMaxScaler
-    scaler = scaler or MinMaxScaler()
-    rows = []
-    for name, (cols, logabs) in candidate_sets.items():
-        X = df[cols].astype(float).copy()
-        if logabs:
-            for c in X.columns:
-                if c.startswith("lifetime_spend_"):
-                    X[c] = np.log1p(X[c].clip(lower=0))
-        Xs = scaler.fit_transform(X)
-        labels = KMeans(n_clusters=k, random_state=random_state,
-                        n_init=n_init).fit_predict(Xs)
-        s = silhouette_score(Xs, labels,
-                             sample_size=min(sample_size, len(labels)),
-                             random_state=random_state)
-        rows.append({"feature_set": name, "n_features": len(cols),
-                     "silhouette": round(float(s), 4)})
-    return pd.DataFrame(rows).sort_values("silhouette", ascending=False).reset_index(drop=True)
+    if abss_granular and abss_granular != abss_no_groceries:
+        sets["spend + promo granular tech"] = (abss_granular + promo, False)
+    # ---- annual spend (lifetime / tenure): only added when columns are present ----
+    if annual:
+        sets["annual_spend"] = (annual, False)
+        sets["annual_spend no groceries"] = (annual_no_groceries, False)
+        sets["annual_spend + promo no groceries"] = (annual_no_groceries + promo, False)
+    return sets
 
 
 def subsample(X, labels, n=8000, random_state=0):
@@ -711,6 +785,84 @@ def apply_feature_pipeline(df, cols, logabs=False, scaler=None, fit=False):
     return scaler.fit_transform(X) if fit else scaler.transform(X)
 
 
+def cap_iqr(df, cols, iqr_k=3.0):
+    """Apply conservative IQR capping to selected numerical columns."""
+    out = df[cols].astype(float).copy()
+    if iqr_k is None:
+        return out
+    for col in out.columns:
+        q1 = out[col].quantile(0.25)
+        q3 = out[col].quantile(0.75)
+        iqr = q3 - q1
+        if pd.notna(iqr) and iqr > 0:
+            out[col] = out[col].clip(q1 - iqr_k * iqr, q3 + iqr_k * iqr)
+    return out
+
+
+def build_solution_matrix(df, cols, scaler_name="Standard", iqr_k=None,
+                          impute_neighbors=5):
+    """Create a capped, scaled and imputed matrix for one clustering solution."""
+    X = cap_iqr(df, cols, iqr_k=iqr_k)
+    scaler = get_scaler(scaler_name)
+    X_scaled = X.to_numpy() if scaler is None else scaler.fit_transform(X)
+    if np.isnan(X_scaled).any():
+        X_scaled = KNNImputer(n_neighbors=impute_neighbors).fit_transform(X_scaled)
+    return X_scaled, scaler
+
+
+def fit_kmeans_solution(df, cols, k=8, scaler_name="Standard", iqr_k=None,
+                        random_state=42, n_init=30, sample_size=10000):
+    """Fit KMeans and return model, matrix, labels and compact validation metrics."""
+    X, scaler = build_solution_matrix(df, cols, scaler_name=scaler_name, iqr_k=iqr_k)
+    model = KMeans(n_clusters=k, random_state=random_state, n_init=n_init).fit(X)
+    labels = model.labels_
+    sil = silhouette_score(
+        X,
+        labels,
+        sample_size=min(sample_size, len(labels)),
+        random_state=random_state,
+    )
+    rng = np.random.RandomState(random_state)
+    idx = rng.choice(len(labels), min(sample_size, len(labels)), replace=False)
+    sil_samples = silhouette_samples(X[idx], labels[idx])
+    sizes = pd.Series(labels).value_counts().sort_index()
+    metrics = {
+        "k": int(k),
+        "n_features": len(cols),
+        "scaler": scaler_name,
+        "iqr_k": iqr_k,
+        "silhouette": round(float(sil), 4),
+        "negative_silhouette_pct": round(float((sil_samples < 0).mean() * 100), 2),
+        "min_cluster_pct": round(float((sizes / len(labels) * 100).min()), 2),
+        "max_cluster_pct": round(float((sizes / len(labels) * 100).max()), 2),
+    }
+    return model, X, labels, scaler, metrics
+
+
+
+
+def clustering_metrics(X, labels, sample_size=10000, random_state=42):
+    """Compact validation metrics for an already fitted clustering solution."""
+    X = np.asarray(X, dtype=float)
+    labels = np.asarray(labels)
+    sil = silhouette_score(
+        X,
+        labels,
+        sample_size=min(sample_size, len(labels)),
+        random_state=random_state,
+    )
+    rng = np.random.RandomState(random_state)
+    idx = rng.choice(len(labels), min(sample_size, len(labels)), replace=False)
+    sil_values = silhouette_samples(X[idx], labels[idx])
+    sizes = pd.Series(labels).value_counts().sort_index()
+    return {
+        "silhouette": round(float(sil), 4),
+        "negative_silhouette_pct": round(float((sil_values < 0).mean() * 100), 2),
+        "min_cluster_pct": round(float((sizes / len(labels) * 100).min()), 2),
+        "max_cluster_pct": round(float((sizes / len(labels) * 100).max()), 2),
+    }
+
+
 def silhouette_grid(df, candidate_sets, k_range=range(2, 11), scaler_name="Robust",
                     random_state=0, n_init=10, sample_size=8000):
     """Mean silhouette for every (feature_set, k) under one scaler. Tidy DataFrame."""
@@ -732,7 +884,7 @@ def plot_silhouette_grid(grid_df, title="Silhouette by feature set and k"):
     """Heatmap of the silhouette grid by feature set and k."""
     piv = grid_df.pivot(index="feature_set", columns="k", values="silhouette")
     plt.figure(figsize=(max(8, piv.shape[1]), max(4, piv.shape[0] * 0.6)))
-    sns.heatmap(piv, annot=True, fmt=".3f", cmap="Blues", linewidths=0.5,
+    sns.heatmap(piv, annot=True, fmt=".3f", cmap=sequential_cmap(), linewidths=0.5,
                 cbar_kws={"shrink": 0.6})
     plt.title(title)
     plt.ylabel("Feature set")
@@ -743,93 +895,6 @@ def plot_silhouette_grid(grid_df, title="Silhouette by feature set and k"):
 
 
 # Embedded feature importance, used post-hoc to explain the final labels.
-
-def embedded_feature_importance(X, labels, feature_cols, method="both",
-                                C=0.5, n_estimators=300, random_state=0):
-    """Embedded-method importance of each clustering feature for the segments.
-
-    Parameters
-    ----------
-    X : array-like (n_samples, n_features)
-        The SAME scaled matrix used to fit the clustering (so importances are
-        measured in the representation the distance actually used).
-    labels : array-like (n_samples,)
-        Cluster labels (the pseudo-target).
-    feature_cols : list[str]
-        Names for the columns of X, in order.
-    method : {'both', 'lasso', 'forest'}
-    C : float
-        Inverse L1 strength for the logistic model (smaller = sparser).
-    n_estimators : int
-        Trees for the Random Forest.
-
-    Returns
-    -------
-    pandas.DataFrame indexed by feature with the requested importance columns
-    (each normalised to sum to 1), sorted descending. A `lasso_selected`
-    boolean column marks features the L1 model kept (non-zero coefficient).
-    """
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.ensemble import RandomForestClassifier
-
-    X = np.asarray(X, dtype=float)
-    labels = np.asarray(labels)
-    if X.shape[1] != len(feature_cols):
-        raise ValueError("X columns and feature_cols length differ.")
-
-    out = pd.DataFrame(index=pd.Index(feature_cols, name="feature"))
-
-    if method in ("lasso", "both"):
-        clf = LogisticRegression(
-            penalty="l1", solver="saga", C=C,
-            max_iter=2000, random_state=random_state,
-        ).fit(X, labels)
-        imp = np.abs(clf.coef_).mean(axis=0)        # mean |coef| over OvR classes
-        total = imp.sum()
-        out["lasso_importance"] = imp / total if total else imp
-        out["lasso_selected"] = imp > 0
-
-    if method in ("forest", "both"):
-        rf = RandomForestClassifier(
-            n_estimators=n_estimators, random_state=random_state, n_jobs=-1,
-        ).fit(X, labels)
-        out["forest_importance"] = rf.feature_importances_
-
-    sort_col = "lasso_importance" if "lasso_importance" in out else "forest_importance"
-    return out.sort_values(sort_col, ascending=False).round(4)
-
-
-def select_features_embedded(importance_df, column="forest_importance",
-                             threshold="median"):
-    """Return the features an embedded method would keep.
-
-    threshold : 'median' | 'mean' | float
-        Features with importance strictly above the threshold are kept. Use
-        this to turn the importance table into an explicit feature shortlist
-        that can be compared against the filter (correlation) decision.
-    """
-    col = importance_df[column].dropna()
-    if threshold == "median":
-        cut = col.median()
-    elif threshold == "mean":
-        cut = col.mean()
-    else:
-        cut = float(threshold)
-    return col[col > cut].index.tolist()
-
-
-def plot_embedded_importance(importance_df, title="Embedded feature importance"):
-    """Horizontal bar chart of the embedded importances (one bar group per method)."""
-    cols = [c for c in ("lasso_importance", "forest_importance")
-            if c in importance_df.columns]
-    data = importance_df[cols].sort_values(cols[0])
-    ax = data.plot(kind="barh", figsize=(9, max(4, len(data) * 0.45)),
-                   color=["#1B4F72", "#7FB3D5"][:len(cols)])
-    ax.set_xlabel("Normalised importance")
-    ax.set_ylabel("Feature")
-    ax.set_title(title)
-    plt.tight_layout()
-    plt.show()
 
 
 # ============================================================
@@ -847,7 +912,7 @@ def plot_profile_heatmap_z(profile_df, title="Cluster profile (standardised per 
     z = (data - data.mean(axis=0)) / data.std(axis=0).replace(0, np.nan)
     z = z.fillna(0.0)
     plt.figure(figsize=(max(8, z.shape[1] * 0.9), max(4, z.shape[0] * 0.7)))
-    sns.heatmap(z, annot=True, fmt="+.1f", cmap="RdBu_r", center=0,
+    sns.heatmap(z, annot=True, fmt="+.1f", cmap=diverging_cmap(), center=0,
                 linewidths=0.5, cbar_kws={"shrink": 0.6, "label": "std devs from overall"})
     plt.title(title)
     plt.ylabel("Cluster")
@@ -860,31 +925,6 @@ def plot_profile_heatmap_z(profile_df, title="Cluster profile (standardised per 
 # ============================================================
 # Granular feature-set search
 # ============================================================
-
-def build_granular_feature_sets(df):
-    """Curated, granular candidate sets (one behaviour/lifecycle block at a time).
-
-    Each entry is (columns, log_absolute_spend?), matching silhouette_grid /
-    plot_silhouette_grid. Identity/geo (is_male, loyalty, lat, long) are left
-    out of every set on purpose: they are profiling variables, not distance
-    drivers, and empirically carry ~0 importance for separating segments.
-    """
-    spend = [c for c in df.columns if c.startswith("lifetime_spend_")]
-    spend_ng = [c for c in spend if c != "lifetime_spend_groceries"]
-    promo = [c for c in ["percentage_of_products_bought_promotion"] if c in df.columns]
-    engage = [c for c in ["distinct_stores_visited", "lifetime_total_distinct_products"]
-              if c in df.columns]
-    family = [c for c in ["total_children"] if c in df.columns]
-
-    sets = {
-        "spend": (spend, True),
-        "spend no groceries": (spend_ng, True),
-        "spend_ng + promo": (spend_ng + promo, True),
-        "spend_ng + promo + engagement": (spend_ng + promo + engage, True),
-        "spend_ng + promo + family": (spend_ng + promo + family, True),
-        "spend_ng + promo + engagement + family": (spend_ng + promo + engage + family, True),
-    }
-    return {k: (cols, log) for k, (cols, log) in sets.items() if cols}
 
 
 # ============================================================
@@ -944,7 +984,7 @@ def assign_som_units(som, X):
 def plot_som_quantization_curve(curve_df):
     """Plot SOM quantization error across training iterations."""
     plt.figure(figsize=(8, 4))
-    plt.plot(curve_df["iteration"], curve_df["quantization_error"], marker="o")
+    plt.plot(curve_df["iteration"], curve_df["quantization_error"], marker="o", color=MAIN_COLOR)
     plt.xlabel("Training iterations")
     plt.ylabel("Quantization error")
     plt.title("SOM quantization error")
@@ -962,7 +1002,7 @@ def plot_som_umatrix(som, title="SOM U-Matrix", annot=False):
     plt.figure(figsize=(width, height))
     sns.heatmap(
         distances,
-        cmap="viridis",
+        cmap=sequential_cmap(),
         annot=annot,
         fmt=".2f",
         xticklabels=True,
@@ -993,7 +1033,7 @@ def plot_som_unit_counts(labels, grid=(3, 3), title="Customers per SOM unit", an
     plt.figure(figsize=(width, height))
     sns.heatmap(
         mat.T,
-        cmap="Blues",
+        cmap=sequential_cmap(),
         annot=annot,
         fmt="d",
         xticklabels=True,
@@ -1010,7 +1050,7 @@ def plot_som_unit_counts(labels, grid=(3, 3), title="Customers per SOM unit", an
 
 
 def plot_som_feature_maps(som, feature_names, features=None, n_cols=3,
-                          cmap="RdYlBu_r"):
+                          cmap=diverging_cmap()):
     """Plot SOM weight maps for selected features."""
     weights = som.get_weights()
     feature_names = list(feature_names)
@@ -1048,15 +1088,8 @@ def plot_som_feature_maps(som, feature_names, features=None, n_cols=3,
 # Ensemble / consensus clustering
 # ============================================================
 
-def consensus_kmeans(X, k, n_runs=25, random_state=0, n_init=5):
-    """Stability-based ensemble of KMeans runs.
-
-    Returns
-    -------
-    (consensus_labels, stability)
-        consensus_labels : majority-vote segment per row (aligned label space)
-        stability        : fraction of runs (0-1) agreeing with the consensus
-    """
+def consensus_kmeans_majority(X, k, n_runs=25, random_state=0, n_init=5):
+    """Majority-vote ensemble of KMeans runs; returns (consensus_labels, stability)."""
     from scipy.optimize import linear_sum_assignment
 
     X = np.asarray(X, dtype=float)
@@ -1085,8 +1118,8 @@ def plot_stability(stability, title="Consensus stability per customer"):
     """Histogram of the per-customer ensemble agreement scores."""
     stability = np.asarray(stability)
     plt.figure(figsize=(8, 4))
-    plt.hist(stability, bins=20, color="#1B4F72", edgecolor="white")
-    plt.axvline(stability.mean(), color="red", linestyle="--",
+    plt.hist(stability, bins=20, color=MAIN_COLOR, edgecolor=LIGHT_COLOR)
+    plt.axvline(stability.mean(), color=ACCENT_COLOR, linestyle="--",
                 label=f"mean = {stability.mean():.3f}")
     plt.xlabel("Fraction of runs agreeing with the consensus label")
     plt.ylabel("Customers")
@@ -1103,7 +1136,7 @@ def plot_stability(stability, title="Consensus stability per customer"):
 def run_method_benchmarks(X, k_range=range(2, 11), random_state=0):
     """Run KMeans, agglomerative and centroid Ward benchmark tables."""
     kmeans_search = kmeans_k_benchmark(
-        X, k_range=k_range, random_state=random_state, n_init=10, sample_size=8000
+        X, k_range=k_range, random_state=random_state, n_init=30, sample_size=8000
     )
     hierarchical_search = hierarchical_k_benchmark(
         X,
@@ -1117,7 +1150,7 @@ def run_method_benchmarks(X, k_range=range(2, 11), random_state=0):
         macro_k_range=k_range,
         micro_k=20,
         random_state=random_state,
-        n_init=20,
+        n_init=30,
         sample_size=8000,
     )
     plot_df = pd.concat(
@@ -1160,42 +1193,6 @@ def compare_hierarchical_linkages(X, k, final_labels, linkages=None,
             name_a="KMeans", name_b=linkage_name.title(),
         )
     return pd.DataFrame(rows), comparisons
-
-
-def benchmark_label_tracking():
-    """Document where benchmark labels are stored in the workflow."""
-    return pd.DataFrame([
-        {
-            "solution": "Final KMeans",
-            "label_column": "cluster",
-            "scope": "regular customer dataset",
-            "purpose": "final assignment before outlier reintegration",
-        },
-        {
-            "solution": "Agglomerative linkages",
-            "label_column": "hierarchical comparison tables",
-            "scope": "sample only",
-            "purpose": "benchmark against KMeans under several linkages",
-        },
-        {
-            "solution": "Centroid Ward macro clusters",
-            "label_column": "macro_cluster",
-            "scope": "regular customer dataset",
-            "purpose": "two stage hierarchical benchmark",
-        },
-        {
-            "solution": "DBSCAN",
-            "label_column": "dbscan_cluster if enabled",
-            "scope": "benchmark only",
-            "purpose": "density and noise sensitivity check",
-        },
-        {
-            "solution": "SOM",
-            "label_column": "som_unit",
-            "scope": "regular customer dataset",
-            "purpose": "topology based visual profiling",
-        },
-    ])
 
 
 def fit_centroid_ward_macro(X, feature_cols, k, micro_k=20, random_state=0,
@@ -1277,6 +1274,18 @@ def dbscan_benchmark_table(X, eps_values=None, min_samples_values=None,
     ].reset_index(drop=True)
     return results, valid, invalid
 
+def practical_dbscan_candidates(results, min_clusters=2, max_clusters=12, max_noise_pct=35):
+    """Return DBSCAN candidates with valid silhouette and manageable noise."""
+    out = results.dropna(subset=["silhouette_non_noise"]).copy()
+    out = out[
+        out["n_clusters"].between(min_clusters, max_clusters)
+        & (out["noise_pct"] <= max_noise_pct)
+    ]
+    return out.sort_values(
+        ["silhouette_non_noise", "noise_pct"],
+        ascending=[False, True],
+    ).reset_index(drop=True)
+
 
 def maybe_fit_dbscan(X, run=False, eps=0.9, min_samples=10):
     """Optionally fit DBSCAN; otherwise keep it as benchmark only."""
@@ -1295,7 +1304,7 @@ def maybe_fit_dbscan(X, run=False, eps=0.9, min_samples=10):
 
 def build_som_features(df):
     """Default profiling variables used in the SOM diagnostic."""
-    return [c for c in [
+    return [
         "lifetime_spend_groceries",
         "lifetime_spend_vegetables",
         "lifetime_spend_meat",
@@ -1306,25 +1315,99 @@ def build_som_features(df):
         "lifetime_spend_technology",
         "percentage_of_products_bought_promotion",
         "total_children",
-        "customer_age",
-        "education_level",
         "number_complaints",
-    ] if c in df.columns]
+    ]
+
+
+def som_grid_search(
+    X,
+    sigmas=(0.5, 1.0, 1.5, 2.0),
+    learning_rates=(0.3, 0.5, 0.7, 0.9),
+    grid=(12, 12),
+    iterations=1000,
+    sample_size=8000,
+    random_state=0,
+):
+    """Grid search over SOM sigma and learning_rate.
+
+    Returns a DataFrame sorted by quantization_error (ascending), so the
+    first row is the best configuration.
+    """
+    from minisom import MiniSom
+
+    X = np.asarray(X, dtype=float)
+    rng = np.random.RandomState(random_state)
+    if len(X) > sample_size:
+        idx = rng.choice(len(X), sample_size, replace=False)
+        X_train = X[idx]
+    else:
+        X_train = X
+
+    rows = []
+    for sigma in sigmas:
+        for lr in learning_rates:
+            som = MiniSom(
+                grid[0], grid[1], input_len=X.shape[1],
+                sigma=sigma, learning_rate=lr,
+                neighborhood_function="gaussian",
+                random_seed=random_state,
+            )
+            som.random_weights_init(X_train)
+            som.train_random(X_train, iterations, verbose=False)
+            qe = float(som.quantization_error(X_train))
+            te = float(som.topographic_error(X_train))
+            rows.append({
+                "sigma": sigma,
+                "learning_rate": lr,
+                "quantization_error": round(qe, 4),
+                "topographic_error": round(te, 4),
+                "combined_score": round(qe + te, 4),
+            })
+
+    results = pd.DataFrame(rows).sort_values("combined_score").reset_index(drop=True)
+    return results
 
 
 def run_som_diagnostic(df, scaler_name="MinMax", grid=(12, 12), iterations=1000,
-                       sample_size=12000, random_state=0):
-    """Train the SOM diagnostic and plot its main views."""
+                       sample_size=12000, random_state=0,
+                       run_grid_search=True,
+                       sigmas=(0.5, 1.0, 1.5, 2.0),
+                       learning_rates=(0.3, 0.5, 0.7, 0.9)):
+    """Train the SOM diagnostic and plot its main views.
+
+    If run_grid_search=True, a sigma × learning_rate grid search is run first
+    and the best configuration (lowest combined QE+TE score) is used for the
+    final SOM. Set run_grid_search=False to skip the search and use the
+    defaults (sigma=1.2, learning_rate=0.5).
+    """
     feature_cols = build_som_features(df)
     scaler = get_scaler(scaler_name)
     X_som = apply_feature_pipeline(df, feature_cols, logabs=True, scaler=scaler, fit=True)
+
+    best_sigma, best_lr = 1.2, 0.5
+    if run_grid_search:
+        print("Running SOM hyperparameter grid search …")
+        gs_results = som_grid_search(
+            X_som,
+            sigmas=sigmas,
+            learning_rates=learning_rates,
+            grid=grid,
+            iterations=iterations,
+            sample_size=min(sample_size, 8000),
+            random_state=random_state,
+        )
+        display(gs_results.head(10))
+        best_sigma = float(gs_results.iloc[0]["sigma"])
+        best_lr = float(gs_results.iloc[0]["learning_rate"])
+        print(f"Best params → sigma={best_sigma}, learning_rate={best_lr}")
+
     curve, som = som_quantization_curve(
         X_som,
         grid=grid,
         iterations=iterations,
         checkpoints=[50, 100, 200, 400, 700, iterations],
-        sigma=1.2,
-        learning_rate=0.5,
+        sigma=best_sigma,
+        learning_rate=best_lr,
         sample_size=sample_size,
         random_state=random_state,
     )
@@ -1345,39 +1428,17 @@ def assign_and_plot_som(df, som, X_som, feature_cols, grid=(12, 12)):
     return units
 
 
-def consensus_report(X, labels, k, n_runs=25, random_state=0):
-    """Run consensus KMeans and print the main stability diagnostics."""
-    from sklearn.metrics import adjusted_rand_score
-
-    consensus_labels, stability = consensus_kmeans(
-        X, k, n_runs=n_runs, random_state=random_state
-    )
-    print("Single-run silhouette  :", round(silhouette_score(
-        X, labels, sample_size=8000, random_state=random_state), 4))
-    print("Consensus  silhouette  :", round(silhouette_score(
-        X, consensus_labels, sample_size=8000, random_state=random_state), 4))
-    print("Agreement single vs consensus (ARI):",
-          round(adjusted_rand_score(labels, consensus_labels), 4))
-    print("Mean stability:", round(stability.mean(), 3),
-          "| very stable (>=0.9):", f"{(stability >= 0.9).mean() * 100:.1f}%",
-          "| ambiguous (<0.6):", f"{(stability < 0.6).mean() * 100:.1f}%")
-    plot_stability(stability)
-    return consensus_labels, stability
-
-
 def default_profile_columns(df):
     """Default behavioural and demographic columns used for profiling."""
-    return [c for c in [
+    return [
         "log_total_spend",
         "percentage_of_products_bought_promotion",
         "distinct_stores_visited",
         "lifetime_total_distinct_products",
-        "customer_age",
-        "education_level",
         "tenure",
         "total_children",
         "number_complaints",
-    ] if c in df.columns]
+    ]
 
 
 def plot_segment_separation(data, label_col="cluster"):
@@ -1386,14 +1447,13 @@ def plot_segment_separation(data, label_col="cluster"):
     profile = profile_clusters(data, label_col, cols)
     scaled = plot_cluster_mean_comparison(profile, title="Normalised cluster mean comparison")
     display(scaled)
-    box_cols = [c for c in [
+    box_cols = [
         "log_total_spend",
         "percentage_of_products_bought_promotion",
         "distinct_stores_visited",
-        "customer_age",
         "total_children",
         "number_complaints",
-    ] if c in data.columns]
+    ]
     plot_boxplot_grid(data, box_cols, label_col=label_col)
     return scaled
 
@@ -1428,7 +1488,7 @@ def geographic_profile(data, label_col="cluster"):
             sub["longitude"].mean(),
             sub["latitude"].mean(),
             s=80,
-            color="red",
+            color=ACCENT_COLOR,
             marker="x",
         )
         ax.set_title(f"Cluster {cluster_id}", fontsize=9)
@@ -1475,21 +1535,26 @@ def reattach_outliers_and_export(regular_df, outlier_df, kmeans_model, feature_c
 
 
 def plot_sample_dendrogram(X, title, linkage="ward", sample_size=3000,
-                           cut_height=None, random_state=0):
+                           cut_height=None, k=None, random_state=0):
     """Fit and plot one truncated dendrogram on a customer sample."""
     _, model = fit_dendrogram_model(
         X, sample_size=sample_size, linkage=linkage, random_state=random_state
     )
+    if cut_height is None and k is not None and hasattr(model, "distances_"):
+        n = len(model.distances_) + 1
+        idx = n - k - 1
+        if 0 <= idx < len(model.distances_) - 1:
+            cut_height = (model.distances_[idx] + model.distances_[idx + 1]) / 2
     plt.figure(figsize=(12, 5))
     plt.title(title)
     plot_dendrogram(model, truncate_mode="level", p=5)
     if cut_height is not None:
         plt.axhline(
             y=cut_height,
-            color="red",
+            color=ACCENT_COLOR,
             linestyle="--",
             linewidth=1.5,
-            label=f"cut = {cut_height}",
+            label=f"cut = {cut_height:.2f}" if k is None else f"k={k}  (cut ≈ {cut_height:.2f})",
         )
         plt.legend(loc="upper right")
     plt.xlabel("Sample of customers")
@@ -1498,7 +1563,7 @@ def plot_sample_dendrogram(X, title, linkage="ward", sample_size=3000,
 
 
 def plot_alternative_dendrograms(X, title_suffix, linkages=None, cut_heights=None,
-                                 sample_size=3000, random_state=0):
+                                 k=None, sample_size=3000, random_state=0):
     """Plot complete, average and single linkage dendrogram checks."""
     linkages = linkages or ["complete", "average", "single"]
     cut_heights = cut_heights or {}
@@ -1509,6 +1574,7 @@ def plot_alternative_dendrograms(X, title_suffix, linkages=None, cut_heights=Non
             linkage=linkage_name,
             sample_size=sample_size,
             cut_height=cut_heights.get(linkage_name),
+            k=k,
             random_state=random_state,
         )
 
@@ -1533,6 +1599,11 @@ def display_method_benchmarks(method_benchmarks):
     ).head(5))
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Consensus KMeans (ensemble)
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 def apply_centroid_ward_macro(data, X, feature_cols, k, micro_k=20, random_state=0):
     """Fit centroid Ward macro clusters, attach labels and display diagnostics."""
     micro, centroids, Z, macro_labels = fit_centroid_ward_macro(
@@ -1555,4 +1626,120 @@ def apply_centroid_ward_macro(data, X, feature_cols, k, micro_k=20, random_state
 
     display(centroid_ward_report(X, data["cluster"].values, data["macro_cluster"].values))
     return micro, centroids, Z
+
+
+# ---------------------------------------------------------------------------
+# Outlier strategy comparison: separation vs IQR capping
+# ---------------------------------------------------------------------------
+
+def compare_outlier_strategies(
+    separation_df,
+    capped_df,
+    feature_cols,
+    k,
+    scaler_name="MinMax",
+    logabs=False,
+    random_state=0,
+    sample_size=10_000,
+):
+    """Compare clustering quality for two outlier handling strategies.
+
+    Parameters
+    ----------
+    separation_df : pd.DataFrame
+        Regular customers only (outliers already removed). The model is
+        fitted on this set; outliers are not reattached here — this function
+        focuses on clustering quality, not full coverage.
+    capped_df : pd.DataFrame
+        Full dataset with IQR-capped values (all customers included).
+    feature_cols : list[str]
+        Columns used for clustering distance.
+    k : int
+        Number of clusters.
+    scaler_name : str
+        Scaler to apply ('MinMax', 'Standard', 'Robust').
+    logabs : bool
+        Whether to apply log1p transform before scaling.
+    random_state : int
+    sample_size : int
+        Silhouette sample size.
+
+    Returns
+    -------
+    pd.DataFrame
+        One row per strategy with silhouette, balance and size metrics.
+    """
+    results = []
+
+    for label, df in [("Separation (regular only)", separation_df),
+                      ("IQR capping (full dataset)", capped_df)]:
+        scaler = get_scaler(scaler_name)
+        X = apply_feature_pipeline(df, feature_cols, logabs, scaler, fit=True)
+        model = fit_kmeans(X, k, random_state=random_state)
+        labels = model.labels_
+        sil = silhouette_score(
+            X, labels,
+            sample_size=min(sample_size, len(labels)),
+            random_state=random_state,
+        )
+        rng = np.random.RandomState(random_state)
+        idx = rng.choice(len(labels), min(sample_size, len(labels)), replace=False)
+        sil_vals = silhouette_samples(X[idx], labels[idx])
+        sizes = pd.Series(labels).value_counts()
+        results.append({
+            "strategy": label,
+            "n_customers": len(df),
+            "k": k,
+            "scaler": scaler_name,
+            "silhouette": round(float(sil), 4),
+            "negative_silhouette_pct": round(float((sil_vals < 0).mean() * 100), 2),
+            "min_cluster_pct": round(float((sizes / len(labels) * 100).min()), 2),
+            "max_cluster_pct": round(float((sizes / len(labels) * 100).max()), 2),
+        })
+
+    return pd.DataFrame(results)
+
+
+def plot_strategy_umap_comparison(
+    separation_df,
+    capped_df,
+    feature_cols,
+    k,
+    scaler_name="MinMax",
+    logabs=False,
+    sample_size=6_000,
+    random_state=0,
+):
+    """Side-by-side UMAP plots for separation vs capping strategies."""
+    fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+
+    for ax, (label, df) in zip(axes, [
+        ("Separation (regular only)", separation_df),
+        ("IQR capping (full dataset)", capped_df),
+    ]):
+        scaler = get_scaler(scaler_name)
+        X = apply_feature_pipeline(df, feature_cols, logabs, scaler, fit=True)
+        model = fit_kmeans(X, k, random_state=random_state)
+        labels = model.labels_
+
+        X_sub, lab_sub = subsample(X, labels, n=sample_size, random_state=random_state)
+        try:
+            import umap
+            reducer = umap.UMAP(n_components=2, random_state=random_state)
+            emb = reducer.fit_transform(X_sub)
+            method = "UMAP"
+        except ImportError:
+            from sklearn.decomposition import PCA
+            emb = PCA(n_components=2, random_state=random_state).fit_transform(X_sub)
+            method = "PCA (UMAP unavailable)"
+
+        scatter = ax.scatter(emb[:, 0], emb[:, 1], c=lab_sub, cmap="tab10",
+                             s=4, alpha=0.5)
+        ax.set_title(f"{method} — {label}", fontsize=11)
+        ax.set_xlabel(f"{method} 1")
+        ax.set_ylabel(f"{method} 2")
+        plt.colorbar(scatter, ax=ax, label="Cluster")
+
+    plt.tight_layout()
+    plt.show()
 
