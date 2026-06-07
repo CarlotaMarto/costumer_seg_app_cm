@@ -545,7 +545,7 @@ def render_footer():
               <p style='color:#64748b; line-height:1.6; margin:0; font-size:14px; padding-top: 27px;'>This project is optimized for executive-level business intelligence and strategic decision making.</p>
             </div>
           </div>
-          <div style='background-color: #000000; color: #ffffff; padding: 18px 32px; margin-top: 48px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; box-sizing: border-box;'>
+          <div style='background-color: #000000; color: #ffffff; padding: 18px 32px; margin-top: 48px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; width: 100%; max-width: 1080px; margin: 48px auto 0 auto; border-radius: 12px; box-sizing: border-box;'>
             <span>&copy; 2026 Customer Segmentation Project - Academic Use Only</span>
             <span style='color: #a3a3a3;'>Built for Machine Learning II</span>
           </div>
