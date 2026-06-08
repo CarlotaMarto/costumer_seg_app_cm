@@ -610,7 +610,7 @@ if selected_page == "Overview":
     st.markdown(f"""
     <div style='display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 32px; margin-top: 0px; margin-bottom: 24px; font-family: "Plus Jakarta Sans", "Inter", sans-serif; width: 100%;'>
         <div style='flex: 1.5; min-width: 320px;'>
-            <h1 style='font-size: clamp(2.5rem, 5.5vw, 5rem); font-weight: 800; color: #000000; line-height: 1.05; margin: 0 0 20px 0; letter-spacing: -0.04em;'>Understand every customer.<br/>Grow with purpose.</h1>
+            <h1 style='font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; color: #000000; line-height: 1.05; margin: 0 0 20px 0; letter-spacing: -0.04em;'>Understand every customer.<br/>Grow with purpose.</h1>
             <p style='font-size: 17px; color: #5f6368; line-height: 1.7; margin: 0; max-width: 520px;'>A machine learning project that segments 34,060 supermarket customers into 8 distinct communities — uncovering who they are, how they shop, and what drives their decisions.</p>
         </div>
         <div style='flex: none; display: flex; flex-direction: column; gap: 24px; white-space: nowrap; min-width: 150px;'>
