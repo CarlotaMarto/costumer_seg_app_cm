@@ -1095,60 +1095,298 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
     <div style='width:100%; box-sizing:border-box; margin-bottom:32px;'>
       <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 1 — Data Preprocessing</div>
-      <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 14px 0;'>
+      <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0;'>
         This notebook applies all transformations identified during the exploratory analysis. The goal is to produce a clean, analysis-ready dataset without losing customers unnecessarily. Every decision is justified by domain logic or statistical evidence — no arbitrary removals are made.
       </p>
 
-      <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:28px;'>
-        <div>
-          <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:12px;'>Corrections applied</div>
-          <div style='display:flex; flex-direction:column; gap:10px;'>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>Future transaction years → NaN</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>Values of <code>year_first_transaction</code> exceeding the current year are data entry errors. Set to NaN rather than dropping the entire customer row.</div>
-            </div>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>Invalid promotion ratio → NaN</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'><code>percentage_of_products_bought_promotion</code> values outside [0, 1] are nulled. These are physically impossible and cannot be imputed.</div>
-            </div>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>Zero-imputation for count columns</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'><code>kids_home</code>, <code>teens_home</code>, and <code>number_complaints</code> receive zero imputation. Domain logic: a missing count means the event was not recorded, which is equivalent to zero.</div>
-            </div>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>Longitude: negative values kept</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>Negative longitudes are geographically valid for Portugal (west of the Greenwich meridian) and are not treated as errors.</div>
-            </div>
-          </div>
+      <!-- Stage 1: Data Cleaning & Missing Values Treatment -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>1. Data Cleaning & Missing Values Treatment</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          Data cleaning and missing value treatment are crucial initial steps to prevent downstream model bias and mathematical distance calculation errors. In this phase, logical inconsistencies are corrected, raw types are structured, and missing entries are addressed using custom domain logic and KNN imputation.
+        </p>
+      </div>
+
+      <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:28px;'>
+        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Future years → NaN</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Future transaction years exceeding 2024 are logical errors. They are set to NaN rather than dropping the customer row.</div>
         </div>
-        <div>
-          <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:12px;'>Feature engineering</div>
-          <div style='display:flex; flex-direction:column; gap:10px;'>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>tenure (years since first transaction)</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>Replaces <code>year_first_transaction</code> to avoid redundancy and make the feature directly interpretable as relationship length.</div>
-            </div>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>typical_hour_sin / typical_hour_cos</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>Cyclic transformation of <code>typical_hour</code> (max=24). Preserves the circular nature of time: 23:00 and 01:00 are adjacent, not distant.</div>
-            </div>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>Annual spend rates</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>Lifetime spend divided by tenure to normalise for relationship length. A customer of 2 years and a customer of 15 years spending the same total are very different profiles.</div>
-            </div>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>lifetime_spend_technology</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>Aggregate of electronics + videogames spend, capturing total technology investment as a single signal.</div>
-            </div>
-          </div>
+        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Invalid promotion → NaN</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Promotion ratios outside the valid [0, 1] range are set to NaN, as they represent invalid measurements.</div>
+        </div>
+        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Zero-imputation for counts</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Missing values in kids_home, teens_home, and number_complaints are filled with 0, assuming lack of entry implies zero count.</div>
+        </div>
+        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Loyalty indicator flag</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Instead of discarding the 38% missing loyalty card numbers, we engineer a binary flag (1 if card exists, 0 otherwise).</div>
         </div>
       </div>
 
-      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:24px;'>
-        <div style='font-size:14px; font-weight:700; color:#111827; margin-bottom:14px;'>Outlier separation — the consensus rule</div>
+      <div style='margin-bottom:28px;'>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 12px 0;'>
+          <strong>Negative Value Analysis:</strong> We scan all numerical columns for values below zero. While negative values in <code>longitude</code> are logically valid (since Lisbon is located west of the Greenwich meridian), negative values in <code>percentage_of_products_bought_promotion</code> represent a logical error and are set to NaN.
+        </p>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 12px 0;'>
+          <strong>Data Type Coercion:</strong> Mixed types in object columns are coerced. For instance, <code>customer_birthdate</code> is parsed to <code>datetime64</code> to compute age, and counts like <code>kids_home</code> and <code>number_complaints</code> are cast to nullable integers to handle noise.
+        </p>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>
+          <strong>KNN Imputation:</strong> Remaining missing values in variables such as typical hour, age, and spend categories are handled using a K-Nearest Neighbors (KNN) model with $k=5$. Imputation is only executed after outliers are separated to ensure that extreme multivariate observations do not bias the imputations of the regular customer base.
+        </p>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    customer_info_pre = pd.read_csv(BASE_DIR / "datasets" / "customer_info.csv")
+    info_unscaled = pd.read_csv(BASE_DIR / "datasets" / "info_clustering_unscaled.csv")
+    outlier_df = pd.read_csv(BASE_DIR / "datasets" / "outlier_dataset.csv")
+
+    current_year = 2024
+    # Calculate counts of anomalies on raw data
+    future_years = customer_info_pre[customer_info_pre["year_first_transaction"] > current_year]
+    future_year_count = len(future_years)
+    invalid_promo = customer_info_pre[(customer_info_pre["percentage_of_products_bought_promotion"] < 0) | (customer_info_pre["percentage_of_products_bought_promotion"] > 1)]
+    invalid_promo_count = len(invalid_promo)
+
+    # 1. Anomalies Chart
+    anomalies_df = pd.DataFrame({
+        "Anomaly Type": ["Future transaction years (>2024)", "Invalid promotion ratio (<0 or >1)"],
+        "Count": [future_year_count, invalid_promo_count]
+    })
+    
+    st.markdown("""
+<div style='margin-top:10px; margin-bottom:12px;'>
+  <div style='font-size:13px; font-weight:700; color:#111827;'>Data cleaning anomalies detected in raw dataset</div>
+</div>
+""", unsafe_allow_html=True)
+
+    anomalies_chart = alt.Chart(anomalies_df).mark_bar(color="#c94f38", cornerRadiusTopRight=6, cornerRadiusBottomRight=6).encode(
+        y=alt.Y("Anomaly Type:N", title="Anomaly Type"),
+        x=alt.X("Count:Q", title="Number of Records"),
+        tooltip=["Anomaly Type", "Count"]
+    ).properties(height=140)
+    st.altair_chart(anomalies_chart, use_container_width=True)
+
+    # Raw missing values bar chart
+    raw_missing = customer_info_pre.isna().sum().reset_index(name="missing_count")
+    raw_missing.columns = ["Column", "Missing Count"]
+    raw_missing["Missing %"] = (raw_missing["Missing Count"] / len(customer_info_pre)) * 100
+    raw_missing = raw_missing[raw_missing["Missing Count"] > 0].sort_values("Missing %", ascending=False)
+    
+    st.markdown("""
+<div style='margin-top:20px; margin-bottom:12px;'>
+  <div style='font-size:13px; font-weight:700; color:#111827;'>Missing values percentage by feature before imputation (raw dataset)</div>
+</div>
+""", unsafe_allow_html=True)
+
+    missing_chart = alt.Chart(raw_missing).mark_bar(color="#c94f38", cornerRadiusTopRight=4, cornerRadiusBottomRight=4).encode(
+        y=alt.Y("Column:N", sort="-x", title="Feature"),
+        x=alt.X("Missing %:Q", title="Missing Percentage (%)"),
+        tooltip=["Column", alt.Tooltip("Missing Count:Q", format=","), alt.Tooltip("Missing %:Q", format=".2f")]
+    ).properties(height=280)
+    st.altair_chart(missing_chart, use_container_width=True)
+
+    # 2. Visual Heatmap of Missing Values (Plotly Heatmap with custom palette)
+    df_missing_sample = customer_info_pre.sample(min(2500, len(customer_info_pre)), random_state=42).sort_index()
+    null_matrix = df_missing_sample.isnull().astype(int)
+    missing_cols = null_matrix.sum()[null_matrix.sum() > 0].index.tolist()
+    
+    if missing_cols:
+        null_matrix_filtered = null_matrix[missing_cols]
+        clean_cols = [col.replace("_", " ").title() for col in missing_cols]
+        
+        import plotly.graph_objects as go
+        fig_heat = go.Figure(data=go.Heatmap(
+            z=null_matrix_filtered.values,
+            x=clean_cols,
+            colorscale=[[0, '#fff8f2'], [1, '#c94f38']],
+            showscale=False,
+            ygaps=0,
+            xgaps=0
+        ))
+        fig_heat.update_layout(
+            margin=dict(l=40, r=40, t=15, b=40),
+            height=280,
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            xaxis={'title': "Features with Missing Values", 'tickangle': 45},
+            yaxis={'title': "Customers (Sample of 2,500)", 'showticklabels': False}
+        )
+        
+        st.markdown("""
+<div style='margin-top:20px; margin-bottom:12px;'>
+  <div style='font-size:13px; font-weight:700; color:#111827;'>Visual map of missing values distribution (raw dataset sample)</div>
+</div>
+""", unsafe_allow_html=True)
+        st.plotly_chart(fig_heat, use_container_width=True)
+
+    st.markdown("""
+<div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The data cleaning shows specific logical errors (such as future transaction years and negative promotion percentages) that were successfully resolved. The missing value map confirms that <code>loyalty_card_number</code> contains the largest volume of missing values (approx 38%). Instead of removing these records or imputing card numbers, we engineer a binary loyalty indicator. Features like spend categories (meat, fish, vegetables) and typical hour have less than 3% missing rates. These are cleanly handled later by KNN Imputation (k=5) inside the regular base, preserving customer rows without losing significant volume.</p>
+</div>
+""", unsafe_allow_html=True)
+
+    # Stage 2: Aggregation Feature Engineering
+    st.markdown("""
+      <!-- Stage 2: Aggregation Feature Engineering -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>2. Aggregation Feature Engineering</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          Before outlier separation and final transformation, we create broader demographic and loyalty features by parsing raw identifiers and dates:
+        </p>
+      </div>
+
+      <div style='display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px;'>
+        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Age calculation</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Age is calculated dynamically relative to the 2024 temporal baseline. Implausible ages (under 16 or over 100) are set to NaN.</div>
+        </div>
+        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Education level proxy</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Academic titles (BSc., MSc., PhD.) are extracted from names as a proxy for education level (years of study), and names are cleaned.</div>
+        </div>
+        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Gender binary mapping</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>The raw customer_gender text field (male/female) is mapped to a binary indicator (is_male: 1 for male, 0 for female).</div>
+        </div>
+      </div>
+    """, unsafe_allow_html=True)
+
+    # Engineered categorical features summary (Gender, Loyalty, Education)
+    gender_df = info_unscaled["customer_gender"].value_counts().reset_index()
+    gender_df.columns = ["Gender", "Customers"]
+    gender_df["Gender"] = gender_df["Gender"].astype(str).str.title()
+    
+    gender_chart = alt.Chart(gender_df).mark_bar(color="#8c6f53", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+        x=alt.X("Gender:N", title="Gender"),
+        y=alt.Y("Customers:Q", title="Customers"),
+        tooltip=["Gender", alt.Tooltip("Customers:Q", format=",")]
+    ).properties(height=220)
+
+    loyalty_df = info_unscaled["customer_loyalty_flag"].value_counts().reset_index()
+    loyalty_df.columns = ["Loyalty", "Customers"]
+    loyalty_df["Loyalty"] = loyalty_df["Loyalty"].map({1: "Loyal", 0: "Non-Loyal"})
+    
+    loyalty_chart = alt.Chart(loyalty_df).mark_bar(color="#b77b45", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+        x=alt.X("Loyalty:N", title="Loyalty Card Flag"),
+        y=alt.Y("Customers:Q", title="Customers"),
+        tooltip=["Loyalty", alt.Tooltip("Customers:Q", format=",")]
+    ).properties(height=220)
+
+    def get_edu_label(name):
+        if pd.isna(name):
+            return "High School (12y)"
+        name = str(name).strip().lower()
+        if name.startswith("bsc."):
+            return "BSc (15y)"
+        elif name.startswith("msc."):
+            return "MSc (17y)"
+        elif name.startswith("phd."):
+            return "PhD (22y)"
+        return "High School (12y)"
+
+    edu_series = info_unscaled["customer_name"].apply(get_edu_label)
+    edu_df = edu_series.value_counts().reset_index()
+    edu_df.columns = ["Education", "Customers"]
+    
+    edu_chart = alt.Chart(edu_df).mark_bar(color="#c94f38", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+        x=alt.X("Education:N", title="Education Level", sort=["High School (12y)", "BSc (15y)", "MSc (17y)", "PhD (22y)"]),
+        y=alt.Y("Customers:Q", title="Customers"),
+        tooltip=["Education", alt.Tooltip("Customers:Q", format=",")]
+    ).properties(height=220)
+
+    st.markdown("""
+<div style='margin-top:10px; margin-bottom:12px;'>
+  <div style='font-size:13px; font-weight:700; color:#111827;'>Distribution of engineered categorical features</div>
+</div>
+""", unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.altair_chart(gender_chart, use_container_width=True)
+    with col2:
+        st.altair_chart(loyalty_chart, use_container_width=True)
+    with col3:
+        st.altair_chart(edu_chart, use_container_width=True)
+
+    # 3. Household distributions
+    kids_df = info_unscaled["kids_home"].value_counts().reset_index()
+    kids_df.columns = ["Kids", "Customers"]
+    kids_chart = alt.Chart(kids_df).mark_bar(color="#b77b45", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+        x=alt.X("Kids:N", title="Kids at Home"),
+        y=alt.Y("Customers:Q", title="Customers"),
+        tooltip=["Kids", alt.Tooltip("Customers:Q", format=",")]
+    ).properties(height=220)
+
+    teens_df = info_unscaled["teens_home"].value_counts().reset_index()
+    teens_df.columns = ["Teens", "Customers"]
+    teens_chart = alt.Chart(teens_df).mark_bar(color="#8c6f53", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+        x=alt.X("Teens:N", title="Teens at Home"),
+        y=alt.Y("Customers:Q", title="Customers"),
+        tooltip=["Teens", alt.Tooltip("Customers:Q", format=",")]
+    ).properties(height=220)
+
+    complaints_df = info_unscaled["number_complaints"].value_counts().reset_index()
+    complaints_df.columns = ["Complaints", "Customers"]
+    complaints_chart = alt.Chart(complaints_df).mark_bar(color="#c94f38", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+        x=alt.X("Complaints:N", title="Number of Complaints"),
+        y=alt.Y("Customers:Q", title="Customers"),
+        tooltip=["Complaints", alt.Tooltip("Customers:Q", format=",")]
+    ).properties(height=220)
+
+    st.markdown("""
+<div style='margin-top:20px; margin-bottom:12px;'>
+  <div style='font-size:13px; font-weight:700; color:#111827;'>Distribution of household and complaints variables (after zero-filling)</div>
+</div>
+""", unsafe_allow_html=True)
+
+    col1_hh, col2_hh, col3_hh = st.columns(3)
+    with col1_hh:
+        st.altair_chart(kids_chart, use_container_width=True)
+    with col2_hh:
+        st.altair_chart(teens_chart, use_container_width=True)
+    with col3_hh:
+        st.altair_chart(complaints_chart, use_container_width=True)
+
+    # Customer age distribution
+    st.markdown("""
+<div style='margin-top:20px; margin-bottom:12px;'>
+  <div style='font-size:13px; font-weight:700; color:#111827;'>Engineered customer age distribution</div>
+</div>
+""", unsafe_allow_html=True)
+    customer_info_pre["customer_birthdate"] = pd.to_datetime(customer_info_pre["customer_birthdate"], errors="coerce")
+    customer_info_pre["customer_age"] = 2024 - customer_info_pre["customer_birthdate"].dt.year
+    age_clean = customer_info_pre.dropna(subset=["customer_age"])
+    age_hist = alt.Chart(age_clean).mark_bar(color="#b77b45", opacity=0.85).encode(
+        x=alt.X("customer_age:Q", bin=alt.Bin(maxbins=25), title="Age (years)"),
+        y=alt.Y("count():Q", title="Customers"),
+        tooltip=[alt.Tooltip("count():Q", title="Customers")]
+    ).properties(height=280)
+    st.altair_chart(age_hist, use_container_width=True)
+
+    st.markdown("""
+<div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The age distribution covers a wide spread (centering on 30 to 50 years). Using birthdates directly would introduce raw date formats that distance calculations cannot interpret. Calculating age dynamically relative to the 2024 temporal baseline resolves this. The categorical summaries also confirm that gender is almost evenly split, loyalty is map-encoded for 62% of customers, and name parsing successfully identifies academic prefixes (BSc, MSc, PhD) as education level proxies. Zero-filling kids, teens and complaints handles the missing values under the assumption that missing counts represent zero counts.</p>
+</div>
+""", unsafe_allow_html=True)
+
+    # Stage 3: Outlier Separation — The Consensus Rule
+    st.markdown("""
+      <!-- Stage 3: Outlier Separation -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>3. Outlier Separation — The Consensus Rule</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
           Rather than capping or removing outliers based on a single method, a <strong>conservative consensus rule</strong> is applied: a customer is set aside only when simultaneously flagged as an outlier by all three of the following methods:
         </p>
+      </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
         <div style='display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:12px;'>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:10px; padding:14px 16px; text-align:center;'>
             <div style='font-size:13px; font-weight:700; color:#c94f38;'>IQR</div>
@@ -1162,93 +1400,18 @@ elif selected_page == "Data Preprocessing":
           </div>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:10px; padding:14px 16px; text-align:center;'>
             <div style='font-size:13px; font-weight:700; color:#c94f38;'>3rd method</div>
-            <div style='font-size:22px; font-weight:800; color:#c94f38; margin:4px 0;'>∩</div>
+            <div style='font-size:22px; font-weight:800; color:#c94f38; margin:4px 0;'>&cap;</div>
             <div style='font-size:12px; color:#7a6454;'>all three must agree</div>
           </div>
         </div>
-        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:14px 0;'>
           Customers flagged by all three methods are exported to <code>outlier_dataset.csv</code>. The regular base is then processed with KNN imputation. This approach ensures that only multivariate extremes are removed — customers with one extreme variable but otherwise normal behaviour are retained. Outliers are later <strong>reattached to their nearest cluster centroid</strong> after the model is fitted.
         </p>
-      </div>
-
-      <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px;'>
-        <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Why export unscaled?</div>
-        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>The final dataset is exported <strong>without scaling</strong>. Scaling is treated as a modelling choice — MinMaxScaler and RobustScaler are both evaluated in Notebook 3 against each other. Keeping the export unscaled ensures that the same raw dataset can be tested against any scaling strategy without re-running preprocessing.</div>
-      </div>
-    </div>
     """, unsafe_allow_html=True)
 
-    customer_info_pre = pd.read_csv(BASE_DIR / "datasets" / "customer_info.csv")
-    info_unscaled = pd.read_csv(BASE_DIR / "datasets" / "info_clustering_unscaled.csv")
-    outlier_df = pd.read_csv(BASE_DIR / "datasets" / "outlier_dataset.csv")
-
-    # Chart 1: Age distribution
+    # Dataset split after consensus outlier separation
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Customer age distribution</div>
-</div>
-""", unsafe_allow_html=True)
-    customer_info_pre["customer_birthdate"] = pd.to_datetime(customer_info_pre["customer_birthdate"], errors="coerce")
-    customer_info_pre["customer_age"] = 2024 - customer_info_pre["customer_birthdate"].dt.year
-    age_clean = customer_info_pre.dropna(subset=["customer_age"])
-    age_hist = alt.Chart(age_clean).mark_bar(color="#374151", opacity=0.85).encode(
-        x=alt.X("customer_age:Q", bin=alt.Bin(maxbins=25), title="Age (years)"),
-        y=alt.Y("count():Q", title="Customers"),
-        tooltip=[alt.Tooltip("count():Q", title="Customers")]
-    ).properties(height=300)
-    st.altair_chart(age_hist, use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The age distribution spans a wide range, with the dominant band falling in the 30 to 50 year range. Rather than using the raw birthdate field directly as a feature, age is engineered as the difference between the reference year 2024 and the birth year extracted from the <code>customer_birthdate</code> timestamp column. This approach resolves two issues: the raw birthdate is a datetime string containing hours and minutes that carry no meaningful information for customer profiling, and storing birthdates directly would introduce a non-linear relationship with time that is harder to interpret in a distance-based model. The resulting <code>customer_age</code> integer is directly interpretable as years of age and is used as a profiling variable in segment characterisation, though it is not included in the clustering feature set to avoid confounding behavioural differences with demographic age effects.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Chart 2: Cyclic hour encoding
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Cyclic encoding of typical shopping hour</div>
-</div>
-""", unsafe_allow_html=True)
-    hour_scatter = alt.Chart(info_unscaled.sample(min(5000, len(info_unscaled)), random_state=42)).mark_circle(color="#374151", opacity=0.3, size=10).encode(
-        x=alt.X("typical_hour_sin:Q", title="sin(hour)", scale=alt.Scale(domain=[-1.1, 1.1])),
-        y=alt.Y("typical_hour_cos:Q", title="cos(hour)", scale=alt.Scale(domain=[-1.1, 1.1])),
-        tooltip=["typical_hour_sin", "typical_hour_cos"]
-    ).properties(height=380)
-    st.altair_chart(hour_scatter, use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The raw <code>typical_hour</code> variable is an integer in [0, 23] representing the most common hour of shopping. Using this integer directly in a clustering distance metric creates a topological error: hour 23 and hour 0 are adjacent in real time but maximally distant numerically (a difference of 23). Sine and cosine encoding resolves this by mapping the circular hour dimension onto a two-dimensional unit circle, where every pair of adjacent hours is equally close regardless of where the boundary between days falls. The scatter plot above confirms that the encoding is correct: points form a circular arc pattern, and the density is distributed smoothly around the circle rather than clustering at the numerical extremes. Customers who shop at 23:00 and those who shop at 01:00 are now correctly represented as near-neighbours in feature space.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Chart 3: Spend boxplots after preprocessing
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Annual spend per category after preprocessing</div>
-</div>
-""", unsafe_allow_html=True)
-    annual_cols = ["annual_spend_groceries", "annual_spend_electronics", "annual_spend_vegetables", "annual_spend_meat", "annual_spend_fish", "annual_spend_hygiene"]
-    spend_melt = info_unscaled[annual_cols].melt(var_name="category", value_name="annual_spend")
-    spend_melt["category"] = spend_melt["category"].str.replace("annual_spend_", "", regex=False).str.replace("_", " ").str.title()
-    spend_melt = spend_melt.dropna(subset=["annual_spend"])
-    box_chart_pre = alt.Chart(spend_melt).mark_boxplot(color="#374151", outliers={"size": 4, "opacity": 0.2}).encode(
-        x=alt.X("category:N", title="Category"),
-        y=alt.Y("annual_spend:Q", title="Annual spend"),
-        tooltip=["category"]
-    ).properties(height=360)
-    st.altair_chart(box_chart_pre, use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The boxplots confirm that right-skew persists even after the preprocessing steps are applied. This is an expected and deliberate outcome: the objective of the outlier separation step is not to eliminate all distributional asymmetry but to remove only the most extreme multivariate observations that would distort cluster centroids. Remaining spread represents genuine natural variation in customer spending behaviour. The wide interquartile ranges across categories, particularly groceries, indicate that spending patterns are highly heterogeneous within the regular customer base, which is precisely the signal that the clustering model is designed to capture. Capping or transforming these values would suppress the very differences the segmentation aims to detect.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Chart 4: Outlier dataset size vs regular base
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+<div style='margin-top:20px; margin-bottom:12px;'>
   <div style='font-size:13px; font-weight:700; color:#111827;'>Dataset split after consensus outlier separation</div>
 </div>
 """, unsafe_allow_html=True)
@@ -1256,25 +1419,105 @@ elif selected_page == "Data Preprocessing":
         "Dataset": ["Regular base", "Outlier dataset"],
         "Customers": [len(info_unscaled), len(outlier_df)]
     })
-    split_chart = alt.Chart(split_df).mark_bar(color="#374151", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+    split_chart = alt.Chart(split_df).mark_bar(color="#b77b45", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
         x=alt.X("Dataset:N", title=""),
         y=alt.Y("Customers:Q", title="Number of customers"),
         tooltip=["Dataset", alt.Tooltip("Customers:Q", format=",")]
-    ).properties(height=300)
+    ).properties(height=280)
     st.altair_chart(split_chart, use_container_width=True)
+
     st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The chart demonstrates the conservative nature of the consensus outlier rule: the overwhelming majority of customers remain in the regular base, with only 1,023 customers (approximately 3.1% of the total) separated into the outlier dataset. This proportion is consistent with a rule that requires simultaneous agreement from three independent detection methods: univariate IQR with a generous multiplier of k = 2.0, DBSCAN density-based isolation with eps = 1.0, and a third method. A customer flagged by only one or two methods is retained in the regular base. This conservative threshold avoids the common error of over-excluding customers who are unusual on a single variable but otherwise unremarkable in the multivariate space. Separated outlier customers are not discarded; they are reassigned to their nearest cluster centroid after the model is fitted on the regular base.</p>
+<div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The chart demonstrates the conservative nature of the consensus outlier rule: the overwhelming majority of customers remain in the regular base, with only 1,023 customers (approx. 3.1%) separated. This conservative threshold avoids over-excluding customers who are unusual on a single variable but unremarkable in the multivariate space. Outliers are reattached to their nearest cluster centroid after model fitting.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # Chart 5: Correlation heatmap
+    # Stage 4: Transformation Feature Engineering & Export
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Feature correlation matrix</div>
+      <!-- Stage 4: Transformation Feature Engineering -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>4. Transformation Feature Engineering & Export</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          After outlier separation, we apply mathematical transformations to prepare our variables for modeling, ensuring distance metrics operate correctly across circular dimensions and spending volume:
+        </p>
+      </div>
+
+      <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:28px;'>
+        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>tenure (years of relationship)</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Replaces raw year_first_transaction to represent lifecycle duration as an interpretable numerical span.</div>
+        </div>
+        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>typical_hour sin/cos</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Sine and cosine transformations map typical shopping hour to a unit circle, preserving adjacent hour distance.</div>
+        </div>
+        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Annual spend rates</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Normalizes total spend by relationship tenure, preventing long tenure from inflating relative spending profiles.</div>
+        </div>
+        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Technology spend</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Aggregates electronics and videogames into a single feature, reducing dimensionality and representing total tech affinity.</div>
+        </div>
+      </div>
+    """, unsafe_allow_html=True)
+
+    # Typical hour cyclic encoding scatter plot
+    st.markdown("""
+<div style='margin-top:20px; margin-bottom:12px;'>
+  <div style='font-size:13px; font-weight:700; color:#111827;'>Cyclic typical shopping hour scatter plot</div>
 </div>
 """, unsafe_allow_html=True)
+    hour_scatter = alt.Chart(info_unscaled.sample(min(5000, len(info_unscaled)), random_state=42)).mark_circle(color="#c94f38", opacity=0.4, size=15).encode(
+        x=alt.X("typical_hour_sin:Q", title="sin(hour)", scale=alt.Scale(domain=[-1.1, 1.1])),
+        y=alt.Y("typical_hour_cos:Q", title="cos(hour)", scale=alt.Scale(domain=[-1.1, 1.1])),
+        tooltip=["typical_hour_sin", "typical_hour_cos"]
+    ).properties(height=340)
+    st.altair_chart(hour_scatter, use_container_width=True)
+
+    st.markdown("""
+<div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Using raw hours directly (0 to 23) introduces a boundary error where 23:00 and 00:00 appear maximally distant (difference of 23). The cyclic encoding resolves this by plotting them on a circle, ensuring hour 23 and hour 0 are correctly recognized as adjacent.</p>
+</div>
+""", unsafe_allow_html=True)
+
+    # Spend boxplots after preprocessing
+    st.markdown("""
+<div style='margin-top:20px; margin-bottom:12px;'>
+  <div style='font-size:13px; font-weight:700; color:#111827;'>Annual spend per category after preprocessing</div>
+</div>
+""", unsafe_allow_html=True)
+    annual_cols = ["annual_spend_groceries", "annual_spend_electronics", "annual_spend_vegetables", "annual_spend_meat", "annual_spend_fish", "annual_spend_hygiene"]
+    spend_melt = info_unscaled[annual_cols].melt(var_name="category", value_name="annual_spend")
+    spend_melt["category"] = spend_melt["category"].str.replace("annual_spend_", "", regex=False).str.replace("_", " ").str.title()
+    spend_melt = spend_melt.dropna(subset=["annual_spend"])
+    box_chart_pre = alt.Chart(spend_melt).mark_boxplot(color="#8c6f53", outliers={"size": 4, "opacity": 0.2}).encode(
+        x=alt.X("category:N", title="Category"),
+        y=alt.Y("annual_spend:Q", title="Annual spend"),
+        tooltip=["category"]
+    ).properties(height=360)
+    st.altair_chart(box_chart_pre, use_container_width=True)
+
+    st.markdown("""
+<div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Right-skew persists after preprocessing as expected. The goal of outlier separation is to remove extreme multivariate records, not all natural variation. The wide spend spread across categories indicates meaningful heterogeneity inside the customer base, which KMeans will utilize to identify segments.</p>
+</div>
+""", unsafe_allow_html=True)
+
+    # Stage 5: Correlation heatmaps
+    st.markdown("""
+      <!-- Stage 5: Correlation Heatmaps -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>5. Feature Correlation Matrix</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          Highly redundant features can distort distance metrics by double-weighting similar signals. We inspect the correlation matrix to ensure no features exceed a collinearity threshold of 0.7.
+        </p>
+      </div>
+    """, unsafe_allow_html=True)
+
     corr_features = [
         "annual_spend_groceries", "annual_spend_electronics", "annual_spend_vegetables",
         "annual_spend_meat", "annual_spend_fish", "annual_spend_hygiene",
@@ -1294,32 +1537,42 @@ elif selected_page == "Data Preprocessing":
     )
     corr_fig.update_layout(margin=dict(l=60, r=20, t=60, b=60), height=500, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(corr_fig, use_container_width=True)
+
     st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The correlation matrix reveals that most spend categories are weakly or negligibly correlated with each other, confirming that they carry distinct information and justifying their separate inclusion in the feature set. The strongest positive correlations appear between meat and fish annual spend, and between electronics and videogames annual spend, both of which are expected given the shared product affinity within those pairs. No pair exceeds the 0.7 collinearity threshold that would typically motivate feature removal. The near-zero correlations between promotional sensitivity and spend categories confirm that promotion usage is an independent behavioural dimension rather than a proxy for spending volume, supporting its inclusion as a separate clustering variable. Total children shows negligible correlation with all spend categories, suggesting that household composition affects product category preferences in ways that are not linearly captured by spend levels alone.</p>
+<div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Most spend categories correlate weakly, confirming they carry distinct signals. The strongest positive correlation is between meat and fish (0.42), well below the 0.7 feature-exclusion threshold. Promotional sensitivity shows near-zero correlation with spend categories, supporting its use as an independent clustering variable.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # Chart: Full correlation heatmap (NB1)
+    # Full correlation heatmap from raw data
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Full-feature correlation heatmap — raw dataset</div>
+<div style='margin-top:20px; margin-bottom:12px;'>
+  <div style='font-size:13px; font-weight:700; color:#111827;'>Full correlation heatmap (raw features)</div>
 </div>
 """, unsafe_allow_html=True)
     corr_chart_path = IMAGENS_DIR / "charts" / "correlation_heatmap.png"
     if corr_chart_path.exists():
         st.image(str(corr_chart_path), use_container_width=True)
+        
     st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The full-feature Pearson correlation matrix covers all numerical variables in the raw dataset. The lower triangle uses a diverging red-blue palette: red cells indicate negative correlation, blue cells positive correlation, and near-white cells negligible linear association. The strongest positive associations cluster within the spending feature group: meat and fish annual spend correlate moderately, as do electronics and videogames — pairs that reflect shared category affinity. Groceries correlates weakly with all other spend categories, consistent with its role as a near-universal baseline rather than a discriminating dimension. Promotional sensitivity shows near-zero correlation with all spend categories, confirming that it captures an independent behavioural dimension. The age and tenure features are weakly correlated, suggesting that long-standing customers are not necessarily older, and that acquisition cohort effects are not fully confounded with demographic age. No pair exceeds the 0.7 threshold that would constitute a collinearity problem requiring feature removal. These findings support including all spend categories in the clustering feature set while treating promotional sensitivity as a distinct axis.</p>
+<div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The full-feature correlation heatmap covers all variables in the raw dataset. It validates that spending variables are relatively independent, and that demographic age/tenure do not share a strong linear association, preventing redundancy in model features.</p>
 </div>
 """, unsafe_allow_html=True)
 
+    # Why export unscaled card
     st.markdown("""
-        <div style='padding:24px; border-radius:16px; background:#f9fafb; border:1px solid #e5e7eb; margin-top:12px;'>
-          <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 1 — Conclusions</div>
+      <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:16px; margin-bottom:32px;'>
+        <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:6px;'>Why export unscaled?</div>
+        <div style='font-size:16px; color:#7a6454; line-height:1.8;'>The final dataset is exported <strong>without scaling</strong>. Scaling is treated as a modelling choice — MinMaxScaler and RobustScaler are both evaluated in Notebook 3 against each other. Keeping the export unscaled ensures that the same raw dataset can be tested against any scaling strategy without re-running preprocessing.</div>
+      </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+        <div style='padding:24px; border-radius:16px; background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); margin-top:12px;'>
+          <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:10px;'>Notebook 1 — Conclusions</div>
           <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>"Before imputing missing values, the most atypical customers are separated into an outlier dataset. The rule is conservative: a customer is only kept aside when it is simultaneously flagged by three methods."</p>
           <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>"After the conservative outlier separation, the regular customer base still contains natural variation, but the most extreme observations are kept aside. This reduces the risk that a small number of atypical customers dominate the clustering distances."</p>
           <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>"In the final exported dataset, <code>year_first_transaction</code> is replaced by <code>tenure</code>, and <code>typical_hour</code> is replaced by its cyclic components. Some high values remain visible in the boxplots after preprocessing. This is expected because lifetime spending variables are naturally skewed."</p>
