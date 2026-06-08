@@ -550,6 +550,27 @@ selected_page = st.sidebar.radio(
     key="sidebar_radio_selection",
     label_visibility="collapsed"
 )
+def render_notebook_outline(notebook_title, topics):
+    items_html = ""
+    for topic in topics:
+        items_html += f"""
+        <div style='display: flex; align-items: flex-start; gap: 8px; font-size: 14px; color: #374151; font-family: "Plus Jakarta Sans", "Inter", sans-serif;'>
+          <span style='color: #c94f38; font-weight: bold; margin-top: 2px;'>✓</span>
+          <span>{topic}</span>
+        </div>
+        """
+    st.markdown(f"""
+    <div style='background: linear-gradient(135deg, #fff8f2 0%, #f7e6e1 100%); border: 1px solid rgba(201, 79, 56, 0.2); border-radius: 16px; padding: 22px 24px; margin-top: 8px; margin-bottom: 32px; box-shadow: 0 4px 20px rgba(201, 79, 56, 0.04);'>
+      <div style='display: flex; align-items: center; gap: 12px; margin-bottom: 14px;'>
+        <div style='background: #c94f38; color: white; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; font-family: "Plus Jakarta Sans", "Inter", sans-serif;'>Notebook Outline</div>
+        <div style='font-size: 13px; color: #7a6454; font-weight: 600; font-family: "Plus Jakarta Sans", "Inter", sans-serif;'>All topics covered from the Jupyter Notebook</div>
+      </div>
+      <h4 style='margin: 0 0 16px 0; color: #3b2720; font-size: 18px; font-weight: 700; font-family: "Plus Jakarta Sans", "Inter", sans-serif;'>{notebook_title} Index</h4>
+      <div style='display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px 24px;'>
+        {items_html}
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 def render_footer():
     st.markdown(
@@ -884,15 +905,35 @@ elif selected_page == "Data Analysis":
     </div>
     """, unsafe_allow_html=True)
 
+    topics_nb0 = [
+        "1. Imports and Data Loading",
+        "1.1 Initial Data Analysis",
+        "1.2 Duplicate Rows Analysis",
+        "1.2.1 Surname Repetition Check",
+        "1.3 Missing Values Analysis",
+        "1.4 Numerical and Categorical Columns",
+        "1.4.1 Findings in Categorical Columns",
+        "1.5 Statistical Summary",
+        "• Spending Categories",
+        "• Temporal & Behavioral Patterns",
+        "Data Analysis Conclusion"
+    ]
+    render_notebook_outline("Notebook 0 — Data Analysis", topics_nb0)
+
     st.markdown("""
     <div style='width:100%; box-sizing:border-box; margin-bottom:32px;'>
       <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 0 — Data Analysis</div>
-      <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 14px 0;'>
+      <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0;'>
         Before any modelling decisions are made, the raw <code>customer_info.csv</code> dataset is subjected to a thorough exploratory analysis. The dataset contains <strong>33,038 unique customers</strong> described across <strong>21 numerical variables</strong> and a set of categorical and identifier fields. This notebook's purpose is diagnostic: no cleaning or transformation is applied here — every finding is deferred to the preprocessing stage.
       </p>
-      <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0;'>
-        The analysis checks for exact and logical duplicates (customers matched by name and birthdate), inspects missing value rates per feature, categorises all columns, and produces distribution plots and boxplots for every numerical variable. A skewness table is computed to quantify the degree of asymmetry in each spending feature.
-      </p>
+
+      <!-- 1. Imports and Data Loading & 1.1 Initial Data Analysis -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>1. Imports and Data Loading & 1.1 Initial Data Analysis</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          The initial data load brings 33,038 rows and 21 numerical variables into memory. Initial scans check basic properties such as column types, presence of keys (e.g. <code>customer_id</code>), and structural characteristics.
+        </p>
+      </div>
 
       <div style='display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px;'>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
@@ -909,24 +950,38 @@ elif selected_page == "Data Analysis":
         </div>
       </div>
 
-      <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
+      <!-- 1.2 Duplicate Rows Analysis -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>1.2 Duplicate Rows Analysis</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          We check for both exact row duplicates and logical duplicates (rows that have matching customer names and birthdates).
+        </p>
+      </div>
+
+      <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:28px;'>
+        <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Duplicate check</div>
+        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>No exact duplicate rows were found. A logical duplicate check (matching on customer name AND birthdate) was also performed. The conclusion is that the dataset does not contain systematic duplicate records requiring removal.</div>
+      </div>
+
+      <!-- 1.2.1 Surname Repetition Check -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:16px; font-weight:700; color:#4b5563; margin-bottom:10px;'>1.2.1 Surname Repetition Check</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          A surname-only proximity test was also run to determine if family groupings could be inferred. However, it produced too many false positives due to common surnames and was not carried forward as a household feature.
+        </p>
+      </div>
+
+      <!-- 1.3 Missing Values Analysis -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>1.3 Missing Values Analysis</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          We inspect missing value rates per feature to design our imputation strategy.
+        </p>
+      </div>
+
+      <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:28px;'>
         <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Missing value strategy</div>
         <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Features with more than 30% missing values were flagged as too sparse to impute reliably. The inspection confirmed that missing values are concentrated in a limited group of behavioural and spend variables, supporting imputation over row-dropping — the customer base does not need to be reduced.</div>
-      </div>
-
-      <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
-        <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Education level as a proxy feature</div>
-        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Customer names contain academic prefixes — BSc., MSc., PhD. — across all 33,038 unique names. These prefixes are flagged as an education-level proxy and earmarked for feature engineering in Notebook 1. Surname repetition alone was found to be too common to be a useful household signal; it was not carried into the modelling feature set.</div>
-      </div>
-
-      <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
-        <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Impossible values detected</div>
-        <div style='font-size:16px; color:#6b7280; line-height:1.8;'><code>percentage_of_products_bought_promotion</code> was found to contain values outside the valid [0, 1] range — both below 0.0 and above 1.0 — indicating data entry errors. These are flagged here and corrected in preprocessing. Spending variables show strong right-skew, confirming that a small group of customers spends disproportionately more than the majority.</div>
-      </div>
-
-      <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:8px;'>
-        <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Duplicate check</div>
-        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>No exact duplicate rows were found. A logical duplicate check (matching on customer name AND birthdate) was also performed. A surname-only proximity test was also run but produced too many false positives due to common surnames. The conclusion is that the dataset does not contain systematic duplicate records requiring removal.</div>
       </div>
     </div>
     """, unsafe_allow_html=True)
@@ -935,7 +990,7 @@ elif selected_page == "Data Analysis":
 
     # Chart 1: Missing values per feature
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+<div style='margin-top:10px; margin-bottom:12px;'>
   <div style='font-size:13px; font-weight:700; color:#111827;'>Missing values per feature (%)</div>
 </div>
 """, unsafe_allow_html=True)
@@ -955,16 +1010,67 @@ elif selected_page == "Data Analysis":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The 30% threshold (red dashed line) was chosen as the boundary above which imputation is judged unreliable: reconstructing more than three out of ten values for a given feature would introduce more noise than signal into the dataset. Features below this threshold retain sufficient observed data to support KNN imputation, which leverages the similarity structure of the customer base. The chart confirms that missing values are concentrated in a small number of behavioural variables, and that no feature exceeds the threshold by a large margin, making row-dropping unnecessary. The majority of the 33,038 customers remain usable across all features.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The 30% threshold (red dashed line) was chosen as the boundary above which imputation is judged unreliable. Features below this threshold retain sufficient observed data to support KNN imputation. The chart confirms that missing values are concentrated in a small number of behavioural variables, and that no feature exceeds the threshold by a large margin, making row-dropping unnecessary.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # Chart 2: Distribution of key numerical features
+    # 1.4 Numerical and Categorical Columns
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Distribution of key numerical features</div>
+    <div style='width:100%; box-sizing:border-box; margin-bottom:32px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+      <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>1.4 Numerical and Categorical Columns</div>
+      <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+        Columns are split into numeric and categorical types to determine appropriate feature engineering. For example, <code>customer_birthdate</code> is processed to calculate age, while text fields are processed for category modeling.
+      </p>
+      
+      <!-- 1.4.1 Findings in Categorical Columns -->
+      <div style='margin-bottom:20px;'>
+        <div style='font-size:16px; font-weight:700; color:#4b5563; margin-bottom:10px;'>1.4.1 Findings in Categorical Columns</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          The name field contains academic titles that can serve as a proxy for education level.
+        </p>
+      </div>
+
+      <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
+        <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Education level as a proxy feature</div>
+        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Customer names contain academic prefixes — BSc., MSc., PhD. — across all 33,038 unique names. These prefixes are flagged as an education-level proxy and earmarked for feature engineering in Notebook 1.</div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Chart 4: Gender distribution
+    st.markdown("""
+<div style='margin-top:10px; margin-bottom:12px;'>
+  <div style='font-size:13px; font-weight:700; color:#111827;'>Gender distribution</div>
 </div>
 """, unsafe_allow_html=True)
+    gender_counts = customer_info["customer_gender"].value_counts().reset_index()
+    gender_counts.columns = ["customer_gender", "count"]
+    gender_bar = alt.Chart(gender_counts).mark_bar(color="#374151", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+        x=alt.X("customer_gender:N", title="Gender"),
+        y=alt.Y("count:Q", title="Number of customers"),
+        tooltip=["customer_gender", alt.Tooltip("count:Q", title="Customers", format=",")]
+    ).properties(height=260)
+    st.altair_chart(gender_bar, use_container_width=True)
+    st.markdown("""
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The gender distribution across the customer base is approximately balanced, preventing gender bias in downstream segments. Gender is retained as a profiling variable for segment characterisation but is not included in the clustering distance matrix.</p>
+</div>
+""", unsafe_allow_html=True)
+
+    # 1.5 Statistical Summary
+    st.markdown("""
+    <div style='width:100%; box-sizing:border-box; margin-bottom:20px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+      <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>1.5 Statistical Summary</div>
+      <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+        A comprehensive review of the statistical properties of the numeric features is carried out, divided into product spend profiles and customer behavioral patterns.
+      </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<div style='font-size:16px; font-weight:700; color:#4b5563; margin-bottom:12px;'>Spending Categories</div>", unsafe_allow_html=True)
+
+    # Chart 2: Distribution of key numerical features
     c1, c2, c3 = st.columns(3)
     c1.markdown("<div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>Lifetime spend: Groceries</div>", unsafe_allow_html=True)
     c2.markdown("<div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>Lifetime spend: Electronics</div>", unsafe_allow_html=True)
@@ -991,57 +1097,13 @@ elif selected_page == "Data Analysis":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>All three distributions exhibit pronounced right-skew: the mass of customers clusters near the lower end of the scale, with a progressively thinner tail extending toward high-spending or high-variety individuals. This asymmetry has two direct implications for modelling. First, standard Euclidean distance in clustering is sensitive to scale differences, meaning that a small group of high-spending customers could disproportionately pull cluster centroids if the data are not scaled. Second, the long tail is precisely where the consensus outlier separation strategy intervenes: rather than capping values, the most extreme multivariate observations are separated into a dedicated outlier dataset before the clustering model is fitted, preserving the shape of the majority distribution while removing undue influence from the periphery.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Chart 3: Promotion ratio distribution
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Promotion ratio distribution (valid range only)</div>
-</div>
-""", unsafe_allow_html=True)
-    promo_valid = customer_info[
-        (customer_info["percentage_of_products_bought_promotion"] >= 0) &
-        (customer_info["percentage_of_products_bought_promotion"] <= 1)
-    ].copy()
-    promo_hist = alt.Chart(promo_valid).mark_bar(color="#374151", opacity=0.85).encode(
-        x=alt.X("percentage_of_products_bought_promotion:Q", bin=alt.Bin(maxbins=30), title="Proportion of products bought on promotion"),
-        y=alt.Y("count():Q", title="Customers"),
-        tooltip=[alt.Tooltip("count():Q", title="Customers")]
-    ).properties(height=300)
-    st.altair_chart(promo_hist, use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The raw dataset contains entries for <code>percentage_of_products_bought_promotion</code> that fall outside the physically valid interval [0, 1], including both negative values and values exceeding 1.0. These are impossible by definition: a proportion cannot be negative or greater than unity, confirming data entry errors rather than extreme but valid behaviour. The chart above is restricted to the valid range only. Within [0, 1], the distribution is roughly bimodal: a concentration of customers near 0.4 to 0.6 suggests a moderately promotion-responsive majority, while a second mass near 1.0 identifies a distinct group of near-exclusively promotional buyers. This heterogeneity in promotional sensitivity later becomes one of the most discriminating variables in the clustering model, most clearly visible in the Promoters segment.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Chart 4: Gender distribution
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Gender distribution</div>
-</div>
-""", unsafe_allow_html=True)
-    gender_counts = customer_info["customer_gender"].value_counts().reset_index()
-    gender_counts.columns = ["customer_gender", "count"]
-    gender_bar = alt.Chart(gender_counts).mark_bar(color="#374151", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
-        x=alt.X("customer_gender:N", title="Gender"),
-        y=alt.Y("count:Q", title="Number of customers"),
-        tooltip=["customer_gender", alt.Tooltip("count:Q", title="Customers", format=",")]
-    ).properties(height=300)
-    st.altair_chart(gender_bar, use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The gender distribution across the customer base is approximately balanced between male and female customers, with no category representing an extreme minority. This near-parity is relevant for segmentation methodology: a heavily skewed gender distribution would risk producing segments that reflect gender composition artefacts rather than genuine behavioural differences. The approximate balance observed here supports the interpretation that the eight clusters recovered by the model reflect spending behaviour and lifestyle patterns rather than demographic overrepresentation of one group. Gender is retained as a profiling variable for segment characterisation but is not included in the clustering distance matrix.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Spending distributions exhibit right-skew: the majority clusters near the lower end, with a thin tail of high spenders. This skew confirms the need to handle outliers and scale variables carefully before clustering.</p>
 </div>
 """, unsafe_allow_html=True)
 
     # Chart 5: Skewness table
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+<div style='margin-top:10px; margin-bottom:12px;'>
   <div style='font-size:13px; font-weight:700; color:#111827;'>Skewness of spend variables</div>
 </div>
 """, unsafe_allow_html=True)
@@ -1055,13 +1117,52 @@ elif selected_page == "Data Analysis":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>All spend categories exhibit positive skewness, confirming that the right-tailed pattern observed in the histograms above is not isolated to groceries and electronics but is systematic across the entire spend feature space. High positive skewness (values substantially above 1.0) indicates that a small number of customers account for a disproportionate share of category-level spending. This has two direct consequences for preprocessing: first, lifetime spend values are converted to annual rates by dividing by tenure, to reduce the contribution of long-tenure customers to the skew; second, the consensus outlier separation rule is applied before clustering to set aside the most extreme multivariate observations. Skewness alone does not justify removing observations, but it confirms the need for careful outlier treatment before distance-based clustering is applied.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>All spend categories exhibit positive skewness, confirming that right-skew is systematic. High positive skewness motivates dividing lifetime spend by tenure to compute annual rates, reducing temporal distortion.</p>
+</div>
+""", unsafe_allow_html=True)
+
+    st.markdown("<div style='font-size:16px; font-weight:700; color:#4b5563; margin-bottom:12px;'>Temporal & Behavioral Patterns</div>", unsafe_allow_html=True)
+
+    # Impossible values card and promo chart
+    st.markdown("""
+    <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:28px;'>
+      <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+        <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Impossible values detected</div>
+        <div style='font-size:14px; color:#7a6454; line-height:1.5;'><code>percentage_of_products_bought_promotion</code> contains values outside the [0, 1] range (both < 0.0 and > 1.0), which are data entry errors flagged for cleaning in preprocessing.</div>
+      </div>
+      <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+        <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Right-skew shape</div>
+        <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Spending variables show strong right-skew, confirming that a small group of customers spends disproportionately more than the majority.</div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Chart 3: Promotion ratio distribution
+    st.markdown("""
+<div style='margin-top:10px; margin-bottom:12px;'>
+  <div style='font-size:13px; font-weight:700; color:#111827;'>Promotion ratio distribution (valid range only)</div>
+</div>
+""", unsafe_allow_html=True)
+    promo_valid = customer_info[
+        (customer_info["percentage_of_products_bought_promotion"] >= 0) &
+        (customer_info["percentage_of_products_bought_promotion"] <= 1)
+    ].copy()
+    promo_hist = alt.Chart(promo_valid).mark_bar(color="#374151", opacity=0.85).encode(
+        x=alt.X("percentage_of_products_bought_promotion:Q", bin=alt.Bin(maxbins=30), title="Proportion of products bought on promotion"),
+        y=alt.Y("count():Q", title="Customers"),
+        tooltip=[alt.Tooltip("count():Q", title="Customers")]
+    ).properties(height=260)
+    st.altair_chart(promo_hist, use_container_width=True)
+    st.markdown("""
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Within the valid [0, 1] range, promotional sensitivity shows a bimodal shape: a central peak around 0.5 and a second peak at 1.0 (exclusively promotion-driven buyers). This heterogeneity makes promotional sensitivity highly discriminating for clustering.</p>
 </div>
 """, unsafe_allow_html=True)
 
     # Chart: Numeric boxplots (from NB0)
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+<div style='margin-top:10px; margin-bottom:12px;'>
   <div style='font-size:13px; font-weight:700; color:#111827;'>Numerical variable distributions — boxplots</div>
 </div>
 """, unsafe_allow_html=True)
@@ -1071,10 +1172,11 @@ elif selected_page == "Data Analysis":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The boxplots confirm the systematic right-skew identified in the histograms: every numerical variable shows a compact interquartile box close to the lower end of its range and a long upper whisker or visible outlier cloud extending far to the right. Median values across spending categories are low relative to the scale maximum, meaning that the majority of customers spend modestly while a thin tail of high-value customers accounts for most of the category-level variance. Variables such as total lifetime spend and electronics show particularly extreme upper outliers, reinforcing the need for the consensus outlier separation step prior to scaling. Age and tenure, by contrast, are more symmetric but still show a modest right tail in tenure, consistent with a customer base accumulated over multiple years of varying acquisition rates. These shapes collectively justify the MinMaxScaler choice over standard z-score normalisation: min-max compression bounds all features to [0, 1] while preserving the relative magnitude ordering within each variable, which is important when inter-feature comparisons are made in UMAP visualisations.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The boxplots confirm the right-skew pattern across all spend variables. Median values are low relative to maximums, while age and tenure are more symmetric. This pattern supports using MinMaxScaler over Z-Score normalization, as it bounds the ranges to [0, 1] while preserving the relative ranking.</p>
 </div>
 """, unsafe_allow_html=True)
 
+    # Data Analysis Conclusion
     st.markdown("""
         <div style='padding:24px; border-radius:16px; background:#f9fafb; border:1px solid #e5e7eb; margin-top:12px;'>
           <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 0 — Conclusions</div>
@@ -1083,7 +1185,6 @@ elif selected_page == "Data Analysis":
           <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>"The missing value inspection shows that the dataset is usable without dropping large parts of the customer base." No cleaning is applied in this notebook — all transformations are deferred to NB1.</p>
         </div>
     """, unsafe_allow_html=True)
-    render_footer()
 
 elif selected_page == "Data Preprocessing":
     st.markdown("""
@@ -1092,6 +1193,23 @@ elif selected_page == "Data Preprocessing":
     </div>
     """, unsafe_allow_html=True)
 
+    topics_nb1 = [
+        "1. Imports and Data Loading",
+        "2. Data Cleaning",
+        "• 2.1 Detecting Invalid Future Years",
+        "• 2.2 Detecting Negative Values",
+        "• 2.3 Fixing Negative Percentages",
+        "• 2.4 Fixing Data Types",
+        "• 2.5 Missing Values Treatment",
+        "3. Aggregation Feature Engineering",
+        "4. Consensus Outlier Separation and KNN Imputation",
+        "5. Transformation Feature Engineering",
+        "6. Outlier Diagnostics",
+        "7. Multivariate Analysis: Feature Correlation",
+        "8. Feature Selection and Final Export"
+    ]
+    render_notebook_outline("Notebook 1 — Preprocessing", topics_nb1)
+
     st.markdown("""
     <div style='width:100%; box-sizing:border-box; margin-bottom:32px;'>
       <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 1 — Data Preprocessing</div>
@@ -1099,42 +1217,19 @@ elif selected_page == "Data Preprocessing":
         This notebook applies all transformations identified during the exploratory analysis. The goal is to produce a clean, analysis-ready dataset without losing customers unnecessarily. Every decision is justified by domain logic or statistical evidence — no arbitrary removals are made.
       </p>
 
-      <!-- Stage 1: Data Cleaning & Missing Values Treatment -->
+      <!-- 1. Imports and Data Loading -->
       <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
-        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>1. Data Cleaning & Missing Values Treatment</div>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>1. Imports and Data Loading</div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
-          Data cleaning and missing value treatment are crucial initial steps to prevent downstream model bias and mathematical distance calculation errors. In this phase, logical inconsistencies are corrected, raw types are structured, and missing entries are addressed using custom domain logic and KNN imputation.
+          The preprocessing workflow begins by loading the raw <code>customer_info.csv</code> containing 33,038 unique customer records. This dataset contains mix-typed variables, missing fields, and coordinate vectors that require treatment.
         </p>
       </div>
 
-      <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:28px;'>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Future years → NaN</div>
-          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Future transaction years exceeding 2026 are logical errors. They are set to NaN rather than dropping the customer row.</div>
-        </div>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Invalid promotion → NaN</div>
-          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Promotion ratios outside the valid [0, 1] range are set to NaN, as they represent invalid measurements.</div>
-        </div>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Zero-imputation for counts</div>
-          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Missing values in kids_home, teens_home, and number_complaints are filled with 0, assuming lack of entry implies zero count.</div>
-        </div>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Loyalty indicator flag</div>
-          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Instead of discarding the 38% missing loyalty card numbers, we engineer a binary flag (1 if card exists, 0 otherwise).</div>
-        </div>
-      </div>
-
-      <div style='margin-bottom:28px;'>
-        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 12px 0;'>
-          <strong>Negative Value Analysis:</strong> We scan all numerical columns for values below zero. While negative values in <code>longitude</code> are logically valid (since Lisbon is located west of the Greenwich meridian), negative values in <code>percentage_of_products_bought_promotion</code> represent a logical error and are set to NaN.
-        </p>
-        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 12px 0;'>
-          <strong>Data Type Coercion:</strong> Mixed types in object columns are coerced. For instance, <code>customer_birthdate</code> is parsed to <code>datetime64</code> to compute age, and counts like <code>kids_home</code> and <code>number_complaints</code> are cast to nullable integers to handle noise.
-        </p>
-        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>
-          <strong>KNN Imputation:</strong> Remaining missing values in variables such as typical hour, age, and spend categories are handled using a K-Nearest Neighbors (KNN) model with $k=5$. Imputation is only executed after outliers are separated to ensure that extreme multivariate observations do not bias the imputations of the regular customer base.
+      <!-- 2. Data Cleaning -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>2. Data Cleaning</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          Data cleaning is the initial step to prevent downstream model bias and mathematical distance errors. We correct logical inconsistencies and deal with missing values using domain rules.
         </p>
       </div>
     </div>
@@ -1145,11 +1240,41 @@ elif selected_page == "Data Preprocessing":
     outlier_df = pd.read_csv(BASE_DIR / "datasets" / "outlier_dataset.csv")
 
     current_year = 2026
-    # Calculate counts of anomalies on raw data (kept for interpretation text reference)
+    # Calculate counts of anomalies on raw data
     future_years = customer_info_pre[customer_info_pre["year_first_transaction"] > current_year]
     future_year_count = len(future_years)
     invalid_promo = customer_info_pre[(customer_info_pre["percentage_of_products_bought_promotion"] < 0) | (customer_info_pre["percentage_of_products_bought_promotion"] > 1)]
     invalid_promo_count = len(invalid_promo)
+
+    st.markdown("""
+    <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:28px;'>
+      <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+        <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>2.1 Detecting Invalid Future Years</div>
+        <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Future transaction years exceeding 2026 are logical errors. We identified <strong>{future_year_count}</strong> rows with transaction years in the future, which are set to NaN.</div>
+      </div>
+      <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+        <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>2.2 Detecting Negative Values</div>
+        <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Negative values in <code>longitude</code> are logically valid (since Lisbon is west of the Greenwich meridian), but other numeric variables are scanned for invalid negative values.</div>
+      </div>
+      <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+        <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>2.3 Fixing Negative Percentages</div>
+        <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Promotion ratios outside the valid [0, 1] range represent invalid entries. We set <strong>{invalid_promo_count}</strong> records to NaN instead of discarding the rows.</div>
+      </div>
+      <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+        <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>2.4 Fixing Data Types</div>
+        <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Mixed types are coerced: <code>customer_birthdate</code> is converted to datetime, and counts like <code>kids_home</code> are cast to nullable integers.</div>
+      </div>
+    </div>
+    """.format(future_year_count=future_year_count, invalid_promo_count=invalid_promo_count), unsafe_allow_html=True)
+
+    st.markdown("""
+    <div style='width:100%; box-sizing:border-box; margin-bottom:12px;'>
+      <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:8px;'>2.5 Missing Values Treatment</div>
+      <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+        Zero-filling is used for counts like <code>kids_home</code>, <code>teens_home</code>, and <code>number_complaints</code> under the assumption that missing records imply zero. For loyalty cards (38% missing), we engineer a binary flag. Remaining missing rates below 3% are resolved using KNN imputation ($k=5$) after outliers are separated.
+      </p>
+    </div>
+    """, unsafe_allow_html=True)
 
     # Raw missing values bar chart
     raw_missing = customer_info_pre.isna().sum().reset_index(name="missing_count")
@@ -1207,15 +1332,15 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
 <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The data cleaning shows specific logical errors (such as future transaction years and negative promotion percentages) that were successfully resolved. The missing value map confirms that <code>loyalty_card_number</code> contains the largest volume of missing values (approx 38%). Instead of removing these records or imputing card numbers, we engineer a binary loyalty indicator. Features like spend categories (meat, fish, vegetables) and typical hour have less than 3% missing rates. These are cleanly handled later by KNN Imputation (k=5) inside the regular base, preserving customer rows without losing significant volume.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Data cleaning successfully isolates invalid entries. The missing values map highlights that <code>loyalty_card_number</code> has the highest rate (38%), which is handled by engineering a binary card flag. Spend and hour missing variables (under 3% rate) are cleanly imputed via KNN, preserving customer records.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # Stage 2: Aggregation Feature Engineering
+    # 3. Aggregation Feature Engineering
     st.markdown("""
       <!-- Stage 2: Aggregation Feature Engineering -->
       <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
-        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>2. Aggregation Feature Engineering</div>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>3. Aggregation Feature Engineering</div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
           Before outlier separation and final transformation, we create broader demographic and loyalty features by parsing raw identifiers and dates:
         </p>
@@ -1352,15 +1477,15 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
 <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The age distribution covers a wide spread (centering on 30 to 50 years). Using birthdates directly would introduce raw date formats that distance calculations cannot interpret. Calculating age dynamically relative to the 2026 temporal baseline resolves this. The categorical summaries also confirm that gender is almost evenly split, loyalty is map-encoded for 62% of customers, and name parsing successfully identifies academic prefixes (BSc, MSc, PhD) as education level proxies. Zero-filling kids, teens and complaints handles the missing values under the assumption that missing counts represent zero counts.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The age distribution spans a wide range centering on 30 to 50 years. Age is computed relative to the 2026 baseline. Education-level proxies successfully represent years of study, and zero-filling resolves missing values in kids, teens, and complaints.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # Stage 3: Outlier Separation — The Consensus Rule
+    # 4. Consensus Outlier Separation and KNN Imputation
     st.markdown("""
-      <!-- Stage 3: Outlier Separation -->
+      <!-- Stage 4: Consensus Outlier Separation and KNN Imputation -->
       <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
-        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>3. Outlier Separation — The Consensus Rule</div>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>4. Consensus Outlier Separation and KNN Imputation</div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
           Rather than capping or removing outliers based on a single method, a <strong>conservative consensus rule</strong> is applied: a customer is set aside only when simultaneously flagged as an outlier by all three of the following methods:
         </p>
@@ -1380,13 +1505,13 @@ elif selected_page == "Data Preprocessing":
             <div style='font-size:12px; color:#7a6454;'>neighbourhood radius</div>
           </div>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:10px; padding:14px 16px; text-align:center;'>
-            <div style='font-size:13px; font-weight:700; color:#c94f38;'>3rd method</div>
+            <div style='font-size:13px; font-weight:700; color:#c94f38;'>SOM Map</div>
             <div style='font-size:22px; font-weight:800; color:#c94f38; margin:4px 0;'>&cap;</div>
-            <div style='font-size:12px; color:#7a6454;'>all three must agree</div>
+            <div style='font-size:12px; color:#7a6454;'>Reconstruction error</div>
           </div>
         </div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:14px 0;'>
-          Customers flagged by all three methods are exported to <code>outlier_dataset.csv</code>. The regular base is then processed with KNN imputation. This approach ensures that only multivariate extremes are removed — customers with one extreme variable but otherwise normal behaviour are retained. Outliers are later <strong>reattached to their nearest cluster centroid</strong> after the model is fitted.
+          Customers flagged by all three methods are exported to <code>outlier_dataset.csv</code>. The remaining regular base is then processed with KNN imputation. Outliers are later reattached to their nearest cluster centroid.
         </p>
     """, unsafe_allow_html=True)
 
@@ -1410,15 +1535,15 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
 <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The chart demonstrates the conservative nature of the consensus outlier rule: the overwhelming majority of customers remain in the regular base, with only 1,023 customers (approx. 3.1%) separated. This conservative threshold avoids over-excluding customers who are unusual on a single variable but unremarkable in the multivariate space. Outliers are reattached to their nearest cluster centroid after model fitting.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Only 1,023 customers (3.1% of the base) are separated as outliers. This conservative consensus rule preserves atypical but valid customers, ensuring K-Means centroids remain undistorted by extreme multivariate outliers.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # Stage 4: Transformation Feature Engineering & Export
+    # 5. Transformation Feature Engineering
     st.markdown("""
-      <!-- Stage 4: Transformation Feature Engineering -->
+      <!-- Stage 5: Transformation Feature Engineering -->
       <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
-        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>4. Transformation Feature Engineering & Export</div>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>5. Transformation Feature Engineering</div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
           After outlier separation, we apply mathematical transformations to prepare our variables for modeling, ensuring distance metrics operate correctly across circular dimensions and spending volume:
         </p>
@@ -1460,9 +1585,20 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
 <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Using raw hours directly (0 to 23) introduces a boundary error where 23:00 and 00:00 appear maximally distant (difference of 23). The cyclic encoding resolves this by plotting them on a circle, ensuring hour 23 and hour 0 are correctly recognized as adjacent.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The cyclic sin/cos encoding successfully places hour 23 and hour 0 adjacent on a circle, resolving the mathematical boundary error where distance calculations would falsely treat them as opposite extremes.</p>
 </div>
 """, unsafe_allow_html=True)
+
+    # 6. Outlier Diagnostics
+    st.markdown("""
+      <!-- Stage 6: Outlier Diagnostics -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>6. Outlier Diagnostics</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          The plots below are used as a final visual check of the main skewed variables after preprocessing. At this point, the extreme consensus subset has already been separated, so these diagnostics help confirm whether the regular customer base is more stable before the clustering stage.
+        </p>
+      </div>
+    """, unsafe_allow_html=True)
 
     # Spend boxplots after preprocessing
     st.markdown("""
@@ -1484,15 +1620,15 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
 <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Right-skew persists after preprocessing as expected. The goal of outlier separation is to remove extreme multivariate records, not all natural variation. The wide spend spread across categories indicates meaningful heterogeneity inside the customer base, which KMeans will utilize to identify segments.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Some high values remain visible in the boxplots after preprocessing. This is expected because lifetime spending variables are naturally skewed. The goal was not to remove every univariate extreme value, but to keep valid high spending customers while separating only the most atypical multivariate cases. This confirms that the regular customer base is more stable before the clustering stage.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # Stage 5: Correlation heatmaps
+    # 7. Multivariate Analysis: Feature Correlation
     st.markdown("""
-      <!-- Stage 5: Correlation Heatmaps -->
+      <!-- Stage 7: Multivariate Analysis: Feature Correlation -->
       <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
-        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>5. Feature Correlation Matrix</div>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>7. Multivariate Analysis: Feature Correlation</div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
           Highly redundant features can distort distance metrics by double-weighting similar signals. We inspect the correlation matrix to ensure no features exceed a collinearity threshold of 0.7.
         </p>
@@ -1543,6 +1679,28 @@ elif selected_page == "Data Preprocessing":
 </div>
 """, unsafe_allow_html=True)
 
+    # 8. Feature Selection and Final Export
+    st.markdown("""
+      <!-- Stage 8: Feature Selection and Final Export -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>8. Feature Selection and Final Export</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          This final step prepares the dataset that will be used in the clustering notebook. Keeping the export step separate makes the transition from preprocessing to clustering clear and reproducible.
+        </p>
+      </div>
+
+      <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:20px;'>
+        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>info_clustering_unscaled.csv</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>The main unscaled clustering dataset (32,015 customers) containing absolute spend features, tenure, and cyclicTypical hour components.</div>
+        </div>
+        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>outlier_dataset.csv</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>The separated extreme customer subset (1,023 customers, approx 3.1% of base). These are kept aside during training and later reattached to their nearest cluster centroid.</div>
+        </div>
+      </div>
+    """, unsafe_allow_html=True)
+
     # Why export unscaled card
     st.markdown("""
       <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:16px; margin-bottom:32px;'>
@@ -1567,15 +1725,31 @@ elif selected_page == "Data in Geography":
         <h2 style='font-size: 56px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.03em;'>Data In Geography</h2>
     </div>
     """, unsafe_allow_html=True)
+
+    topics_nb2 = [
+        "1) Imports",
+        "2) Data loading",
+        "3) Basic geographic statistics",
+        "4) Customer geographic distribution",
+        "5) Customer density map",
+        "6) Hotspot profile and area near the university check"
+    ]
+    render_notebook_outline("Notebook 2 — Geographic Analysis", topics_nb2)
+
     st.markdown("""
     <div style='width:100%; box-sizing:border-box; margin-bottom:32px;'>
       <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 2 — Geographic Analysis</div>
       <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 14px 0;'>
         Geographic data is available for a significant portion of the customer base in the form of latitude and longitude coordinates. This notebook investigates whether the spatial distribution of customers reveals behavioural patterns beyond what the demographic and spend variables capture. Crucially, <strong>geography is intentionally excluded from the clustering distance</strong> — including it would risk creating geographic groups rather than behavioural segments.
       </p>
-      <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0;'>
-        The analysis uses four complementary visualisations: a scatter plot of coordinates, an interactive Plotly scatter mapbox, a Folium map with MarkerCluster, and a hexbin density map. The hotspot is identified programmatically using a coordinate grid (bins=50) — not visually — to ensure the finding is data-driven and reproducible.
-      </p>
+      
+      <!-- 1) Imports & 2) Data loading & 3) Basic geographic statistics -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>1) Imports, 2) Data loading & 3) Basic geographic statistics</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          Coordinate coordinates (latitude/longitude) are imported and checked. Spatial statistics confirm customer concentrations around Lisbon urban zones, allowing spatial profiling.
+        </p>
+      </div>
 
       <div style='display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px;'>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
@@ -1597,9 +1771,9 @@ elif selected_page == "Data in Geography":
         <div style='font-size:16px; color:#6b7280; line-height:1.8;'>The hotspot shows a distinct behavioural profile even before clustering labels are applied. The strongest differences are in <strong>age, product diversity, number of complaints, store visits, total spend, and promotion usage</strong>. Hotspot customers are younger, more active, and more variety-seeking — consistent with a younger urban population, though the data does not confirm student status directly.</div>
       </div>
 
-      <div style='border-left:3px solid #111827; padding-left:20px;'>
+      <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:28px;'>
         <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Why geography is excluded from clustering</div>
-        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Including geographic coordinates in the clustering distance would create spatially-defined groups — customers near each other in space would be forced into the same cluster regardless of their spending behaviour. The objective is to discover <em>behavioural</em> communities, not geographic ones. Geography is kept as a profiling tool: after clusters are fitted, the geographic distribution of each cluster is inspected as a validation and characterisation layer.</div>
+        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Including geographic coordinates in the clustering distance would create spatially-defined groups. Geography is kept as a profiling tool: after clusters are fitted, the geographic distribution of each cluster is inspected as a validation and characterisation layer.</div>
       </div>
     </div>
     """, unsafe_allow_html=True)
@@ -1609,7 +1783,12 @@ elif selected_page == "Data in Geography":
     customer_info["promo_ratio"] = customer_info["percentage_of_products_bought_promotion"] * 100
     customer_info["size_spend"] = customer_info["lifetime_total_distinct_products"].fillna(0) / 50
 
-    st.subheader("Customer geographic distribution")
+    # 4) Customer geographic distribution
+    st.markdown("""
+    <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+      <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>4) Customer geographic distribution</div>
+    </div>
+    """, unsafe_allow_html=True)
     scatter_map = px.scatter_mapbox(
         customer_info,
         lat="latitude",
@@ -1625,7 +1804,12 @@ elif selected_page == "Data in Geography":
     scatter_map.update_layout(margin=dict(l=0, r=0, t=0, b=0), coloraxis_colorbar=dict(title="Promo %"), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(scatter_map, width=1080, config={"scrollZoom": True})
 
-    st.subheader("Customer density map")
+    # 5) Customer density map
+    st.markdown("""
+    <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+      <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>5) Customer density map</div>
+    </div>
+    """, unsafe_allow_html=True)
     density_map = px.density_mapbox(
         customer_info,
         lat="latitude",
@@ -1638,6 +1822,13 @@ elif selected_page == "Data in Geography":
     )
     density_map.update_layout(margin=dict(l=0, r=0, t=0, b=0), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(density_map, width=1080, config={"scrollZoom": True})
+
+    # 6) Hotspot profile and area near the university check
+    st.markdown("""
+    <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+      <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>6) Hotspot profile and area near the university check</div>
+    </div>
+    """, unsafe_allow_html=True)
 
     customer_info["lat_bin"] = (customer_info["latitude"] * 20).round(0) / 20
     customer_info["lon_bin"] = (customer_info["longitude"] * 20).round(0) / 20
@@ -1667,12 +1858,12 @@ elif selected_page == "Data in Geography":
         column=alt.Column("metric:N", header=alt.Header(labelAngle=0, labelAlign="left", title=""))
     ).properties(height=260)
 
-    st.subheader("Hotspot profile vs outside")
+    st.markdown("<div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>Hotspot profile vs outside</div>", unsafe_allow_html=True)
     st.altair_chart(compare_chart, use_container_width=True)
 
     # Chart: Age distribution hotspot vs outside
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+<div style='margin-top:10px; margin-bottom:12px;'>
   <div style='font-size:13px; font-weight:700; color:#111827;'>Age distribution: hotspot vs. rest of base</div>
 </div>
 """, unsafe_allow_html=True)
@@ -1700,13 +1891,13 @@ elif selected_page == "Data in Geography":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The overlaid age histograms reveal a pronounced difference in age composition between the hotspot and the rest of the customer base. The hotspot skews clearly toward the 25 to 34 age band, while the broader base has a flatter distribution extending through the 40 to 55 range. This age gap is the most statistically robust finding of the geographic analysis: it corroborates the hypothesis that the dense area near Cidade Universitaria and Entrecampos attracts a younger urban population, consistent with proximity to university infrastructure and high-density residential areas. The finding is treated as an interpretive insight rather than an actionable segment boundary, because geography is deliberately excluded from the clustering distance. The age skew observed in the hotspot does not define a segment; rather, it adds spatial context to the behavioural profiles that the clustering model identifies independently.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The age distribution skews clearly younger (25 to 34 years) in the hotspot compared to the broader base, supporting the university proximity hypothesis. Geography is kept as an interpretive layer rather than a clustering constraint.</p>
 </div>
 """, unsafe_allow_html=True)
 
     # Chart: Static scatter (NB2)
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+<div style='margin-top:10px; margin-bottom:12px;'>
   <div style='font-size:13px; font-weight:700; color:#111827;'>Geographic distribution of all customers (raw)</div>
 </div>
 """, unsafe_allow_html=True)
@@ -1737,7 +1928,7 @@ elif selected_page == "Data in Geography":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>This static scatter plot represents every customer as a point at their recorded latitude and longitude coordinates, plotted without any segmentation labels. The visualisation reveals that the customer base is heavily concentrated in a narrow geographic band consistent with the Lisbon Metropolitan Area, with a pronounced density peak in the central zone. The clustering of points is not uniform: a high-density region emerges in the centre-north quadrant of the scatter, corresponding to the urban core identified in the interactive maps above. Surrounding this core, points become progressively sparser and more dispersed, consistent with suburban and commuter-belt customers. This raw spatial pattern is the starting point for the geographic analysis: the identification of the hotspot bounding box, the density map, and the behavioural comparisons are all derived from the concentration visible here. The static format makes the overall geographic footprint clear without the visual clutter of colour-coded segments, which are overlaid in the clustering-era scatter produced later in Notebook 4.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>This scatter plot shows points representing each customer's coordinate, validating the concentration in the Lisbon Metropolitan core area. Points disperse near commuter fringes, showing suburban density drop-off.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1757,91 +1948,96 @@ elif selected_page == "NB3 Clustering":
     </div>
     """, unsafe_allow_html=True)
 
+    topics_nb3 = [
+        "1) Imports and data loading",
+        "2) Outlier strategy check — separation vs IQR capping",
+        "• 2.1 — UMAP side by side",
+        "3) Candidate feature sets and scalers",
+        "4) Diagnostics A — scaler comparison, elbow and dendrograms",
+        "• 4.1 — Scaler comparison (silhouette vs k)",
+        "• 4.2 — Inertia elbow",
+        "• 4.3 — Ward dendrogram (on a sample)",
+        "• 4.4 — Complete, average and single linkage dendrograms",
+        "5) Diagnostics B — feature set and k silhouette grid",
+        "6) Model configuration",
+        "7) Model fitting and validation",
+        "• 7.1 — Silhouette plot",
+        "• 7.2 — PCA, UMAP and t-SNE projections",
+        "• 7.3 — Current solution and petfood alternative",
+        "• 7.4 — Petfood alternative validation plots",
+        "8) Method benchmarks",
+        "• 8.0 — Independent method search",
+        "• 8.0.1 — UMAP comparison on the Ward sample",
+        "• 8.1 — Ward, complete, average and single sample comparison",
+        "• 8.1.1 — Benchmark label usage",
+        "• 8.2 — Hierarchical R2 comparison",
+        "• 8.3 — Hierarchical on KMeans centroids",
+        "• 8.4 — DBSCAN density benchmark",
+        "• 8.5 — SOM Map feature map analysis",
+        "  • 8.5.1 — SOM interpretation",
+        "9) Segment profiling",
+        "• 9.1 — Petfood signal check in the current model",
+        "• 9.2 — Segment separation plots",
+        "• 9.3 — Complaint behaviour by segment",
+        "• 9.4 — Geographic profiling",
+        "• 9.5 — Numeric cluster labels",
+        "10) Reattach outliers and export",
+        "11) Final modelling conclusion"
+    ]
+    render_notebook_outline("Notebook 3 — Clustering", topics_nb3)
+
     st.markdown("""
     <div style='width:100%; box-sizing:border-box; margin-bottom:32px;'>
-      <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 3 — Clustering</div>
+      <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 3 — Clustering Overview</div>
       <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 14px 0;'>
         This notebook contains the full model selection process. No single diagnostic drives the final choice: instead, six candidate feature sets, two scalers, and five values of k (6 to 10) are evaluated simultaneously using silhouette scores, elbow curves, Ward dendrograms, and dimensionality reduction projections. Every decision is documented and every alternative is tested before being accepted or rejected.
       </p>
-      <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 14px 0;'>
+      <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0;'>
         The dataset entering this notebook is <code>info_clustering_unscaled.csv</code> — 32,015 customers after the consensus outlier separation carried out in NB1. Each record is described by 11 features: the 10 non-groceries lifetime spend columns plus <code>percentage_of_products_bought_promotion</code>. Groceries are deliberately excluded from the clustering distance because they act as a near-universal baseline with low discriminating power; they are retained for profiling in NB4.
       </p>
 
-      <div style='display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px;'>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
-          <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Algorithm</div>
-          <div style='font-size:22px; font-weight:800; color:#c94f38;'>K-Means</div>
-        </div>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
-          <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>K selected</div>
-          <div style='font-size:22px; font-weight:800; color:#c94f38;'>8</div>
-        </div>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
-          <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Scaler</div>
-          <div style='font-size:22px; font-weight:800; color:#c94f38;'>MinMax</div>
-        </div>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
-          <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Feature set</div>
-          <div style='font-size:16px; font-weight:800; color:#c94f38; line-height:1.2;'>spend + promo<br/>no groceries</div>
+      <!-- 1) Imports and data loading -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>1) Imports and data loading</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          The notebook starts by loading standard library modules (<code>numpy</code>, <code>pandas</code>, <code>matplotlib</code>, <code>seaborn</code>, and <code>sklearn</code>) and loading the preprocessed customer base <code>info_clustering_unscaled.csv</code> and the 1,023 consensus outliers stored in <code>outlier_dataset.csv</code>.
+        </p>
+      </div>
+
+      <!-- 2) Outlier strategy check - separation vs IQR capping -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>2) Outlier strategy check — separation vs IQR capping</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          We evaluate whether separating outliers or using IQR capping on all data is better. IQR capping truncates extreme values but leaves them in the training set, causing clusters to be pulled toward capped boundaries. Separating them creates a separate dataset, keeping the core clusters distinct and clean.
+        </p>
+        <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px; margin-bottom:16px;'>
+          <div style='font-size:13px; font-weight:600; color:#111827;'>2.1 — UMAP side by side</div>
+          <div style='font-size:15px; color:#6b7280; margin-top:3px;'>A side-by-side UMAP comparison confirms that when outliers are separated, the local density topology becomes more structured and homogeneous. Capping, by contrast, artificializes the boundary density and blends distinct behavioral clusters together.</div>
         </div>
       </div>
 
-      <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:28px;'>
-        <div>
-          <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:12px;'>Model selection decisions</div>
-          <div style='display:flex; flex-direction:column; gap:10px;'>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>Why K=8?</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>Values between 6 and 10 were compared across multiple feature spaces and scalers using the Elbow Method, Silhouette Score, Ward dendrogram (cut height=6.4), and R² grid. K=8 was selected as the configuration that balances geometric separation with business interpretability.</div>
-            </div>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>Why exclude groceries from clustering distance?</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>Most customers spend heavily on groceries regardless of segment. Including it dominated the distance calculation, masking more differentiating categories. Groceries are kept for profiling — not for clustering.</div>
-            </div>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>Why MinMaxScaler over RobustScaler?</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>Both scalers were tested. MinMaxScaler produced slightly stronger and more stable silhouette scores across the k range tested, and was preferred after side-by-side UMAP comparison.</div>
-            </div>
-          </div>
-        </div>
-        <div>
-          <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:12px;'>Alternatives tested & rejected</div>
-          <div style='display:flex; flex-direction:column; gap:10px;'>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>DBSCAN — rejected</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>"Strongest silhouettes are obtained when most customers are classified as noise." DBSCAN did not recover the richer eight-segment structure obtained with K-Means and was ruled out as the final model.</div>
-            </div>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>Petfood alternative — rejected</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>A model adding <code>lifetime_spend_petfood</code> and separating electronics from videogames was tested. "Overall structure is slightly less clean than the current model." Petfood is kept as a profiling insight only.</div>
-            </div>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>SOM & hierarchical Ward — benchmarked</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>A 12×12 SOM (1,000 iterations) and a Centroid Ward macro (20 micro-K-Means → Ward into 8 macro segments) were run as benchmarks. K-Means was confirmed as the strongest and most interpretable model.</div>
-            </div>
-          </div>
-        </div>
+      <!-- 3) Candidate feature sets and scalers -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>3) Candidate feature sets and scalers</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          Six candidate feature sets were evaluated, varying the inclusion of grocery spend, total store visits, and geographic metrics. Groceries represent a high-frequency baseline with little segment discrimination, which is why it was excluded. MinMaxScaler and RobustScaler were selected as candidate scaling methods for evaluation.
+        </p>
       </div>
 
-      <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-bottom:28px;'>
-        <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>Naming rationale (Notebook 4)</div>
-        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Business names are assigned only after the modelling stage is complete. A name is only confirmed when the same pattern appears consistently across <strong>at least three views</strong>: the spend deviation table, the radar plot, the spend profile heatmap, and the demographic/behavioural profile. "The final name of each segment is chosen only when the same pattern appears in more than one view."</div>
+      <!-- 4) Diagnostics A - scaler comparison, elbow and dendrograms -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>4) Diagnostics A — scaler comparison, elbow and dendrograms</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          We run initial diagnostics to choose the scaler, determine the range of valid k values, and inspect hierarchical structures.
+        </p>
       </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # ---- NB3 Charts ----
+    # 4.1 Scaler comparison
     st.markdown("""
-<div style='margin-top:48px; margin-bottom:6px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:6px;'>Notebook 3 — Clustering process</div>
-  <div style='font-size:20px; font-weight:800; color:#111827; margin-bottom:4px;'>Model selection: charts from the clustering notebook</div>
-</div>
-""", unsafe_allow_html=True)
-
-    # Scaler comparison
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Scaler comparison — silhouette score vs k (MinMax vs Robust)</div>
+<div style='margin-top:12px; margin-bottom:12px;'>
+  <div style='font-size:14px; font-weight:700; color:#111827;'>4.1 — Scaler comparison (silhouette vs k)</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "scaler_comparison.png"
@@ -1849,14 +2045,14 @@ elif selected_page == "NB3 Clustering":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Both MinMaxScaler and RobustScaler were tested across the full range of k values from 2 to 11 using the same feature set and KMeans initialisation. MinMaxScaler consistently produces higher silhouette scores at k=8 and shows a cleaner elbow in the curve. RobustScaler, designed to be resistant to outliers via median/IQR centering, performs worse here because the outlier separation step carried out in Notebook 1 already removed the most extreme observations — leaving the remaining distribution compact enough that robust centering offers no additional benefit. The advantage of MinMaxScaler is that it maps each feature to [0, 1], preserving relative spread within each variable while equalising their contribution to the Euclidean distance. This behaviour is appropriate for the spend feature set, where individual categories span very different absolute ranges but each contributes meaningful behavioural signal at any scale.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>MinMaxScaler consistently produces higher silhouette scores at k=8 and shows a cleaner elbow in the curve compared to RobustScaler. RobustScaler, designed to be resistant to outliers, performs worse here because the outlier separation step carried out in Notebook 1 already removed the most extreme observations — leaving the remaining distribution compact enough that robust centering offers no additional benefit.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # Elbow + silhouette
+    # 4.2 Elbow + silhouette
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Elbow curve and silhouette score vs k</div>
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:14px; font-weight:700; color:#111827;'>4.2 — Inertia elbow and silhouette score vs k</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "elbow_silhouette.png"
@@ -1864,14 +2060,14 @@ elif selected_page == "NB3 Clustering":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The left panel shows the within-cluster sum of squares (inertia) as a function of k. The curve bends most sharply between k=3 and k=6, after which the rate of decrease slows considerably. The "elbow" is not pronounced at a single value but rather forms a gradual plateau from k=7 onward, which is consistent with datasets that contain many overlapping clusters of similar size. The right panel plots the average silhouette score, which measures how well each customer fits its own cluster relative to the nearest alternative. The silhouette peaks locally near k=4 and k=8, with k=8 providing the best balance between geometric separation and the number of actionable segments. The silhouette score at k=8 (0.249) is modest in absolute terms — typical for real-world retail datasets where customer behaviours overlap naturally — but is the best achievable value given the intrinsic structure of the feature space. Neither criterion alone is decisive; k=8 was selected because it is supported simultaneously by the silhouette plateau, the Ward dendrogram cut, and the business interpretability of the resulting segments.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The left panel shows the within-cluster sum of squares (inertia) as a function of k, showing a gradual elbow. The right panel plots average silhouette score, peaking locally near k=4 and k=8. K=8 is selected to balance geometric separation with a sufficient number of actionable business segments.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # Ward dendrogram
+    # 4.3 Ward dendrogram
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Ward dendrogram — 3,000 customer subsample (cut height = 6.4)</div>
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:14px; font-weight:700; color:#111827;'>4.3 — Ward dendrogram (on a sample of 3,000 customers)</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "ward_dendrogram.png"
@@ -1879,14 +2075,14 @@ elif selected_page == "NB3 Clustering":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The Ward dendrogram merges clusters bottom-up by minimising the within-cluster sum of squares at each step, producing the same objective as KMeans but from a hierarchical perspective. A random subsample of 3,000 customers is used because computing full linkage on 32,015 observations is computationally prohibitive in a single session. The red dashed line marks the cut height of 6.4, which is the value at which the dendrogram is split to yield 8 macro-groups. This cut was chosen because the vertical segment lengths (representing merge costs) are substantially longer below this point, indicating that the 8 groups at this level are meaningfully separated from one another. Cutting higher would merge communities with genuinely different spend profiles; cutting lower would produce groups too small or too similar to be actionable. The dendrogram independently confirms k=8 as the natural partition depth, providing hierarchical validation for the flat KMeans solution.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The Ward dendrogram suggests a cut height of 6.4, yielding exactly 8 macro-groups. Cutting higher would merge communities with different spend profiles; cutting lower would produce segments too small to target. This provides strong hierarchical validation for Flat KMeans at k=8.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # Alternative dendrograms
+    # 4.4 Alternative linkage dendrograms
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Alternative linkage methods — complete, average, single (500 customer subsample)</div>
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:14px; font-weight:700; color:#111827;'>4.4 — Complete, average and single linkage dendrograms (500 customer sample)</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "alt_dendrograms.png"
@@ -1894,14 +2090,14 @@ elif selected_page == "NB3 Clustering":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Three alternative linkage strategies are shown for comparison: complete linkage (maximum pairwise distance), average linkage (mean pairwise distance), and single linkage (minimum pairwise distance). Complete linkage tends to produce compact, equally-sized clusters and is robust to outliers, but generates a complex dendrogram structure that is harder to cut cleanly. Average linkage is a compromise that balances compactness and sensitivity, but also results in a complex tree at this sample size. Single linkage, the most sensitive to noise, exhibits the chaining effect — long strands of incremental merges — which produces very unbalanced trees and is inappropriate for well-separated segment identification. The Ward linkage used in the final model produces the cleanest tree structure with the most interpretable cut point, which is why it was selected as the primary hierarchical validation tool. The alternative dendrograms are included here to document that the Ward method was not adopted arbitrarily but compared against standard alternatives.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Comparing complete, average, and single linkage shows that single linkage exhibits severe "chaining effects" (incremental merges), while complete and average linkage are too sensitive to sample noise. The Ward linkage is preferred as it produces the cleanest partition.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # Silhouette grid
+    # 5) Diagnostics B - feature set and k silhouette grid
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Silhouette score grid — feature sets vs number of clusters (k=6 to 10)</div>
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:14px; font-weight:700; color:#111827;'>5) Diagnostics B — feature set and k silhouette grid</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "silhouette_grid.png"
@@ -1909,14 +2105,34 @@ elif selected_page == "NB3 Clustering":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The grid evaluates six candidate feature sets against five values of k (6 through 10), with each cell reporting the average silhouette score on a green-yellow-red scale where green represents better separation. The feature set "spend + promo no groceries" — which corresponds to the 10 non-groceries lifetime spend columns plus the promotional sensitivity variable — produces the best or near-best silhouette score at k=8 across multiple feature set variants. Removing groceries consistently improves scores because groceries acts as a near-universal baseline: most customers buy groceries at moderate levels regardless of their broader spending profile, and its inclusion compresses inter-cluster distances without adding discriminative information. The grid also confirms that k=8 is the optimal choice within the range tested: scores do not improve meaningfully at k=9 or k=10, while the segment interpretability would decrease with more clusters. This systematic grid replaces the informal "try one configuration" approach and provides reproducible justification for the final feature set and k selection.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The silhouette grid compares 6 feature configurations across k=6 to 10. The feature set "spend + promo no groceries" (11 features) consistently produces the highest silhouette score at k=8. Removing groceries removes background noise, allowing the clustering algorithm to focus on differentiating categories.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # Silhouette blades
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Silhouette blades — KMeans k=8 (final model)</div>
+    <div style='width:100%; box-sizing:border-box;'>
+      <!-- 6) Model configuration -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>6) Model configuration</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          Based on the diagnostic grid, we select and configure the final model: <strong>K-Means clustering</strong>, $K=8$ clusters, initialised with <code>k-means++</code>, fitted on the 11-feature dataset normalized with <code>MinMaxScaler</code>.
+        </p>
+      </div>
+
+      <!-- 7) Model fitting and validation -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>7) Model fitting and validation</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          We fit the K-Means algorithm to the normalized data and validate the stability, geometric separation, and business meaning of the resulting 8 clusters.
+        </p>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 7.1 Silhouette blades
+    st.markdown("""
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:14px; font-weight:700; color:#111827;'>7.1 — Silhouette plot (blades)</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "silhouette_blades.png"
@@ -1924,59 +2140,109 @@ elif selected_page == "NB3 Clustering":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The silhouette blade plot shows the individual silhouette coefficient for every customer in the dataset, grouped by cluster and sorted in descending order. Each "blade" (filled horizontal bar) represents one cluster: a wide, tall blade extending well to the right of the global average line (red dashed) indicates a compact, well-separated cluster. A blade with a large negative portion (extending left of zero) indicates customers that may fit a neighbouring cluster better than their assigned one. In the final k=8 model, all clusters show predominantly positive silhouette values, with the global average around 0.249. Some clusters are narrower and taller, indicating tighter internal cohesion; others are wider and shorter, reflecting a naturally more dispersed population. The absence of large negative "valleys" across all clusters confirms that the KMeans solution does not force clearly misclassified customers into wrong segments — a critical quality check for retail segmentation, where a customer appearing in the wrong community would receive inappropriate campaign messaging.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The silhouette blade plot for KMeans k=8 shows predominantly positive silhouette values with a global average of 0.249. The absence of large negative regions confirms that the clustering solution is stable and does not force mismatched customers into incorrect clusters.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # PCA projection
+    # 7.2 Projections
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>PCA projection — 2D embedding of cluster assignments</div>
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:14px; font-weight:700; color:#111827;'>7.2 — PCA, UMAP and t-SNE projections</div>
 </div>
 """, unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "pca_projection.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown("<div style='font-size:13px; font-weight:700; color:#111827; text-align:center;'>PCA Projection</div>", unsafe_allow_html=True)
+        _p_pca = IMAGENS_DIR / "charts" / "pca_projection.png"
+        if _p_pca.exists(): st.image(str(_p_pca), use_container_width=True)
+    with col2:
+        st.markdown("<div style='font-size:13px; font-weight:700; color:#111827; text-align:center;'>UMAP Projection</div>", unsafe_allow_html=True)
+        _p_umap = IMAGENS_DIR / "charts" / "umap_projection.png"
+        if _p_umap.exists(): st.image(str(_p_umap), use_container_width=True)
+    with col3:
+        st.markdown("<div style='font-size:13px; font-weight:700; color:#111827; text-align:center;'>t-SNE Projection</div>", unsafe_allow_html=True)
+        _p_tsne = IMAGENS_DIR / "charts" / "tsne_projection.png"
+        if _p_tsne.exists(): st.image(str(_p_tsne), use_container_width=True)
+
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Principal Component Analysis reduces the 11-dimensional feature space to its two highest-variance directions, projecting each customer to a 2D point coloured by cluster assignment. PC1 and PC2 together explain the percentage of total variance noted in the axis labels. The PCA projection is the most conservative dimensionality reduction: it is a linear transformation and therefore cannot "unfold" non-linear manifold structure. Where clusters appear well-separated along the principal axes, the separation is genuine and would be detectable by any linear classifier. Where clusters overlap in this view, the separation may still be real in higher dimensions — it is simply not visible in the two principal directions. The Techies and Loyalists clusters tend to separate along the technology-spend axis that dominates PC1, while the Promoters cluster separates along the promotional-sensitivity axis visible in PC2. Some overlapping between adjacent clusters (Wellness, Regulars, Economizers) is expected given their moderate spending profiles; these are the communities whose naming decisions required the most supporting evidence from multiple chart types.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Concordance across linear (PCA) and non-linear (UMAP, t-SNE) embeddings validates that the clusters represent genuine and distinct multivariate densities. More distinct profiles like Techies and Promoters form clear local islands, while moderate spenders form adjacent groups.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # UMAP projection
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>UMAP projection — non-linear 2D embedding (n=3,000 subsample)</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "umap_projection.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>UMAP (Uniform Manifold Approximation and Projection) is a non-linear dimensionality reduction method that preserves local neighbourhood structure more faithfully than PCA. Points that are close together in the 11-dimensional feature space remain close in the 2D embedding; the global distances between clusters are less interpretable but the within-cluster density and local boundaries are meaningful. In the UMAP projection, the clusters that are most behaviourally distinct — Techies, Promoters, Vegetarians — appear as more isolated and compact islands, confirming that the KMeans solution has identified genuinely separable groups. Clusters that overlap substantially in the UMAP (Regulars, Economizers, Wellness) share the most feature space in reality: they occupy the moderate-spend, moderate-promo region of the customer population, and their differentiation relies on subtle but consistent deviations visible in the spend profile and radar charts. UMAP was used as a validation tool at multiple stages of model selection, including to compare MinMaxScaler versus RobustScaler configurations, and the scaler that produced more structured UMAP topology was preferred.</p>
-</div>
-""", unsafe_allow_html=True)
+    <div style='width:100%; box-sizing:border-box;'>
+      <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:18px 20px; margin-bottom:24px;'>
+        <div style='font-size:15px; font-weight:700; color:#111827; margin-bottom:6px;'>7.3 — Current solution and petfood alternative & 7.4 — Petfood alternative validation plots</div>
+        <div style='font-size:15px; color:#6b7280; line-height:1.6;'>
+          An alternative model adding <code>lifetime_spend_petfood</code> and separating electronics from video games was tested. Validation plots showed that the petfood signal is a minor sub-pattern that degrades the overall cluster compactness. Thus, the alternative was rejected and petfood is kept only as a profiling insight.
+        </div>
+      </div>
 
-    # t-SNE projection
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>t-SNE projection — stochastic 2D embedding (n=3,000 subsample)</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "tsne_projection.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>t-SNE (t-distributed Stochastic Neighbour Embedding) is a probabilistic dimensionality reduction technique optimised for visualising high-dimensional cluster structure. Unlike PCA, t-SNE does not preserve global distances: the spacing between well-separated clusters in the t-SNE plot is not proportional to their actual feature-space distance. What it does preserve is local density: points within each cluster remain tightly grouped, and nearby clusters in the original space tend to appear adjacent. The t-SNE projection is included here as a third independent visual check alongside PCA and UMAP. Concordance across all three projections — that the same clusters appear compact and distinct in each — provides strong evidence that the KMeans partition is not an artefact of any single visualisation method. The perplexity parameter was set to 40 (a value appropriate for datasets of this size), and a subsample of 3,000 customers was used to make the computation tractable. Colour mapping is identical to the PCA and UMAP panels to facilitate direct comparison.</p>
-</div>
-""", unsafe_allow_html=True)
+      <!-- 8) Method benchmarks -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>8) Method benchmarks</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          We compare the K-Means results against alternative clustering algorithms to ensure it is the most stable and interpretable option.
+        </p>
+        <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:20px;'>
+          <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
+            <div style='font-size:13px; font-weight:600; color:#111827;'>8.0 — Independent method search & 8.0.1 — UMAP comparison on the Ward sample</div>
+            <div style='font-size:14px; color:#6b7280; margin-top:3px;'>Comparing clusters under multiple techniques using UMAP embeddings confirms that Flat KMeans matches the natural grouping structure of the data better than other methods.</div>
+          </div>
+          <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
+            <div style='font-size:13px; font-weight:600; color:#111827;'>8.1 — Ward, complete, average and single sample comparison & 8.1.1 — Benchmark label usage</div>
+            <div style='font-size:14px; color:#6b7280; margin-top:3px;'>Hierarchical linkage comparisons reveal that Ward linkage is the only one that yields stable and balanced sizes across the cluster labels, while other linkages suffer from excessive grouping imbalances.</div>
+          </div>
+          <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
+            <div style='font-size:13px; font-weight:600; color:#111827;'>8.2 — Hierarchical R2 comparison & 8.3 — Hierarchical on KMeans centroids</div>
+            <div style='font-size:14px; color:#6b7280; margin-top:3px;'>We analyze the $R^2$ variance metric, and evaluate a two-step clustering (Ward on KMeans centroids). FLAT KMeans is shown to yield a simpler and more robust objective.</div>
+          </div>
+          <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
+            <div style='font-size:13px; font-weight:600; color:#111827;'>8.4 — DBSCAN density benchmark</div>
+            <div style='font-size:14px; color:#6b7280; margin-top:3px;'>DBSCAN was rejected: the highest silhouette scores are obtained when the bulk of the customers are classified as noise, failing to recover a useful business segmentation.</div>
+          </div>
+        </div>
+        <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px; margin-bottom:24px;'>
+          <div style='font-size:13px; font-weight:600; color:#111827;'>8.5 — SOM Map feature map analysis & 8.5.1 — SOM interpretation</div>
+          <div style='font-size:14px; color:#6b7280; margin-top:3px;'>A 12×12 Self-Organizing Map (1,000 iterations) was trained. It visualizes topological relations well, but the final flat KMeans model is preferred for its lower complexity and easier deployment in production.</div>
+        </div>
+      </div>
 
-    # Z-score behavioural heatmap
+      <!-- 9) Segment profiling -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>9) Segment profiling</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          Before assigning business names, we profile each segment across multiple dimensions to verify that name mappings are grounded in data.
+        </p>
+        <div style='display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px;'>
+          <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; padding:12px 14px;'>
+            <div style='font-size:12px; font-weight:600; color:#111827;'>9.1 — Petfood signal check</div>
+            <div style='font-size:13px; color:#6b7280; margin-top:2px;'>We confirm that petfood spend is distributed across Wellness and Regulars without defining a standalone cluster.</div>
+          </div>
+          <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; padding:12px 14px;'>
+            <div style='font-size:12px; font-weight:600; color:#111827;'>9.3 — Complaint behaviour</div>
+            <div style='font-size:13px; color:#6b7280; margin-top:2px;'>Complaint levels are analyzed across clusters, showing that Wellness and Promoters have elevated complaint rates.</div>
+          </div>
+          <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; padding:12px 14px;'>
+            <div style='font-size:12px; font-weight:600; color:#111827;'>9.4 — Geographic profiling</div>
+            <div style='font-size:13px; color:#6b7280; margin-top:2px;'>We map the clusters and check for spatial patterns, verifying that Wellness and Promoters are concentrated in Lisbon core.</div>
+          </div>
+        </div>
+        <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px; margin-bottom:24px;'>
+          <div style='font-size:13px; font-weight:600; color:#111827;'>9.5 — Numeric cluster labels</div>
+          <div style='font-size:14px; color:#6b7280; margin-top:3px;'>We map the numeric labels 0 to 7 to the final business names: 0 → Vegetarians, 1 → Regulars, 2 → Wellness, 3 → Promoters, 4 → Loyalists, 5 → Families, 6 → Economizers, 7 → Techies.</div>
+        </div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 9.2 Segment separation plots
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Standardised behavioural z-score heatmap — all features by cluster</div>
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:14px; font-weight:700; color:#111827;'>9.2 — Segment separation plots (Standardised behavioural z-score heatmap)</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "zscore_heatmap.png"
@@ -1984,13 +2250,26 @@ elif selected_page == "NB3 Clustering":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Each cell shows the z-score deviation of a cluster's mean from the global dataset mean for that feature: red indicates above-average, blue below-average. Z-scores standardise across features with different scales, enabling direct comparison of how strongly each cluster deviates from baseline on each dimension. The heatmap makes naming decisions transparent: Techies show strong positive z-scores for electronics, technology, and videogames; Vegetarians for vegetables and non-alcoholic drinks; Promoters for the promotional sensitivity variable. Economizers and Wellness show uniformly near-zero or slightly negative z-scores, reflecting their moderate, below-average positioning across most categories — which explains why they are the most challenging segments to characterise from a single variable and require the full multivariate profile. Loyalists show above-average scores across multiple spend categories simultaneously, consistent with their status as the highest-lifetime-value segment. This heatmap was one of the primary tools used to validate cluster names before they were finalised.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Each cell shows the z-score deviation of a cluster's mean from the global dataset mean. Techies show positive z-scores for electronics/videogames, Vegetarians for vegetables/non-alcoholic drinks, Promoters for promotion sensitivity, and Loyalists show above-average spend across multiple categories.</p>
 </div>
 """, unsafe_allow_html=True)
 
     st.markdown("""
-        <div style='padding:24px; border-radius:16px; background:#f9fafb; border:1px solid #e5e7eb; margin-top:32px;'>
-          <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 3 — Conclusions</div>
+    <div style='width:100%; box-sizing:border-box;'>
+      <!-- 10) Reattach outliers and export -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>10) Reattach outliers and export</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          The final step merges the 32,015 clustered customers with the 1,023 consensus outliers (assigned to a distinct "Outliers" segment) to create the complete customer base dataset. This dataset is exported to <code>id_and_cluster.csv</code>, mapping each customer ID to its final cluster label.
+        </p>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 11) Final modelling conclusion
+    st.markdown("""
+        <div style='padding:24px; border-radius:16px; background:#f9fafb; border:1px solid #e5e7eb; margin-top:32px; margin-bottom:32px;'>
+          <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>11) Notebook 3 — Conclusions</div>
           <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>The final model is KMeans with k=8, MinMaxScaler, and the feature set "spend + promo no groceries" (11 features). This configuration was selected after systematically testing six feature sets, two scalers, and five k values using silhouette scores, elbow curves, Ward dendrogram, and three dimensionality reduction projections. No single diagnostic was decisive; k=8 was selected because it is consistently supported across all evaluation tools simultaneously.</p>
           <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>DBSCAN was rejected because it classified most customers as noise and did not produce a rich multi-segment structure. The petfood alternative feature set produced a slightly less clean UMAP structure and was not adopted. SOM and hierarchical centroid Ward were run as benchmarks and confirmed KMeans as the best-performing model in terms of silhouette score and segment interpretability.</p>
           <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The z-score heatmap and three 2D projections (PCA, UMAP, t-SNE) serve as independent geometric validators: concordance across all three confirms that the eight-segment structure is not an artefact of any single visualisation method. The characterisation of each segment is carried out in Notebook 4.</p>
@@ -2007,44 +2286,48 @@ elif selected_page == "NB4 Characterisation":
     </div>
     """, unsafe_allow_html=True)
 
+    topics_nb4 = [
+        "1) Imports and data loading",
+        "2) Segment sizes",
+        "3) Spend profile",
+        "4) Behavioural and demographic profile",
+        "5) Loyalty, gender and household checks",
+        "6) Normalised comparison",
+        "• 6.1 — Radar profile summary",
+        "7) Feature by feature plots",
+        "8) Main differentiators by cluster",
+        "• 6.2 — Cluster summary cards",
+        "9) Cluster interpretation and naming rationale",
+        "10) Geographic check",
+        "11) Final segment names",
+        "12) Export ID and cluster mapping"
+    ]
+    render_notebook_outline("Notebook 4 — Cluster Characterisation", topics_nb4)
+
     st.markdown("""
     <div style='width:100%; box-sizing:border-box; margin-bottom:32px;'>
-      <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 4 — Cluster Characterisation</div>
+      <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 4 — Overview</div>
       <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 14px 0;'>
-        Notebook 4 takes the cluster assignments produced by the KMeans model in NB3 and applies a systematic characterisation process to each of the eight communities. The goal is twofold: first, to understand what distinguishes each cluster from the rest of the customer base across spend, behaviour, and demographic dimensions; second, to assign interpretable business names that are grounded in the data rather than imposed a priori.
+        Notebook 4 takes the cluster assignments produced by the KMeans model in NB3 and applies a systematic characterisation process to each of the eight communities. The goal is to understand what distinguishes each cluster from the rest of the customer base across spend, behaviour, and demographic dimensions, and to assign interpretable business names that are grounded in the data.
       </p>
-      <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 14px 0;'>
-        The naming protocol is strict: a name is only confirmed when the same pattern appears consistently in at least three independent views — the spend profile heatmap, the z-score deviation table, the radar chart, and the demographic/behavioural profile. No segment is named from a single chart. This multi-view requirement prevents overfitting a name to a visual artefact and ensures that the label reflects a genuine and stable behavioural pattern.
-      </p>
-      <div style='display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px;'>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
-          <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Segments named</div>
-          <div style='font-size:22px; font-weight:800; color:#c94f38;'>8</div>
-        </div>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
-          <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Chart views used</div>
-          <div style='font-size:22px; font-weight:800; color:#c94f38;'>7</div>
-        </div>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
-          <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Customers profiled</div>
-          <div style='font-size:22px; font-weight:800; color:#c94f38;'>32,015</div>
-        </div>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
-          <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Min views to name</div>
-          <div style='font-size:22px; font-weight:800; color:#c94f38;'>3</div>
-        </div>
-      </div>
-      <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-bottom:28px;'>
-        <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>Naming protocol</div>
-        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Business names are assigned only after the modelling stage is complete. A name is only confirmed when the same pattern appears consistently across at least three views: the spend deviation table, the radar plot, the spend profile heatmap, and the demographic/behavioural profile. "The final name of each segment is chosen only when the same pattern appears in more than one view." This prevents confirmation bias and ensures that names reflect stable, data-grounded patterns rather than single-chart impressions.</div>
+      
+      <!-- 1) Imports and data loading -->
+      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>1) Imports and data loading</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          We load the necessary Python packages and load the customer segment assignments (<code>customer_segments.csv</code>) along with the unscaled behavioral profiles (<code>info_clustering_unscaled.csv</code>) and demographic tables.
+        </p>
       </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Cluster sizes
+    # 2) Segment sizes
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Customer count per community</div>
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>2) Segment sizes</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+    The distribution of customers across the eight communities is free from pathological size imbalance. The two largest segments represent moderate spenders, while the smaller segments correspond to highly distinctive, rarer shopping patterns.
+  </p>
 </div>
 """, unsafe_allow_html=True)
     id_cluster_df = pd.read_csv(BASE_DIR / "datasets" / "id_and_cluster.csv")
@@ -2059,16 +2342,21 @@ elif selected_page == "NB4 Characterisation":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The distribution of customers across the eight communities is free from pathological size imbalance. No single community dominates the dataset and no community is too small to be actionable. This balance is a direct consequence of the outlier separation step in NB1: removing multivariate extremes before clustering produces a more homogeneous input space in which K-Means converges to more evenly populated centroids. The two largest segments (Regulars and Economizers) are also the most behaviourally moderate, which is consistent with a retail customer base where the majority of customers have unremarkable spending patterns. The three smallest segments (Techies, Promoters, Families) are the most behaviourally distinctive — their smaller size reflects how rare those specific patterns are in the population, not a modelling failure. Segment sizes inform campaign prioritisation: larger segments offer higher absolute reach, while smaller but more homogeneous segments offer higher targeting precision.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Removing multivariate outliers in NB1 produces a more homogeneous input space. As a result, the clusters are relatively balanced in size. The largest segments represent moderate behaviors, while smaller segments correspond to highly specialized groups like Techies and Families.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # Interactive spend heatmap
+    # 3) Spend profile
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Normalised spend profile per cluster — interactive heatmap</div>
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>3) Spend profile</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+    We inspect raw average lifetime spend (€) per segment alongside a normalized view to isolate each cluster's core product category focus.
+  </p>
 </div>
 """, unsafe_allow_html=True)
+
+    # Spend heatmap (interactive plotly)
     seg_spend_df = pd.read_csv(BASE_DIR / "datasets" / "segment_spend_profile.csv")
     spend_heat_cols = [c for c in seg_spend_df.columns if c.startswith("lifetime_spend_")]
     seg_spend_df["cluster"] = pd.to_numeric(seg_spend_df["cluster"], errors="coerce")
@@ -2080,23 +2368,33 @@ elif selected_page == "NB4 Characterisation":
     col_range = col_max - col_min; col_range[col_range == 0] = 1
     spend_matrix_norm = (spend_matrix - col_min) / col_range
     spend_col_labels = [c.replace("lifetime_spend_", "").replace("_", " ").title() for c in spend_heat_cols]
+    
     spend_heat_fig = px.imshow(spend_matrix_norm, x=spend_col_labels, y=seg_spend_df["segment_name"].tolist(),
         color_continuous_scale="Blues", zmin=0, zmax=1, text_auto=".2f")
-    spend_heat_fig.update_layout(margin=dict(l=80, r=20, t=60, b=80), height=420, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+    spend_heat_fig.update_layout(margin=dict(l=80, r=20, t=20, b=80), height=400, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(spend_heat_fig, use_container_width=True)
+
+    # Static raw spend heatmap
+    _p = IMAGENS_DIR / "charts" / "spend_heatmap.png"
+    if _p.exists(): st.image(str(_p), use_container_width=True)
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Each cell is normalised to [0, 1] across segments per column, so the darkest cell identifies the highest-spending segment in that category. Techies concentrate spending in electronics, videogames, and technology. Vegetarians over-index in vegetables and non-alcoholic drinks. Families show elevated spend across groceries and hygiene. Groceries show similar shading across nearly all segments, confirming that its exclusion from the clustering distance was correct — it adds little discriminative power. Alcohol and petfood show very low values across all segments, confirming their niche status in the customer base. Hover over any cell to see the normalised score; compare columns to identify which category most cleanly separates one segment from the rest.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Comparing normalized and raw lifetime spend reveals category peaks. Techies dominate electronics and video games. Vegetarians peak in vegetables. Families index highly in meat and hygiene, while groceries act as a high-volume baseline for all segments.</p>
+</div>
+""", unsafe_allow_html=True)
+
+    # 4) Behavioural and demographic profile
+    st.markdown("""
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>4) Behavioural and demographic profile</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+    We look at non-spend dimensions: tenure, children at home, complaints, store visits, and promotional sensitivity.
+  </p>
 </div>
 """, unsafe_allow_html=True)
 
     # Interactive behavioural heatmap
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Normalised behavioural profile per cluster — interactive heatmap</div>
-</div>
-""", unsafe_allow_html=True)
     info_unscaled_comm = pd.read_csv(BASE_DIR / "datasets" / "info_clustering_unscaled.csv")
     customer_segments_comm = pd.read_csv(BASE_DIR / "datasets" / "customer_segments.csv")
     merged_comm = info_unscaled_comm.merge(customer_segments_comm, on="customer_id", how="inner")
@@ -2111,16 +2409,88 @@ elif selected_page == "NB4 Characterisation":
     behav_heat_fig = px.imshow(behav_matrix_norm, x=["Promo sensitivity", "Tenure (years)", "Total children", "Avg complaints"],
         y=behav_by_cluster["segment_name"].tolist(), color_continuous_scale="Blues", zmin=0, zmax=1,
         text_auto=".2f")
-    behav_heat_fig.update_layout(margin=dict(l=80, r=20, t=60, b=80), height=420, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+    behav_heat_fig.update_layout(margin=dict(l=80, r=20, t=20, b=80), height=400, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(behav_heat_fig, use_container_width=True)
+
+    # Behavioural heatmap z-scores
+    _p = IMAGENS_DIR / "charts" / "behavioural_heatmap.png"
+    if _p.exists(): st.image(str(_p), use_container_width=True)
+
+    # Boxplot grid
+    st.markdown("<div style='font-size:13px; font-weight:700; color:#111827; margin-top:20px; margin-bottom:10px;'>Key variable distributions by cluster — boxplot grid</div>", unsafe_allow_html=True)
+    _p_box = IMAGENS_DIR / "charts" / "boxplot_grid.png"
+    if _p_box.exists(): st.image(str(_p_box), use_container_width=True)
+
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Promotional sensitivity varies strongly across segments: Promoters register the maximum value on this dimension, confirming that their defining trait is price-driven purchasing. Tenure separates long-term customers (Loyalists, Vegetarians) from newer cohorts (Regulars), supporting differentiated retention versus acquisition strategies. Total children most strongly characterises the Families segment — the highest value on this axis was one of the primary naming criteria. Complaints vary modestly across segments; where elevated, they reflect higher transaction frequency rather than systematic dissatisfaction. Together, these four dimensions provide a multi-axis profile that is more actionable for campaign design than spend data alone.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Promoters show a highly concentrated promotional ratio near 1.0. Families register the highest kids/teens count. Loyalists have the longest tenure (mean 13.6 years) and highest overall spend stability, while Regulars show wider variance in tenure representing newer acquisitions.</p>
 </div>
 """, unsafe_allow_html=True)
 
-    # Community cards
+    # 5) Loyalty, gender and household checks
+    st.markdown("""
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>5) Loyalty, gender and household checks</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+    Categorical traits show distinct distributions across clusters. Loyalists have the highest loyalty program adoption rate (76.8%), while Families exhibit large households with kids. Gender distribution is balanced across all eight clusters.
+  </p>
+</div>
+""", unsafe_allow_html=True)
+
+    # 6) Normalised comparison
+    st.markdown("""
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>6) Normalised comparison</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+    We overlay segment profiles across nine product and behavioral axes to identify characterisation patterns.
+  </p>
+</div>
+""", unsafe_allow_html=True)
+
+    # 6.1 Radar profile summary
+    st.markdown("<div style='font-size:13px; font-weight:700; color:#111827; margin-top:10px; margin-bottom:10px;'>6.1 — Radar profile summary (individual and combined overlaid spider charts)</div>", unsafe_allow_html=True)
+    _p_ind = IMAGENS_DIR / "charts" / "radar_individual.png"
+    if _p_ind.exists(): st.image(str(_p_ind), use_container_width=True)
+    _p_comb = IMAGENS_DIR / "charts" / "radar_combined.png"
+    if _p_comb.exists(): st.image(str(_p_comb), use_container_width=True)
+    st.markdown("""
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Techies extend sharply on the electronics and technology axes. Vegetarians show large vegetable axes extensions. Promoters are strongly biased toward promotional sensitivity, while Loyalists have broad, balanced shapes across all categories.</p>
+</div>
+""", unsafe_allow_html=True)
+
+    # 7) Feature by feature plots
+    st.markdown("""
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>7) Feature by feature plots</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+    Grouped bar charts reveal absolute spending scale differences in euros across the segments.
+  </p>
+</div>
+""", unsafe_allow_html=True)
+    _p_bar = IMAGENS_DIR / "charts" / "feature_barplots.png"
+    if _p_bar.exists(): st.image(str(_p_bar), use_container_width=True)
+    st.markdown("""
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Barplots confirm absolute scales. Techies spend twice as much on electronics as the next cluster. Vegetarians maintain a moderate but clear lead in vegetables. Niche categories like video games are almost exclusively populated by Techies, while other groups spend near zero.</p>
+</div>
+""", unsafe_allow_html=True)
+
+    # 8) Main differentiators by cluster
+    st.markdown("""
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>8) Main differentiators by cluster</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+    We summarize key differentiators and targeting suggestions for all eight customer segments.
+  </p>
+</div>
+""", unsafe_allow_html=True)
+
+    # 6.2 Cluster summary cards
+    st.markdown("<div style='font-size:13px; font-weight:700; color:#111827; margin-top:10px; margin-bottom:10px;'>6.2 — Cluster summary cards</div>", unsafe_allow_html=True)
     try:
         seg_summary = pd.read_csv(BASE_DIR / "datasets" / "segment_summary.csv")
         seg_meta_grid = {
@@ -2134,7 +2504,7 @@ elif selected_page == "NB4 Characterisation":
             7: {"name": "Techies", "desc": "Small households buying high-value tech. Cleanest electronics and audio cross-sell campaign audience.", "icon_idx": 7}
         }
         cluster_images = {0:VEGETARIANS_URI,1:REGULARS_URI,2:WELLNESS_URI,3:PROMOTERS_URI,4:LOYALISTS_URI,5:FAMILIES_URI,6:ECONOMIZERS_URI,7:TECHIES_URI}
-        st.markdown("<div style='font-size:20px; font-weight:700; color:#111827; margin-top:40px; margin-bottom:4px;'>Your 8 customer communities</div>", unsafe_allow_html=True)
+        
         cards_list_html = []
         for idx, row in seg_summary.iterrows():
             c_id = int(row['cluster']); share = row['share_%']; custs = int(row['customers'])
@@ -2145,135 +2515,12 @@ elif selected_page == "NB4 Characterisation":
     except Exception as e:
         st.error(f"Error loading segment summary: {e}")
 
-    st.markdown("""
-<div style='margin-top:48px; margin-bottom:6px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:6px;'>Notebook 4 — Segment profiling charts</div>
-  <div style='font-size:20px; font-weight:800; color:#111827; margin-bottom:4px;'>Deep-dive characterisation — all charts from NB4</div>
-</div>
-""", unsafe_allow_html=True)
-
-    # Spend profile heatmap (NB4 version)
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Spend profile heatmap — average lifetime spend per cluster (€)</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "spend_heatmap.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The spend profile heatmap shows raw average lifetime spend in euros per cluster-category pair, with colour normalised across clusters per column so that the darkest cell identifies the highest-spending segment in each category. Cell annotations show the actual euro values. Techies stand out strongly in electronics, technology, and videogames — confirming they are the technology-oriented segment and making them the priority audience for any cross-sell campaign targeting premium devices. Vegetarians dominate vegetables and non-alcoholic drinks, consistent with a health- and diet-conscious profile. Families show elevated spend across groceries and hygiene, reflecting large household purchasing patterns. Loyalists rank highly across multiple categories simultaneously, consistent with a long-tenure, broad-basket profile. Economizers show consistently low raw spend values across all categories, reflecting a restrained purchasing style — importantly, this is not driven by promotion sensitivity (their promo usage is near the median), but by genuinely lower absolute spending levels. This raw-values version of the heatmap complements the normalised plotly version shown above by revealing the actual scale differences between clusters, which the normalised view compresses.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Behavioural + demographic heatmap (NB4)
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Behavioural and demographic profile heatmap — z-scores by cluster</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "behavioural_heatmap.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>This heatmap captures non-spend dimensions: customer age, tenure as a customer, number of children at home, number of teenagers at home, number of complaints, stores visited, and promotional sensitivity. Z-scores allow direct comparison across variables with different units and scales. Families show the strongest positive deviation on the children and teens dimensions, which is the primary naming driver for this segment. Loyalists score highest on tenure, consistent with their long-standing relationship with the retailer. Promoters show by far the strongest positive z-score on promotional sensitivity (percentage of products bought on promotion), confirming that this is their defining and differentiating characteristic. Regulars and Economizers have relatively flat profiles across behavioural dimensions, which contributes to their lower distinctiveness in the z-score space — their differentiation comes from the spend profile rather than demographic or behavioural attributes. Complaints vary modestly across segments; no cluster is systematically dissatisfied, reducing the risk that any identified community represents a cohort at high churn risk due to service quality alone.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Individual radar profiles
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Individual radar profiles — all 8 clusters (9-axis spider chart)</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "radar_individual.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Each panel shows a single cluster's average profile across nine axes: electronics, vegetables, meat, fish, technology, petfood, videogames, hygiene, and promotional sensitivity. Values are normalised to [0, 1] relative to the dataset maximum for each axis, so the shape of each radar reflects relative spend intensity rather than absolute euros. Techies (C7) present a highly asymmetric shape with large extensions along electronics and technology and a very small promotional sensitivity arm, confirming they are full-price technology buyers. Vegetarians (C0) show a large extension along the vegetables axis with a near-zero promotional arm, consistent with quality-driven, full-price vegetable purchasers. Promoters (C3) show a large promotional sensitivity arm but a relatively flat spend profile across product categories, confirming that what defines this segment is how they buy rather than what they buy. Families (C5) show elevated hygiene and meat arms. Loyalists (C4) present a broadly extended shape across multiple arms, reflecting their high-basket, broad-category purchasing. The individual view makes segment-specific patterns clear without the visual complexity of the overlaid comparison.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Combined radar
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Combined radar — all 8 clusters overlaid</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "radar_combined.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The combined radar overlays all eight cluster profiles in a single chart, enabling direct visual comparison of where each community stands relative to every other on the same axis. The chart reveals the concentration of most profiles near the centre for the majority of axes — confirming that most spending categories are at moderate or low levels for most customers — while a small number of clusters extend significantly outward on specific axes. This visual concentration pattern is the radar equivalent of the z-score heatmap's near-zero cells for moderate segments. The axes where clear separation occurs (electronics for Techies, vegetables for Vegetarians, promotional sensitivity for Promoters) are precisely the axes that carry the highest discriminative power in the clustering distance. The combined radar is particularly useful for campaign planning: any axis where the target segment extends furthest from the centre while others remain near the origin represents an opportunity for category-specific messaging with minimal audience overlap risk.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Feature barplots
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Average spend per category by cluster — grouped bar charts</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "feature_barplots.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Each panel shows one product category, with bars coloured by cluster and the y-axis representing the average lifetime spend in euros. This view complements the heatmap by making absolute scale differences explicit: the electronics panel, for example, reveals that Techies spend roughly twice the next-highest cluster on electronics, while the vegetables panel shows a moderate but consistent advantage for Vegetarians. The fish panel shows that Wellness customers have a notably elevated fish spend relative to other moderate-spending segments, an insight that would be invisible in a normalised view but visible here because the absolute difference is meaningful. The petfood panel confirms that the petfood feature, while excluded from the clustering distance, does differentiate one cluster (Families) in the profiling stage. The videogames panel shows that Techies dominate this category, while most other segments spend near zero — making videogames the most concentrated single-segment category in the dataset and therefore the most targeted cross-sell opportunity available from any campaign built on these segments.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Boxplot grid
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Key variable distributions by cluster — boxplot grid</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "boxplot_grid.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The boxplot grid shows the within-cluster distribution of four key variables: total lifetime spend, promotional purchase ratio, customer age, and tenure. Unlike mean-based heatmaps, boxplots expose the spread and skew within each cluster — information that is essential for assessing how targeted a campaign can realistically be. The total spend panel reveals that Loyalists have the highest median spend and also the widest interquartile range, meaning that this segment contains both very high and moderately high spenders. Promoters show a very narrow promotional sensitivity distribution clustered near 1.0, confirming that their defining characteristic is consistent, not occasional, promotion usage. The age panel reveals that Regulars and Techies skew younger while Loyalists and Families are older on average. Tenure follows a similar pattern: Loyalists have the longest tenure and the narrowest spread, while Regulars and Economizers are newer customers with wider tenure distributions, consistent with a more recently acquired and more heterogeneous cohort. These within-cluster distributions inform the confidence level with which each segment can be targeted: narrow distributions mean higher message precision; wide distributions mean a broader or tiered communication strategy is more appropriate.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Geographic scatter by cluster (NB4)
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Geographic distribution by cluster — static scatter</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "geo_scatter.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The geographic scatter overlays all eight cluster labels on the latitude-longitude coordinate space, using the same colour palette as the radar and heatmap charts. Because geography was deliberately excluded from the clustering distance, any spatial pattern visible here is an emergent property of the behavioural segmentation rather than a modelling artefact. The chart reveals that clusters are not randomly mixed across space: Techies and Loyalists show a higher concentration in the central urban zone, consistent with the younger and higher-income urban customer profile identified in the geographic analysis notebook. Families are more evenly distributed across the suburban periphery, consistent with lower population density in residential areas outside the city centre. Promoters appear throughout the map with no strong geographic concentration, suggesting that price-sensitivity is a behavioural trait not constrained to a particular residential area. This geographic overlay is used as a final profiling validation step: if a cluster appeared concentrated exclusively in a single neighbourhood, that would raise a flag that geography had leaked into the segmentation through a correlated variable. The relatively mixed spatial distribution across clusters confirms that the model is capturing behavioural rather than geographic patterns.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    st.markdown("<h3 style='margin-top: 48px; margin-bottom: 24px;'>Explore Clustered Data</h3>", unsafe_allow_html=True)
-
+    # Interactive inspector
+    st.markdown("<h3 style='margin-top: 24px; margin-bottom: 12px;'>Interactive Cluster Inspector</h3>", unsafe_allow_html=True)
     try:
-        seg_summary = pd.read_csv(BASE_DIR / "datasets" / "segment_summary.csv")
         seg_spend = pd.read_csv(BASE_DIR / "datasets" / "segment_spend_profile.csv")
         seg_complaints = pd.read_csv(BASE_DIR / "datasets" / "segment_complaints_profile.csv")
-        
-        cluster_options = {
-            0: "Cluster 0: Vegetarians",
-            1: "Cluster 1: Regulars",
-            2: "Cluster 2: Wellness",
-            3: "Cluster 3: Promoters",
-            4: "Cluster 4: Loyalists",
-            5: "Cluster 5: Families",
-            6: "Cluster 6: Economizers",
-            7: "Cluster 7: Techies"
-        }
+        cluster_options = {0: "Cluster 0: Vegetarians", 1: "Cluster 1: Regulars", 2: "Cluster 2: Wellness", 3: "Cluster 3: Promoters", 4: "Cluster 4: Loyalists", 5: "Cluster 5: Families", 6: "Cluster 6: Economizers", 7: "Cluster 7: Techies"}
         
         selected_cluster = st.selectbox("Select cluster to inspect", options=list(cluster_options.keys()), format_func=lambda x: cluster_options[x])
         cluster_color = SEGMENT_COLORS.get(selected_cluster, "#ea580c")
@@ -2297,20 +2544,52 @@ elif selected_page == "NB4 Characterisation":
             spend_vals = [row_spend.iloc[0][col] for col in spend_cols]
             spend_labels = [col.replace("lifetime_spend_", "").replace("_", " ").title() for col in spend_cols]
             
-            spend_df = pd.DataFrame({
-                "Category": spend_labels,
-                "Average Spend (€)": spend_vals
-            })
-            
+            spend_df = pd.DataFrame({"Category": spend_labels, "Average Spend (€)": spend_vals})
             spend_chart_cluster = alt.Chart(spend_df).mark_bar(color=cluster_color, cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
                 x=alt.X("Category:N", sort="-y", title="Spend Category"),
                 y=alt.Y("Average Spend (€):Q", title="Average Spend (€)"),
                 tooltip=["Category", alt.Tooltip("Average Spend (€):Q", format=",.2f")]
-            ).properties(height=300)
-            
+            ).properties(height=260)
             st.altair_chart(spend_chart_cluster, use_container_width=True)
     except Exception as e:
-        st.info("Dynamic cluster files not fully loaded. Displaying static mockup.")
+        st.info("Dynamic cluster files not fully loaded.")
+
+    # 9) Cluster interpretation and naming rationale
+    st.markdown("""
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>9) Cluster interpretation and naming rationale</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+    The naming protocol is strict: a name is only confirmed when the same pattern appears consistently in at least three independent views: the spend profile, the behavioral/demographic profile, and the radar comparison charts. This prevents single-metric confirmation bias.
+  </p>
+</div>
+""", unsafe_allow_html=True)
+
+    # 10) Geographic check
+    st.markdown("""
+<div style='margin-top:12px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:20px; font-weight:700; color:#111827; margin-bottom:10px;'>10) Geographic check</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+    We project segment coordinates on a static map. Because geography was excluded from model distances, the emergent spatial clusters validate our behavioral profiles.
+  </p>
+</div>
+""", unsafe_allow_html=True)
+    _p_geo = IMAGENS_DIR / "charts" / "geo_scatter.png"
+    if _p_geo.exists(): st.image(str(_p_geo), use_container_width=True)
+    st.markdown("""
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Techies and Loyalists cluster in central Lisbon core urban locations. Families spread uniformly in suburbs, and Promoters display spatial randomness, proving that discount sensitivity is geographically distributed.</p>
+</div>
+""", unsafe_allow_html=True)
+
+    # 11) Final segment names & 12) Export ID and cluster mapping
+    st.markdown("""
+        <div style='padding:24px; border-radius:16px; background:#f9fafb; border:1px solid #e5e7eb; margin-top:32px; margin-bottom:32px;'>
+          <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>11) Final segment names & 12) Export ID and cluster mapping</div>
+          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>The 8 clusters are finalized with business-ready segment names: <em>Vegetarians, Regulars, Wellness, Promoters, Loyalists, Families, Economizers, Techies</em>.</p>
+          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>We export the final customer ID-to-segment mapping to <code>id_and_cluster.csv</code>, allowing direct downstream marketing integration, campaign targeting, and lookalike audience generation.</p>
+        </div>
+    """, unsafe_allow_html=True)
     render_footer()
 
 elif selected_page == "Targeter Promotion":
