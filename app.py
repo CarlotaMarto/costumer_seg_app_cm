@@ -1110,7 +1110,7 @@ elif selected_page == "Data Preprocessing":
       <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:28px;'>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
           <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Future years → NaN</div>
-          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Future transaction years exceeding 2024 are logical errors. They are set to NaN rather than dropping the customer row.</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Future transaction years exceeding 2026 are logical errors. They are set to NaN rather than dropping the customer row.</div>
         </div>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
           <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Invalid promotion → NaN</div>
@@ -1144,7 +1144,7 @@ elif selected_page == "Data Preprocessing":
     info_unscaled = pd.read_csv(BASE_DIR / "datasets" / "info_clustering_unscaled.csv")
     outlier_df = pd.read_csv(BASE_DIR / "datasets" / "outlier_dataset.csv")
 
-    current_year = 2024
+    current_year = 2026
     # Calculate counts of anomalies on raw data (kept for interpretation text reference)
     future_years = customer_info_pre[customer_info_pre["year_first_transaction"] > current_year]
     future_year_count = len(future_years)
@@ -1224,7 +1224,7 @@ elif selected_page == "Data Preprocessing":
       <div style='display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px;'>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
           <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Age calculation</div>
-          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Age is calculated dynamically relative to the 2024 temporal baseline. Implausible ages (under 16 or over 100) are set to NaN.</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Age is calculated dynamically relative to the 2026 temporal baseline. Implausible ages (under 16 or over 100) are set to NaN.</div>
         </div>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
           <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Education level proxy</div>
@@ -1340,7 +1340,7 @@ elif selected_page == "Data Preprocessing":
 </div>
 """, unsafe_allow_html=True)
     customer_info_pre["customer_birthdate"] = pd.to_datetime(customer_info_pre["customer_birthdate"], errors="coerce")
-    customer_info_pre["customer_age"] = 2024 - customer_info_pre["customer_birthdate"].dt.year
+    customer_info_pre["customer_age"] = 2026 - customer_info_pre["customer_birthdate"].dt.year
     age_clean = customer_info_pre.dropna(subset=["customer_age"])
     age_hist = alt.Chart(age_clean).mark_bar(color="#b77b45", opacity=0.85).encode(
         x=alt.X("customer_age:Q", bin=alt.Bin(maxbins=25), title="Age (years)"),
@@ -1352,7 +1352,7 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
 <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The age distribution covers a wide spread (centering on 30 to 50 years). Using birthdates directly would introduce raw date formats that distance calculations cannot interpret. Calculating age dynamically relative to the 2024 temporal baseline resolves this. The categorical summaries also confirm that gender is almost evenly split, loyalty is map-encoded for 62% of customers, and name parsing successfully identifies academic prefixes (BSc, MSc, PhD) as education level proxies. Zero-filling kids, teens and complaints handles the missing values under the assumption that missing counts represent zero counts.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The age distribution covers a wide spread (centering on 30 to 50 years). Using birthdates directly would introduce raw date formats that distance calculations cannot interpret. Calculating age dynamically relative to the 2026 temporal baseline resolves this. The categorical summaries also confirm that gender is almost evenly split, loyalty is map-encoded for 62% of customers, and name parsing successfully identifies academic prefixes (BSc, MSc, PhD) as education level proxies. Zero-filling kids, teens and complaints handles the missing values under the assumption that missing counts represent zero counts.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1679,7 +1679,7 @@ elif selected_page == "Data in Geography":
     customer_info_geo = pd.read_csv(BASE_DIR / "datasets" / "customer_info.csv")
     customer_info_geo = customer_info_geo.dropna(subset=["latitude", "longitude"]).copy()
     customer_info_geo["customer_birthdate"] = pd.to_datetime(customer_info_geo["customer_birthdate"], errors="coerce")
-    customer_info_geo["customer_age"] = 2024 - customer_info_geo["customer_birthdate"].dt.year
+    customer_info_geo["customer_age"] = 2026 - customer_info_geo["customer_birthdate"].dt.year
     customer_info_geo["lat_bin"] = (customer_info_geo["latitude"] * 20).round(0) / 20
     customer_info_geo["lon_bin"] = (customer_info_geo["longitude"] * 20).round(0) / 20
     geo_grid = customer_info_geo.groupby(["lat_bin", "lon_bin"]).size().reset_index(name="count")
