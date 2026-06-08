@@ -1145,30 +1145,11 @@ elif selected_page == "Data Preprocessing":
     outlier_df = pd.read_csv(BASE_DIR / "datasets" / "outlier_dataset.csv")
 
     current_year = 2024
-    # Calculate counts of anomalies on raw data
+    # Calculate counts of anomalies on raw data (kept for interpretation text reference)
     future_years = customer_info_pre[customer_info_pre["year_first_transaction"] > current_year]
     future_year_count = len(future_years)
     invalid_promo = customer_info_pre[(customer_info_pre["percentage_of_products_bought_promotion"] < 0) | (customer_info_pre["percentage_of_products_bought_promotion"] > 1)]
     invalid_promo_count = len(invalid_promo)
-
-    # 1. Anomalies Chart
-    anomalies_df = pd.DataFrame({
-        "Anomaly Type": ["Future transaction years (>2024)", "Invalid promotion ratio (<0 or >1)"],
-        "Count": [future_year_count, invalid_promo_count]
-    })
-    
-    st.markdown("""
-<div style='margin-top:10px; margin-bottom:12px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Data cleaning anomalies detected in raw dataset</div>
-</div>
-""", unsafe_allow_html=True)
-
-    anomalies_chart = alt.Chart(anomalies_df).mark_bar(color="#c94f38", cornerRadiusTopRight=6, cornerRadiusBottomRight=6).encode(
-        y=alt.Y("Anomaly Type:N", title="Anomaly Type"),
-        x=alt.X("Count:Q", title="Number of Records"),
-        tooltip=["Anomaly Type", "Count"]
-    ).properties(height=140)
-    st.altair_chart(anomalies_chart, use_container_width=True)
 
     # Raw missing values bar chart
     raw_missing = customer_info_pre.isna().sum().reset_index(name="missing_count")
@@ -1177,7 +1158,7 @@ elif selected_page == "Data Preprocessing":
     raw_missing = raw_missing[raw_missing["Missing Count"] > 0].sort_values("Missing %", ascending=False)
     
     st.markdown("""
-<div style='margin-top:20px; margin-bottom:12px;'>
+<div style='margin-top:10px; margin-bottom:12px;'>
   <div style='font-size:13px; font-weight:700; color:#111827;'>Missing values percentage by feature before imputation (raw dataset)</div>
 </div>
 """, unsafe_allow_html=True)
@@ -1204,8 +1185,8 @@ elif selected_page == "Data Preprocessing":
             x=clean_cols,
             colorscale=[[0, '#fff8f2'], [1, '#c94f38']],
             showscale=False,
-            ygaps=0,
-            xgaps=0
+            ygap=0,
+            xgap=0
         ))
         fig_heat.update_layout(
             margin=dict(l=40, r=40, t=15, b=40),
