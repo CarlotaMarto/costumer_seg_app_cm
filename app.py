@@ -6,6 +6,10 @@ import base64
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
+
+@st.cache_data
+def load_csv_data(filename):
+    return pd.read_csv(BASE_DIR / "datasets" / filename)
 IMAGENS_DIR = BASE_DIR / "imagens"
 
 def load_image_as_base64(path):
@@ -66,6 +70,7 @@ body {
     background: transparent !important;
     background-color: transparent !important;
     backdrop-filter: none !important;
+    padding-bottom: 0rem !important;
 }
 section[role="main"] {
     padding-top: 0px !important;
@@ -575,11 +580,17 @@ selected_page = st.sidebar.radio(
 )
 st.session_state.current_page = selected_page
 
+if "previous_page" not in st.session_state:
+    st.session_state.previous_page = "Overview"
+
+if st.session_state.previous_page != selected_page:
+    st.session_state.previous_page = selected_page
+    st.session_state.scroll_trigger = True
+
 def render_footer():
     st.markdown(
         """
-        <div style='margin-top: 24px; font-family:"Plus Jakarta Sans", "Inter", sans-serif;'>
-          <hr style='border: 0; border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 0 0 32px 0;' />
+        <div style='margin-top: 24px; font-family:"Plus Jakarta Sans", "Inter", sans-serif; background-color: #fcfbf8; padding: 32px; border-radius: 16px; border: 1px solid #f0ece1;'>
           <div style='width:100%; display:grid; grid-template-columns:repeat(4, 1fr); gap:24px; align-items:start;'>
             <div>
               <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.15em; color:#8c8c8c; margin-bottom:16px; font-weight:700;'>Navigation</div>
@@ -614,20 +625,51 @@ def render_footer():
             <div>
               <div style='text-transform:uppercase; font-size:11px; letter-spacing:0.15em; color:#8c8c8c; margin-bottom:16px; font-weight:700;'>Teacher</div>
               <div style='font-weight:700; color:#3b2720; margin-bottom:4px; font-size:14px;'>Ivo Bernardo</div>
-              <div style='color:#8c8c8c; font-size:13px;'>Machine Learning II</div>
+              <div style='color:#8c8c8c; font-size:18px;'>Machine Learning II</div>
             </div>
-            <div>
-              <p style='color:#64748b; line-height:1.6; margin:0; font-size:14px; padding-top: 27px;'>This project is optimized for executive-level business intelligence and strategic decision making.</p>
+            <div style='text-align: left;'>
+              <div style='color:#64748b; line-height:1.6; margin:0; font-size:14px; padding-top: 27px; text-align: left !important;'>This project is optimized for executive-level business intelligence and strategic decision making.</div>
             </div>
           </div>
-          <div style='background-color: #000000; color: #ffffff; padding: 18px 32px; margin-top: 32px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; width: 100%; border-radius: 12px; box-sizing: border-box;'>
+          <div style='background-color: #f7e6e1; color: #a36154; padding: 16px 32px; margin-top: 32px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; width: 100%; border-radius: 12px; box-sizing: border-box;'>
             <span>&copy; 2026 Customer Segmentation Project - Academic Use Only</span>
-            <span style='color: #a3a3a3;'>Built for Machine Learning II</span>
+            <span>Built for Machine Learning II</span>
           </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
+
+    if st.session_state.get('scroll_trigger', False):
+        import streamlit.components.v1 as components
+        components.html(
+            '''
+            <script>
+                function forceScroll() {
+                    var selectors = [
+                        window.parent,
+                        window.parent.document.documentElement,
+                        window.parent.document.body,
+                        window.parent.document.querySelector("[data-testid='stAppViewContainer']"),
+                        window.parent.document.querySelector(".main"),
+                        window.parent.document.querySelector(".block-container")
+                    ];
+                    selectors.forEach(function(c) {
+                        if (c && typeof c.scrollTo === 'function') {
+                            c.scrollTo({top: 0, behavior: 'instant'});
+                        }
+                    });
+                }
+                forceScroll();
+                setTimeout(forceScroll, 50);
+                setTimeout(forceScroll, 200);
+                setTimeout(forceScroll, 500);
+                setTimeout(forceScroll, 1000);
+            </script>
+            ''',
+            height=0
+        )
+        st.session_state.scroll_trigger = False
 
 # Page conditional routing
 if selected_page == "Overview":
@@ -660,7 +702,7 @@ if selected_page == "Overview":
 
     # Mini Community Cards — Overview preview
     import pandas as _pd
-    _seg = _pd.read_csv(BASE_DIR / "datasets" / "id_and_cluster.csv")
+    _seg = load_csv_data("id_and_cluster.csv")
     _total = len(_seg)
     _counts = _seg.groupby(["cluster","cluster_name"]).size().reset_index(name="n")
     _counts["pct"] = (_counts["n"] / _total * 100).round(1)
@@ -761,7 +803,7 @@ if selected_page == "Overview":
       .ov-arrow {{ font-size:14px; color:#9ca3af; margin-top:8px; }}
       .ov-header {{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }}
       .ov-header-title {{ font-size:15px; font-weight:700; color:#111827; }}
-      .ov-header-link {{ font-size:13px; color:#6b7280; }}
+      .ov-header-link {{ font-size:18px; color:#6b7280; }}
     </style>
     <div class='ov-header'>
       <div class='ov-header-title'>Your 8 customer communities</div>
@@ -921,15 +963,15 @@ elif selected_page == "Data Analysis":
         <div style='display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:16px; margin-bottom:28px;'>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
             <div style='font-size:28px; font-weight:800; color:#c94f38; line-height:1;'>33,038</div>
-            <div style='font-size:13px; color:#7a6454; margin-top:4px;'>unique customers in raw dataset</div>
+            <div style='font-size:18px; color:#7a6454; margin-top:4px;'>unique customers in raw dataset</div>
           </div>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
             <div style='font-size:28px; font-weight:800; color:#c94f38; line-height:1;'>21</div>
-            <div style='font-size:13px; color:#7a6454; margin-top:4px;'>numerical variables identified</div>
+            <div style='font-size:18px; color:#7a6454; margin-top:4px;'>numerical variables identified</div>
           </div>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
             <div style='font-size:28px; font-weight:800; color:#c94f38; line-height:1;'>30%</div>
-            <div style='font-size:13px; color:#7a6454; margin-top:4px;'>missing value threshold for feature exclusion</div>
+            <div style='font-size:18px; color:#7a6454; margin-top:4px;'>missing value threshold for feature exclusion</div>
           </div>
         </div>
       </div>
@@ -937,58 +979,51 @@ elif selected_page == "Data Analysis":
       <div style='background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);'>
         <div style='font-size:14px; font-weight:800; color:#111827; margin-bottom:16px; border-bottom:2px solid #f3eee6; padding-bottom:8px;'>Notebook 0 Index</div>
         <div style='display:flex; flex-wrap:wrap; gap:12px; align-items:center;'>
-          <a href="#nb0-1" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>1. Imports and Data Loading</div></a>
+          <a href="#nb0-1" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>1. Imports and Data Loading</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb0-1-1" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>1.1 Initial Data Analysis</div></a>
+          <a href="#nb0-1-1" style="text-decoration:none;"><div style='font-size:18px; color:#6b7280;'>1.1 Initial Data Analysis</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb0-1-2" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>1.2 Duplicate Rows Analysis</div></a>
+          <a href="#nb0-1-2" style="text-decoration:none;"><div style='font-size:18px; color:#6b7280;'>1.2 Duplicate Rows Analysis</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb0-1-2-1" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>1.2.1 Surname Repetition Check</div></a>
+          <a href="#nb0-1-2-1" style="text-decoration:none;"><div style='font-size:18px; color:#6b7280;'>1.2.1 Surname Repetition Check</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb0-1-3" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>1.3 Missing Values Analysis</div></a>
+          <a href="#nb0-1-3" style="text-decoration:none;"><div style='font-size:18px; color:#6b7280;'>1.3 Missing Values Analysis</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb0-1-4" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>1.4 Numerical and Categorical Columns</div></a>
+          <a href="#nb0-1-4" style="text-decoration:none;"><div style='font-size:18px; color:#6b7280;'>1.4 Numerical and Categorical Columns</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb0-1-4-1" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>1.4.1 Findings in Categorical Columns</div></a>
+          <a href="#nb0-1-4-1" style="text-decoration:none;"><div style='font-size:18px; color:#6b7280;'>1.4.1 Findings in Categorical Columns</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb0-1-5" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>1.5 Statistical Summary</div></a>
+          <a href="#nb0-1-5" style="text-decoration:none;"><div style='font-size:18px; color:#6b7280;'>1.5 Statistical Summary</div></a>
         </div>
       </div>
     </div>
 
-    <div id="nb0-1"></div><div id="nb0-1-1"></div>
+    <div id="nb0-1"></div>
+    <div id="nb0-1-1" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.1 Initial Data Analysis</h2></div>
+    <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
+      <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Dataset Overview</div>
+      <div style='font-size:16px; color:#6b7280; line-height:1.8;'>The dataset contains demographic and transactional records for a subset of the customer base. This initial pass focuses on identifying data quality issues, structural problems, and general feature distributions before any preprocessing or scaling is applied.</div>
+    </div>
 
     <div id="nb0-1-2" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.2 Duplicate Rows Analysis & <span id="nb0-1-2-1">1.2.1 Surname Repetition Check</span></h2></div>
     <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
-      <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Duplicate check</div>
+      <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Duplicate check</div>
       <div style='font-size:16px; color:#6b7280; line-height:1.8;'>No exact duplicate rows were found. A logical duplicate check (matching on customer name AND birthdate) was also performed. A surname-only proximity test was also run but produced too many false positives due to common surnames. The conclusion is that the dataset does not contain systematic duplicate records requiring removal.</div>
     </div>
 
     <div id="nb0-1-3" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.3 Missing Values Analysis</h2></div>
     <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
-      <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Missing value strategy</div>
+      <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Missing value strategy</div>
       <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Features with more than 30% missing values were flagged as too sparse to impute reliably. The inspection confirmed that missing values are concentrated in a limited group of behavioural and spend variables, supporting imputation over row-dropping — the customer base does not need to be reduced.</div>
-    </div>
-
-    <div id="nb0-1-4-1" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.4.1 Findings in Categorical Columns</h2></div>
-    <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
-      <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Education level as a proxy feature</div>
-      <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Customer names contain academic prefixes — BSc., MSc., PhD. — across all 33,038 unique names. These prefixes are flagged as an education-level proxy and earmarked for feature engineering in Notebook 1. Surname repetition alone was found to be too common to be a useful household signal; it was not carried into the modelling feature set.</div>
-    </div>
-
-    <div id="nb0-1-5" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.5 Statistical Summary</h2></div>
-    <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:8px;'>
-      <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Impossible values detected</div>
-      <div style='font-size:16px; color:#6b7280; line-height:1.8;'><code>percentage_of_products_bought_promotion</code> was found to contain values outside the valid [0, 1] range — both below 0.0 and above 1.0 — indicating data entry errors. These are flagged here and corrected in preprocessing. Spending variables show strong right-skew, confirming that a small group of customers spends disproportionately more than the majority.</div>
     </div>
     """, unsafe_allow_html=True)
 
-    customer_info = pd.read_csv(BASE_DIR / "datasets" / "customer_info.csv")
+    customer_info = load_csv_data("customer_info.csv")
 
     # Chart 1: Missing values per feature
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Missing values per feature (%)</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Missing values per feature (%)</div>
 </div>
 """, unsafe_allow_html=True)
     missing_pct = (customer_info.isnull().mean() * 100).reset_index()
@@ -1011,14 +1046,17 @@ elif selected_page == "Data Analysis":
 </div>
 """, unsafe_allow_html=True)
 
-    # Chart 2: Distribution of key numerical features
+    # 1.4 Numerical and Categorical Columns
     st.markdown("""
-<div id="nb0-1-4" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.4 Numerical and Categorical Columns - Distribution of key numerical features</h2></div>
+<div id="nb0-1-4" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.4 Numerical and Categorical Columns</h2></div>
+<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Distribution of key numerical features</div>
+</div>
 """, unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
-    c1.markdown("<div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>Lifetime spend: Groceries</div>", unsafe_allow_html=True)
-    c2.markdown("<div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>Lifetime spend: Electronics</div>", unsafe_allow_html=True)
-    c3.markdown("<div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>Total distinct products</div>", unsafe_allow_html=True)
+    c1.markdown("<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:8px;'>Lifetime spend: Groceries</div>", unsafe_allow_html=True)
+    c2.markdown("<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:8px;'>Lifetime spend: Electronics</div>", unsafe_allow_html=True)
+    c3.markdown("<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:8px;'>Total distinct products</div>", unsafe_allow_html=True)
 
     hist_groceries = alt.Chart(customer_info.dropna(subset=["lifetime_spend_groceries"])).mark_bar(color=SEGMENT_COLORS[3], opacity=0.85).encode(
         x=alt.X("lifetime_spend_groceries:Q", bin=alt.Bin(maxbins=30), title="Groceries spend"),
@@ -1045,10 +1083,41 @@ elif selected_page == "Data Analysis":
 </div>
 """, unsafe_allow_html=True)
 
-    # Chart 3: Promotion ratio distribution
+    # 1.4.1 Findings in Categorical Columns
     st.markdown("""
+<div id="nb0-1-4-1" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.4.1 Findings in Categorical Columns</h2></div>
+<div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
+  <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Education level as a proxy feature</div>
+  <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Customer names contain academic prefixes — BSc., MSc., PhD. — across all 33,038 unique names. These prefixes are flagged as an education-level proxy and earmarked for feature engineering in Notebook 1. Surname repetition alone was found to be too common to be a useful household signal; it was not carried into the modelling feature set.</div>
+</div>
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Promotion ratio distribution (valid range only)</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Gender distribution</div>
+</div>
+""", unsafe_allow_html=True)
+    gender_counts = customer_info["customer_gender"].value_counts().reset_index()
+    gender_counts.columns = ["customer_gender", "count"]
+    gender_bar = alt.Chart(gender_counts).mark_bar(color=SEGMENT_COLORS[6], cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+        x=alt.X("customer_gender:N", title="Gender"),
+        y=alt.Y("count:Q", title="Number of customers"),
+        tooltip=["customer_gender", alt.Tooltip("count:Q", title="Customers", format=",")]
+    ).properties(height=300)
+    st.altair_chart(gender_bar, use_container_width=True)
+    st.markdown("""
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The gender distribution across the customer base is approximately balanced between male and female customers, with no category representing an extreme minority. This near-parity is relevant for segmentation methodology: a heavily skewed gender distribution would risk producing segments that reflect gender composition artefacts rather than genuine behavioural differences. The approximate balance observed here supports the interpretation that the eight clusters recovered by the model reflect spending behaviour and lifestyle patterns rather than demographic overrepresentation of one group. Gender is retained as a profiling variable for segment characterisation but is not included in the clustering distance matrix.</p>
+</div>
+""", unsafe_allow_html=True)
+
+    # 1.5 Statistical Summary
+    st.markdown("""
+<div id="nb0-1-5" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.5 Statistical Summary</h2></div>
+<div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:8px;'>
+  <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Impossible values detected</div>
+  <div style='font-size:16px; color:#6b7280; line-height:1.8;'><code>percentage_of_products_bought_promotion</code> was found to contain values outside the valid [0, 1] range — both below 0.0 and above 1.0 — indicating data entry errors. These are flagged here and corrected in preprocessing. Spending variables show strong right-skew, confirming that a small group of customers spends disproportionately more than the majority.</div>
+</div>
+<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Promotion ratio distribution (valid range only)</div>
 </div>
 """, unsafe_allow_html=True)
     promo_valid = customer_info[
@@ -1068,31 +1137,10 @@ elif selected_page == "Data Analysis":
 </div>
 """, unsafe_allow_html=True)
 
-    # Chart 4: Gender distribution
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Gender distribution</div>
-</div>
-""", unsafe_allow_html=True)
-    gender_counts = customer_info["customer_gender"].value_counts().reset_index()
-    gender_counts.columns = ["customer_gender", "count"]
-    gender_bar = alt.Chart(gender_counts).mark_bar(color=SEGMENT_COLORS[6], cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
-        x=alt.X("customer_gender:N", title="Gender"),
-        y=alt.Y("count:Q", title="Number of customers"),
-        tooltip=["customer_gender", alt.Tooltip("count:Q", title="Customers", format=",")]
-    ).properties(height=300)
-    st.altair_chart(gender_bar, use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The gender distribution across the customer base is approximately balanced between male and female customers, with no category representing an extreme minority. This near-parity is relevant for segmentation methodology: a heavily skewed gender distribution would risk producing segments that reflect gender composition artefacts rather than genuine behavioural differences. The approximate balance observed here supports the interpretation that the eight clusters recovered by the model reflect spending behaviour and lifestyle patterns rather than demographic overrepresentation of one group. Gender is retained as a profiling variable for segment characterisation but is not included in the clustering distance matrix.</p>
-</div>
-""", unsafe_allow_html=True)
-
     # Chart 5: Skewness table
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Skewness of spend variables</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Skewness of spend variables</div>
 </div>
 """, unsafe_allow_html=True)
     spend_cols_skew = [c for c in customer_info.columns if c.startswith("lifetime_spend_")]
@@ -1112,7 +1160,7 @@ elif selected_page == "Data Analysis":
     # Chart: Numeric boxplots (from NB0)
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Numerical variable distributions — boxplots</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Numerical variable distributions — boxplots</div>
 </div>
 """, unsafe_allow_html=True)
     nb00_boxplot_path = IMAGENS_DIR / "charts" / "numeric_boxplots.png"
@@ -1128,9 +1176,9 @@ elif selected_page == "Data Analysis":
     st.markdown("""
         <div style='padding:24px; border-radius:16px; background:#f9fafb; border:1px solid #e5e7eb; margin-top:12px;'>
           <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 0 — Conclusions</div>
-          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>"The raw customer data contains missing values, skewed spending variables, identifier columns, date fields and several variables that require type conversion before modelling. These findings motivate the preprocessing notebook, where invalid values are handled, categorical variables are encoded and outliers are addressed."</p>
-          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>"The distribution plots confirm that spending variables are highly skewed. This supports two later decisions: separating the most atypical customers before fitting the clustering model, and leaving scaling as a modelling choice."</p>
-          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>"The missing value inspection shows that the dataset is usable without dropping large parts of the customer base." No cleaning is applied in this notebook — all transformations are deferred to NB1.</p>
+          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>The raw customer data contains missing values, skewed spending variables, identifier columns, date fields and several variables that require type conversion before modelling. These findings motivate the preprocessing notebook, where invalid values are handled, categorical variables are encoded and outliers are addressed.</p>
+          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>The distribution plots confirm that spending variables are highly skewed. This supports two later decisions: separating the most atypical customers before fitting the clustering model, and leaving scaling as a modelling choice.</p>
+          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The missing value inspection shows that the dataset is usable without dropping large parts of the customer base. No cleaning is applied in this notebook — all transformations are deferred to NB1.</p>
         </div>
     """, unsafe_allow_html=True)
     render_footer()
@@ -1154,38 +1202,43 @@ elif selected_page == "Data Preprocessing":
       <div style='background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);'>
         <div style='font-size:14px; font-weight:800; color:#111827; margin-bottom:16px; border-bottom:2px solid #f3eee6; padding-bottom:8px;'>Notebook 1 Index</div>
         <div style='display:flex; flex-wrap:wrap; gap:12px; align-items:center;'>
-          <a href="#nb1-1" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>1. Imports and Data Loading</div></a>
+          <a href="#nb1-1" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>1. Imports and Data Loading</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb1-2" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>2. Data Cleaning</div></a>
+          <a href="#nb1-2" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>2. Data Cleaning</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb1-2-1" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>2.1 Detecting Invalid Future Years</div></a>
+          <a href="#nb1-2-1" style="text-decoration:none;"><div style='font-size:18px; color:#6b7280;'>2.1 Detecting Invalid Future Years</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb1-2-2" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>2.2 Detecting Negative Values</div></a>
+          <a href="#nb1-2-2" style="text-decoration:none;"><div style='font-size:18px; color:#6b7280;'>2.2 Detecting Negative Values</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb1-2-3" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>2.3 Fixing Negative Percentages</div></a>
+          <a href="#nb1-2-3" style="text-decoration:none;"><div style='font-size:18px; color:#6b7280;'>2.3 Fixing Negative Percentages</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb1-2-4" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>2.4 Fixing Data Types</div></a>
+          <a href="#nb1-2-4" style="text-decoration:none;"><div style='font-size:18px; color:#6b7280;'>2.4 Fixing Data Types</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb1-2-5" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>2.5 Missing Values Treatment</div></a>
+          <a href="#nb1-2-5" style="text-decoration:none;"><div style='font-size:18px; color:#6b7280;'>2.5 Missing Values Treatment</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb1-3" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>3. Aggregation Feature Engineering</div></a>
+          <a href="#nb1-3" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>3. Aggregation Feature Engineering</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb1-4" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>4. Consensus Outlier Separation</div></a>
+          <a href="#nb1-4" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>4. Consensus Outlier Separation</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb1-5" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>5. Transformation Feature Engineering</div></a>
+          <a href="#nb1-5" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>5. Transformation Feature Engineering</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb1-6" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>6. Outlier Diagnostics</div></a>
+          <a href="#nb1-6" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>6. Outlier Diagnostics</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb1-7" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>7. Multivariate Analysis</div></a>
+          <a href="#nb1-7" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>7. Multivariate Analysis</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb1-8" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>8. Feature Selection</div></a>
+          <a href="#nb1-8" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>8. Feature Selection</div></a>
         </div>
       </div>
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown("""
-      <div id="nb1-1"></div>
+      <div id="nb1-1" style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>1. Imports and Data Loading</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
+          The dataset is loaded and prepared for cleaning. Initial inspection of data types and general structure sets the foundation for the preprocessing pipeline.
+        </p>
+      </div>
       <!-- Stage 2: Data Cleaning -->
       <div id="nb1-2" style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
         <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>2. Data Cleaning</div>
@@ -1196,19 +1249,19 @@ elif selected_page == "Data Preprocessing":
 
       <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:28px;'>
         <div id="nb1-2-1" style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>2.1 Detecting Invalid Future Years</div>
+          <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>2.1 Detecting Invalid Future Years</div>
           <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Future transaction years exceeding 2026 are logical errors. They are set to NaN rather than dropping the customer row.</div>
         </div>
         <div id="nb1-2-3" style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>2.3 Fixing Negative Percentages</div>
+          <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>2.3 Fixing Negative Percentages</div>
           <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Promotion ratios outside the valid [0, 1] range are set to NaN, as they represent invalid measurements.</div>
         </div>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Zero-imputation for counts</div>
+          <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Zero-imputation for counts</div>
           <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Missing values in kids_home, teens_home, and number_complaints are filled with 0, assuming lack of entry implies zero count.</div>
         </div>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Loyalty indicator flag</div>
+          <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Loyalty indicator flag</div>
           <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Instead of discarding the 38% missing loyalty card numbers, we engineer a binary flag (1 if card exists, 0 otherwise).</div>
         </div>
       </div>
@@ -1228,9 +1281,9 @@ elif selected_page == "Data Preprocessing":
     </div>
     """, unsafe_allow_html=True)
 
-    customer_info_pre = pd.read_csv(BASE_DIR / "datasets" / "customer_info.csv")
-    info_unscaled = pd.read_csv(BASE_DIR / "datasets" / "info_clustering_unscaled.csv")
-    outlier_df = pd.read_csv(BASE_DIR / "datasets" / "outlier_dataset.csv")
+    customer_info_pre = load_csv_data("customer_info.csv")
+    info_unscaled = load_csv_data("info_clustering_unscaled.csv")
+    outlier_df = load_csv_data("outlier_dataset.csv")
 
     current_year = 2026
     # Calculate counts of anomalies on raw data (kept for interpretation text reference)
@@ -1250,7 +1303,7 @@ elif selected_page == "Data Preprocessing":
         <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>2.5 Missing Values Treatment</div>
       </div>
 <div style='margin-top:10px; margin-bottom:12px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Missing values percentage by feature before imputation (raw dataset)</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Missing values percentage by feature before imputation (raw dataset)</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1280,17 +1333,17 @@ elif selected_page == "Data Preprocessing":
             xgap=0
         ))
         fig_heat.update_layout(
-            margin=dict(l=40, r=40, t=15, b=40),
+            margin=dict(l=100, r=40, t=15, b=40),
             height=280,
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             xaxis={'title': "Features with Missing Values", 'tickangle': 45},
-            yaxis={'title': "Customers (Sample of 2,500)", 'showticklabels': False}
+            yaxis={'title': "Customers", 'showticklabels': False}
         )
         
         st.markdown("""
 <div style='margin-top:20px; margin-bottom:12px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Visual map of missing values distribution (raw dataset sample)</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Visual map of missing values distribution (raw dataset sample)</div>
 </div>
 """, unsafe_allow_html=True)
         st.plotly_chart(fig_heat, use_container_width=True)
@@ -1314,15 +1367,15 @@ elif selected_page == "Data Preprocessing":
 
       <div style='display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px;'>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Age calculation</div>
+          <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Age calculation</div>
           <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Age is calculated dynamically relative to the 2026 temporal baseline. Implausible ages (under 16 or over 100) are set to NaN.</div>
         </div>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Education level proxy</div>
+          <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Education level proxy</div>
           <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Academic titles (BSc., MSc., PhD.) are extracted from names as a proxy for education level (years of study), and names are cleaned.</div>
         </div>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Gender binary mapping</div>
+          <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Gender binary mapping</div>
           <div style='font-size:14px; color:#7a6454; line-height:1.5;'>The raw customer_gender text field (male/female) is mapped to a binary indicator (is_male: 1 for male, 0 for female).</div>
         </div>
       </div>
@@ -1373,7 +1426,7 @@ elif selected_page == "Data Preprocessing":
 
     st.markdown("""
 <div style='margin-top:10px; margin-bottom:12px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Distribution of engineered categorical features</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Distribution of engineered categorical features</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1412,7 +1465,7 @@ elif selected_page == "Data Preprocessing":
 
     st.markdown("""
 <div style='margin-top:20px; margin-bottom:12px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Distribution of household and complaints variables (after zero-filling)</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Distribution of household and complaints variables (after zero-filling)</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1427,7 +1480,7 @@ elif selected_page == "Data Preprocessing":
     # Customer age distribution
     st.markdown("""
 <div style='margin-top:20px; margin-bottom:12px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Engineered customer age distribution</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Engineered customer age distribution</div>
 </div>
 """, unsafe_allow_html=True)
     customer_info_pre["customer_birthdate"] = pd.to_datetime(customer_info_pre["customer_birthdate"], errors="coerce")
@@ -1461,17 +1514,17 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
         <div style='display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:12px;'>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:10px; padding:14px 16px; text-align:center;'>
-            <div style='font-size:13px; font-weight:700; color:#c94f38;'>IQR</div>
+            <div style='font-size:18px; font-weight:700; color:#c94f38;'>IQR</div>
             <div style='font-size:22px; font-weight:800; color:#c94f38; margin:4px 0;'>k = 2.0</div>
             <div style='font-size:12px; color:#7a6454;'>multiplier</div>
           </div>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:10px; padding:14px 16px; text-align:center;'>
-            <div style='font-size:13px; font-weight:700; color:#c94f38;'>DBSCAN</div>
+            <div style='font-size:18px; font-weight:700; color:#c94f38;'>DBSCAN</div>
             <div style='font-size:22px; font-weight:800; color:#c94f38; margin:4px 0;'>eps = 1.0</div>
             <div style='font-size:12px; color:#7a6454;'>neighbourhood radius</div>
           </div>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:10px; padding:14px 16px; text-align:center;'>
-            <div style='font-size:13px; font-weight:700; color:#c94f38;'>3rd method</div>
+            <div style='font-size:18px; font-weight:700; color:#c94f38;'>3rd method</div>
             <div style='font-size:22px; font-weight:800; color:#c94f38; margin:4px 0;'>&cap;</div>
             <div style='font-size:12px; color:#7a6454;'>all three must agree</div>
           </div>
@@ -1484,7 +1537,7 @@ elif selected_page == "Data Preprocessing":
     # Dataset split after consensus outlier separation
     st.markdown("""
 <div style='margin-top:20px; margin-bottom:12px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Dataset split after consensus outlier separation</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Dataset split after consensus outlier separation</div>
 </div>
 """, unsafe_allow_html=True)
     split_df = pd.DataFrame({
@@ -1517,19 +1570,19 @@ elif selected_page == "Data Preprocessing":
 
       <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:28px;'>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>tenure (years of relationship)</div>
+          <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>tenure (years of relationship)</div>
           <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Replaces raw year_first_transaction to represent lifecycle duration as an interpretable numerical span.</div>
         </div>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>typical_hour sin/cos</div>
+          <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>typical_hour sin/cos</div>
           <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Sine and cosine transformations map typical shopping hour to a unit circle, preserving adjacent hour distance.</div>
         </div>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Annual spend rates</div>
+          <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Annual spend rates</div>
           <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Normalizes total spend by relationship tenure, preventing long tenure from inflating relative spending profiles.</div>
         </div>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Technology spend</div>
+          <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Technology spend</div>
           <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Aggregates electronics and videogames into a single feature, reducing dimensionality and representing total tech affinity.</div>
         </div>
       </div>
@@ -1538,7 +1591,7 @@ elif selected_page == "Data Preprocessing":
     # Typical hour cyclic encoding scatter plot
     st.markdown("""
 <div style='margin-top:20px; margin-bottom:12px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Cyclic typical shopping hour scatter plot</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Cyclic typical shopping hour scatter plot</div>
 </div>
 """, unsafe_allow_html=True)
     hour_scatter = alt.Chart(info_unscaled.sample(min(5000, len(info_unscaled)), random_state=42)).mark_circle(color=SEGMENT_COLORS[3], opacity=0.4, size=15).encode(
@@ -1569,7 +1622,7 @@ elif selected_page == "Data Preprocessing":
     # Spend boxplots after preprocessing
     st.markdown("""
 <div style='margin-top:20px; margin-bottom:12px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Annual spend per category after preprocessing</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Annual spend per category after preprocessing</div>
 </div>
 """, unsafe_allow_html=True)
     annual_cols = ["annual_spend_groceries", "annual_spend_electronics", "annual_spend_vegetables", "annual_spend_meat", "annual_spend_fish", "annual_spend_hygiene"]
@@ -1609,11 +1662,13 @@ elif selected_page == "Data Preprocessing":
     ]
     corr_matrix = info_unscaled[corr_features].corr()
     corr_labels = [f.replace("annual_spend_", "").replace("_", " ").title() for f in corr_features]
+    custom_corr_scale = ["#6B7D7D", "#fcfbf8", "#9D5C4A"]
     corr_fig = px.imshow(
         corr_matrix.values,
         x=corr_labels,
         y=corr_labels,
-        color_continuous_scale=list(SEGMENT_COLORS.values()),
+        color_continuous_scale=custom_corr_scale,
+        color_continuous_midpoint=0,
         zmin=-1,
         zmax=1,
         text_auto=".2f"
@@ -1631,12 +1686,31 @@ elif selected_page == "Data Preprocessing":
     # Full correlation heatmap from raw data
     st.markdown("""
 <div style='margin-top:20px; margin-bottom:12px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Full correlation heatmap (raw features)</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Full correlation heatmap (raw features)</div>
 </div>
 """, unsafe_allow_html=True)
-    corr_chart_path = IMAGENS_DIR / "charts" / "correlation_heatmap.png"
-    if corr_chart_path.exists():
-        st.image(str(corr_chart_path), use_container_width=True)
+    import numpy as np
+    numeric_df = info_unscaled.select_dtypes(include=['number'])
+    if 'customer_id' in numeric_df.columns:
+        numeric_df = numeric_df.drop(columns=['customer_id'])
+    full_corr = numeric_df.corr()
+    mask = np.triu(np.ones_like(full_corr, dtype=bool))
+    full_corr_masked = full_corr.mask(mask)
+    
+    full_corr_labels = [c.replace('_', ' ').title() for c in full_corr.columns]
+    
+    custom_corr_scale = ["#6B7D7D", "#fcfbf8", "#9D5C4A"]
+    full_corr_fig = px.imshow(
+        full_corr_masked.values,
+        x=full_corr_labels,
+        y=full_corr_labels,
+        color_continuous_scale=custom_corr_scale,
+        color_continuous_midpoint=0,
+        zmin=-1,
+        zmax=1
+    )
+    full_corr_fig.update_layout(margin=dict(l=60, r=20, t=60, b=100), height=800, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+    st.plotly_chart(full_corr_fig, use_container_width=True)
         
     st.markdown("""
 <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
@@ -1657,11 +1731,11 @@ elif selected_page == "Data Preprocessing":
 
       <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:20px;'>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>info_clustering_unscaled.csv</div>
+          <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>info_clustering_unscaled.csv</div>
           <div style='font-size:14px; color:#7a6454; line-height:1.5;'>The main unscaled clustering dataset (32,015 customers) containing absolute spend features, tenure, and cyclicTypical hour components.</div>
         </div>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>outlier_dataset.csv</div>
+          <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>outlier_dataset.csv</div>
           <div style='font-size:14px; color:#7a6454; line-height:1.5;'>The separated extreme customer subset (1,023 customers, approx 3.1% of base). These are kept aside during training and later reattached to their nearest cluster centroid.</div>
         </div>
       </div>
@@ -1670,7 +1744,7 @@ elif selected_page == "Data Preprocessing":
     # Why export unscaled card
     st.markdown("""
       <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:16px; margin-bottom:32px;'>
-        <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:6px;'>Why export unscaled?</div>
+        <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:6px;'>Why export unscaled?</div>
         <div style='font-size:16px; color:#7a6454; line-height:1.8;'>The final dataset is exported <strong>without scaling</strong>. Scaling is treated as a modelling choice — MinMaxScaler and RobustScaler are both evaluated in Notebook 3 against each other. Keeping the export unscaled ensures that the same raw dataset can be tested against any scaling strategy without re-running preprocessing.</div>
       </div>
     """, unsafe_allow_html=True)
@@ -1702,15 +1776,15 @@ elif selected_page == "Data in Geography":
         </p>
         <div style='display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:16px; margin-bottom:28px;'>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-            <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Core spatial pattern</div>
+            <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Core spatial pattern</div>
             <div style='font-size:14px; color:#7a6454; line-height:1.6;'>Strong concentration along a specific linear band, interpreted as a major coastal or river-adjacent urban corridor (consistent with Lisbon/Cascais profile).</div>
           </div>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-            <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Dominant age group</div>
+            <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Dominant age group</div>
             <div style='font-size:14px; color:#7a6454; line-height:1.6;'>The <strong>25–34</strong> age band dominates the hotspot profile.</div>
           </div>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-            <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Hotspot radius</div>
+            <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Hotspot radius</div>
             <div style='font-size:14px; color:#7a6454; line-height:1.6;'><strong>0.006 decimal degrees</strong> — defined programmatically via grid-based analysis.</div>
           </div>
         </div>
@@ -1719,41 +1793,52 @@ elif selected_page == "Data in Geography":
       <div style='background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); margin-top:20px;'>
         <div style='font-size:14px; font-weight:800; color:#111827; margin-bottom:16px; border-bottom:2px solid #f3eee6; padding-bottom:8px;'>Notebook 2 Index</div>
         <div style='display:flex; flex-wrap:wrap; gap:12px; align-items:center;'>
-          <a href="#nb2-1" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>1) Imports & 2) Data loading</div></a>
+          <a href="#nb2-1" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>1) Imports & 2) Data loading</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb2-3" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>3) Basic geographic statistics</div></a>
+          <a href="#nb2-3" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>3) Basic geographic statistics</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb2-4" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>4) Customer geographic distribution</div></a>
+          <a href="#nb2-4" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>4) Customer geographic distribution</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb2-insights" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>Insights from Geospatial Mapping</div></a>
+          <a href="#nb2-insights" style="text-decoration:none;"><div style='font-size:18px; color:#6b7280;'>Insights from Geospatial Mapping</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb2-5" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>5) Customer density map</div></a>
+          <a href="#nb2-5" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>5) Customer density map</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb2-6" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>6) Hotspot profile</div></a>
+          <a href="#nb2-6" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>6) Hotspot profile</div></a>
         </div>
       </div>
     </div>
 
-    <div id="nb2-1"></div><div id="nb2-3"></div><div id="nb2-insights" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">Insights from Geospatial Mapping</h2></div>
+    <div id="nb2-1" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1) Imports & 2) Data loading</h2></div>
+    <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
+      <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Data Preparation</div>
+      <div style='font-size:16px; color:#6b7280; line-height:1.8;'>The geographic coordinates (latitude and longitude) are loaded from the customer information dataset. Customers with missing geographic data are excluded from this specific spatial analysis to ensure mapping integrity.</div>
+    </div>
+
+    <div id="nb2-3" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">3) Basic geographic statistics</h2></div>
+    <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
+      <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Coordinate range</div>
+      <div style='font-size:16px; color:#6b7280; line-height:1.8;'>The spatial bounding box confirms that all valid customer coordinates fall within the expected region. There are no erroneous locations (e.g. coordinates in the ocean) that require cleaning.</div>
+    </div>
+
+    <div id="nb2-insights" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">Insights from Geospatial Mapping</h2></div>
 
     <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
-      <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Behavioural differences: hotspot vs. rest of base</div>
+      <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Behavioural differences: hotspot vs. rest of base</div>
       <div style='font-size:16px; color:#6b7280; line-height:1.8;'>The hotspot shows a distinct behavioural profile even before clustering labels are applied. The strongest differences are in <strong>age, product diversity, number of complaints, store visits, total spend, and promotion usage</strong>. Hotspot customers are younger, more active, and more variety-seeking — consistent with a younger urban population, though the data does not confirm student status directly.</div>
     </div>
 
     <div style='border-left:3px solid #111827; padding-left:20px;'>
-      <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Why geography is excluded from clustering</div>
+      <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Why geography is excluded from clustering</div>
       <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Including geographic coordinates in the clustering distance would create spatially-defined groups — customers near each other in space would be forced into the same cluster regardless of their spending behaviour. The objective is to discover <em>behavioural</em> communities, not geographic ones. Geography is kept as a profiling tool: after clusters are fitted, the geographic distribution of each cluster is inspected as a validation and characterisation layer.</div>
     </div>
     """, unsafe_allow_html=True)
 
-    customer_info = pd.read_csv(BASE_DIR / "datasets" / "customer_info.csv")
+    customer_info = load_csv_data("customer_info.csv")
     customer_info = customer_info.dropna(subset=["latitude", "longitude"]).copy()
     customer_info["promo_ratio"] = customer_info["percentage_of_products_bought_promotion"] * 100
     customer_info["size_spend"] = customer_info["lifetime_total_distinct_products"].fillna(0) / 50
 
-    st.markdown("<div id='nb2-4'></div>", unsafe_allow_html=True)
-    st.subheader("4) Customer geographic distribution")
+    st.markdown("<div id='nb2-4' style='margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;'><h2 style='font-size:24px; font-weight:800; color:#111827; margin:0;'>4) Customer geographic distribution</h2></div>", unsafe_allow_html=True)
     scatter_map = px.scatter_mapbox(
         customer_info,
         lat="latitude",
@@ -1819,10 +1904,10 @@ elif selected_page == "Data in Geography":
     # Chart: Age distribution hotspot vs outside
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Age distribution: hotspot vs. rest of base</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Age distribution: hotspot vs. rest of base</div>
 </div>
 """, unsafe_allow_html=True)
-    customer_info_geo = pd.read_csv(BASE_DIR / "datasets" / "customer_info.csv")
+    customer_info_geo = load_csv_data("customer_info.csv")
     customer_info_geo = customer_info_geo.dropna(subset=["latitude", "longitude"]).copy()
     customer_info_geo["customer_birthdate"] = pd.to_datetime(customer_info_geo["customer_birthdate"], errors="coerce")
     customer_info_geo["customer_age"] = 2026 - customer_info_geo["customer_birthdate"].dt.year
@@ -1853,7 +1938,7 @@ elif selected_page == "Data in Geography":
     # Chart: Static scatter (NB2)
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Geographic distribution of all customers (raw)</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Geographic distribution of all customers (raw)</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1897,13 +1982,13 @@ elif selected_page == "Data in Geography":
     render_footer()
 
 elif selected_page == "NB3 Clustering":
-    st.markdown("""
+    st.markdown('''
     <div style='margin-top: 0px; margin-bottom: 24px;'>
         <h2 style='font-size: 56px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.03em;'>Clustering</h2>
     </div>
-    """, unsafe_allow_html=True)
+    ''', unsafe_allow_html=True)
 
-    st.markdown("""
+    st.markdown('''
     <div style='margin-bottom:32px;'>
       <div>
         <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 3 — Clustering</div>
@@ -1933,243 +2018,236 @@ elif selected_page == "NB3 Clustering":
       <div style='background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); margin-top:20px;'>
         <div style='font-size:14px; font-weight:800; color:#111827; margin-bottom:16px; border-bottom:2px solid #f3eee6; padding-bottom:8px;'>Notebook 3 Index</div>
         <div style='display:flex; flex-wrap:wrap; gap:12px; align-items:center;'>
-          <a href="#nb3-1" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>1) Imports & data loading</div></a>
+          <a href="#nb3-1" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>1) Imports & data loading</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb3-2" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>2) Outlier strategy check</div></a>
+          <a href="#nb3-2" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>2) Outlier strategy check</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb3-3" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>3) Candidate feature sets & scalers</div></a>
+          <a href="#nb3-3" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>3) Candidate feature sets & scalers</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb3-4" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>4) Diagnostics A - scalers & elbow</div></a>
+          <a href="#nb3-4" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>4) Diagnostics A - scalers & elbow</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb3-5" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>5) Diagnostics B - feature set & k grid</div></a>
+          <a href="#nb3-5" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>5) Diagnostics B - feature set & k grid</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb3-6" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>6) Model configuration</div></a>
+          <a href="#nb3-6" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>6) Model configuration</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb3-7" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>7) Model fitting & validation</div></a>
+          <a href="#nb3-7" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>7) Model fitting & validation</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb3-8" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>8) Method benchmarks</div></a>
+          <a href="#nb3-8" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>8) Method benchmarks</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb3-9" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>9) Segment profiling</div></a>
+          <a href="#nb3-9" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>9) Segment profiling</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb3-10" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>10) Reattach outliers & export</div></a>
+          <a href="#nb3-10" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>10) Reattach outliers & export</div></a>
           <div style='color:#d1d5db;'>•</div>
-          <a href="#nb3-11" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>11) Final modelling conclusion</div></a>
+          <a href="#nb3-11" style="text-decoration:none;"><div style='font-size:18px; color:#374151; font-weight:500;'>11) Final modelling conclusion</div></a>
         </div>
       </div>
     </div>
-    """, unsafe_allow_html=True)
+    ''', unsafe_allow_html=True)
 
-    st.markdown("""
-      <div id="nb3-1"></div><div id="nb3-2"></div><div id="nb3-3"></div>
-      <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:28px;'>
+    st.markdown('''
+      <div id="nb3-1" style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-bottom:28px;'>
+        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:8px;'>1) Imports & data loading</div>
+        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Loading the core data libraries and the unscaled characterisation datasets prepared in Notebook 2.</div>
+      </div>
+
+      <div id="nb3-2" style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-bottom:28px;'>
+        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:8px;'>2) Outlier strategy check</div>
+        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Verifying the impact of the Isolation Forest outlier removal from Notebook 1 on the cluster structures. Ensuring extreme values do not disproportionately pull the centroids.</div>
+      </div>
+
+      <div id="nb3-3" style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-bottom:28px;'>
+        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:8px;'>3) Candidate feature sets & scalers</div>
+        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Different combinations of features (including/excluding groceries, including promotional sensitivity) and scaling techniques (MinMaxScaler vs RobustScaler) are formulated for systematic evaluation.</div>
+      </div>
+    ''', unsafe_allow_html=True)
+
+    # 4) Diagnostics A
+    st.markdown('''
+<div id="nb3-4" style="margin-top:40px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">4) Diagnostics A - Scaler comparison & Elbow</h2></div>
+''', unsafe_allow_html=True)
+    
+    _p = IMAGENS_DIR / "charts" / "scaler_comparison.png"
+    if _p.exists():
+        st.markdown("<div style='margin-bottom:12px;'><div style='font-size:18px; font-weight:700; color:#111827;'>Scaler comparison</div></div>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
+    st.markdown('''
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Both MinMaxScaler and RobustScaler were tested. MinMaxScaler consistently produces higher silhouette scores at k=8 and shows a cleaner elbow in the curve.</p>
+</div>
+''', unsafe_allow_html=True)
+
+    _p = IMAGENS_DIR / "charts" / "elbow_silhouette.png"
+    if _p.exists():
+        st.markdown("<div style='margin-bottom:12px;'><div style='font-size:18px; font-weight:700; color:#111827;'>Elbow method (Silhouette score)</div></div>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
+    st.markdown('''
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The silhouette peaks locally near k=4 and k=8, with k=8 providing the best balance between geometric separation and the number of actionable segments.</p>
+</div>
+''', unsafe_allow_html=True)
+
+    _p = IMAGENS_DIR / "charts" / "ward_dendrogram.png"
+    if _p.exists():
+        st.markdown("<div style='margin-bottom:12px;'><div style='font-size:18px; font-weight:700; color:#111827;'>Ward Dendrogram</div></div>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
+        st.markdown('''
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The Ward dendrogram confirms that an 8-cluster cut perfectly aligns with the natural hierarchical structure of the data, showing well-separated, balanced branches.</p>
+</div>
+''', unsafe_allow_html=True)
+
+    _p = IMAGENS_DIR / "charts" / "alt_dendrograms.png"
+    if _p.exists():
+        st.markdown("<div style='margin-bottom:12px;'><div style='font-size:18px; font-weight:700; color:#111827;'>Alternative linkages (Average, Complete, Single)</div></div>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
+        st.markdown('''
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Alternative linkage methods exhibit severe chaining and pathological imbalance, confirming that Ward linkage (which minimises within-cluster variance) is the only viable approach for this dataset.</p>
+</div>
+''', unsafe_allow_html=True)
+
+    st.markdown('''
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Both MinMaxScaler and RobustScaler were tested. MinMaxScaler consistently produces higher silhouette scores at k=8 and shows a cleaner elbow in the curve.</p>
+</div>
+''', unsafe_allow_html=True)
+
+    _p = IMAGENS_DIR / "charts" / "elbow_silhouette.png"
+    if _p.exists():
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
+    st.markdown('''
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The silhouette peaks locally near k=4 and k=8, with k=8 providing the best balance between geometric separation and the number of actionable segments.</p>
+</div>
+''', unsafe_allow_html=True)
+
+    _p = IMAGENS_DIR / "charts" / "ward_dendrogram.png"
+    if _p.exists():
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
+    _p = IMAGENS_DIR / "charts" / "alt_dendrograms.png"
+    if _p.exists():
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
+
+
+    # 5) Diagnostics B
+    st.markdown('''
+<div id="nb3-5" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">5) Diagnostics B - Silhouette score grid & Projections</h2></div>
+''', unsafe_allow_html=True)
+    
+    _p = IMAGENS_DIR / "charts" / "silhouette_grid.png"
+    if _p.exists():
+        st.markdown("<div style='margin-bottom:12px;'><div style='font-size:18px; font-weight:700; color:#111827;'>Silhouette score grid (K=6 to K=10)</div></div>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
+        
+    _p = IMAGENS_DIR / "charts" / "silhouette_blades.png"
+    if _p.exists():
+        st.markdown("<div style='margin-bottom:12px;'><div style='font-size:18px; font-weight:700; color:#111827;'>Silhouette blades (K=8)</div></div>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
+        st.markdown('''
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The blades for k=8 show relatively uniform thickness (indicating balanced cluster sizes) and mostly positive scores, with few instances of negative silhouette scores (which would indicate misclassification).</p>
+</div>
+''', unsafe_allow_html=True)
+
+    _p = IMAGENS_DIR / "charts" / "pca_projection.png"
+    if _p.exists():
+        st.markdown("<div style='margin-bottom:12px;'><div style='font-size:18px; font-weight:700; color:#111827;'>PCA Projection (2D)</div></div>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
+
+    _p = IMAGENS_DIR / "charts" / "umap_projection.png"
+    if _p.exists():
+        st.markdown("<div style='margin-bottom:12px;'><div style='font-size:18px; font-weight:700; color:#111827;'>UMAP Projection (2D)</div></div>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
+
+    _p = IMAGENS_DIR / "charts" / "tsne_projection.png"
+    if _p.exists():
+        st.markdown("<div style='margin-bottom:12px;'><div style='font-size:18px; font-weight:700; color:#111827;'>t-SNE Projection (2D)</div></div>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
+        st.markdown('''
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>While PCA shows some overlap due to its linear nature, the manifold learning techniques (UMAP and particularly t-SNE) demonstrate clear boundaries and distinct islands, visually validating the K-Means cluster assignments in a non-linear low-dimensional space.</p>
+</div>
+''', unsafe_allow_html=True)
+
+    _p = IMAGENS_DIR / "charts" / "zscore_heatmap.png"
+    if _p.exists():
+        st.markdown("<div style='margin-bottom:12px;'><div style='font-size:18px; font-weight:700; color:#111827;'>Z-Score Heatmap (Features x Clusters)</div></div>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
+        st.markdown('''
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>This heatmap visualises the z-score deviations of each cluster's centroid from the global mean across all features. Deep rust indicates values significantly above the average, while slate indicates values below the average. It confirms the distinct spending and behavioural profile of each segment: Techies dominate electronics and technology, Vegetarians dominate vegetables, and Families show strong deviations in meat and hygiene.</p>
+</div>
+''', unsafe_allow_html=True)
+
+    # 6, 7, 8, 9
+    st.markdown('''
+      <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:28px; margin-top:40px;'>
         <div>
-          <div id="nb3-6" style='font-size:13px; font-weight:700; color:#111827; margin-bottom:12px;'>6) Model configuration & 7) Model fitting & validation - Model selection decisions</div>
+          <div id="nb3-6" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>6) Model configuration & 7) Model fitting & validation</div>
           <div style='display:flex; flex-direction:column; gap:10px;'>
             <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>Why K=8?</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>Values between 6 and 10 were compared across multiple feature spaces and scalers using the Elbow Method, Silhouette Score, Ward dendrogram (cut height=6.4), and R² grid. K=8 was selected as the configuration that balances geometric separation with business interpretability.</div>
+              <div style='font-size:18px; font-weight:600; color:#111827;'>Why K=8?</div>
+              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>Values between 6 and 10 were compared. K=8 balances geometric separation with business interpretability.</div>
             </div>
             <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>Why exclude groceries from clustering distance?</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>Most customers spend heavily on groceries regardless of segment. Including it dominated the distance calculation, masking more differentiating categories. Groceries are kept for profiling — not for clustering.</div>
-            </div>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>Why MinMaxScaler over RobustScaler?</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>Both scalers were tested. MinMaxScaler produced slightly stronger and more stable silhouette scores across the k range tested, and was preferred after side-by-side UMAP comparison.</div>
+              <div style='font-size:18px; font-weight:600; color:#111827;'>Why exclude groceries?</div>
+              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>Most customers spend heavily on groceries regardless of segment. Groceries are kept for profiling.</div>
             </div>
           </div>
         </div>
         <div>
-          <div id="nb3-8" style='font-size:13px; font-weight:700; color:#111827; margin-bottom:12px;'>8) Method benchmarks - Alternatives tested & rejected</div>
+          <div id="nb3-8" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>8) Method benchmarks - Alternatives</div>
           <div style='display:flex; flex-direction:column; gap:10px;'>
             <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>DBSCAN — rejected</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>"Strongest silhouettes are obtained when most customers are classified as noise." DBSCAN did not recover the richer eight-segment structure obtained with K-Means and was ruled out as the final model.</div>
+              <div style='font-size:18px; font-weight:600; color:#111827;'>DBSCAN — rejected</div>
+              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>Classified too many as noise.</div>
             </div>
             <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>Petfood alternative — rejected</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>A model adding <code>lifetime_spend_petfood</code> and separating electronics from videogames was tested. "Overall structure is slightly less clean than the current model." Petfood is kept as a profiling insight only.</div>
-            </div>
-            <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
-              <div style='font-size:13px; font-weight:600; color:#111827;'>SOM & hierarchical Ward — benchmarked</div>
-              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>A 12×12 SOM (1,000 iterations) and a Centroid Ward macro (20 micro-K-Means → Ward into 8 macro segments) were run as benchmarks. K-Means was confirmed as the strongest and most interpretable model.</div>
+              <div style='font-size:18px; font-weight:600; color:#111827;'>SOM & hierarchical Ward</div>
+              <div style='font-size:15px; color:#6b7280; margin-top:3px;'>K-Means was confirmed as the strongest model.</div>
             </div>
           </div>
         </div>
       </div>
 
       <div id="nb3-9" style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-bottom:28px;'>
-        <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>9) Segment profiling - Naming rationale (Notebook 4)</div>
-        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Business names are assigned only after the modelling stage is complete. A name is only confirmed when the same pattern appears consistently across <strong>at least three views</strong>: the spend deviation table, the radar plot, the spend profile heatmap, and the demographic/behavioural profile. "The final name of each segment is chosen only when the same pattern appears in more than one view."</div>
+        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:8px;'>9) Segment profiling - Naming rationale</div>
+        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Business names are assigned only after the modelling stage is complete.</div>
       </div>
-    </div>
-    """, unsafe_allow_html=True)
+      
+      <div id="nb3-10" style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-bottom:28px;'>
+        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:8px;'>10) Reattach outliers & export</div>
+        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Outliers are merged back into the dataset and assigned to the closest existing cluster centroid to ensure all customers receive a segment label for downstream business use.</div>
+      </div>
 
-    # ---- NB3 Charts ----
-    st.markdown("""
-<div style='margin-top:48px; margin-bottom:6px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:6px;'>Notebook 3 — Clustering process</div>
-  <div style='font-size:20px; font-weight:800; color:#111827; margin-bottom:4px;'>Model selection: charts from the clustering notebook</div>
-</div>
-""", unsafe_allow_html=True)
-
-    # Scaler comparison
-    st.markdown("""
-<div id="nb3-4" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">4) Diagnostics A - Scaler comparison — silhouette score vs k (MinMax vs Robust)</h2></div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "scaler_comparison.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Both MinMaxScaler and RobustScaler were tested across the full range of k values from 2 to 11 using the same feature set and KMeans initialisation. MinMaxScaler consistently produces higher silhouette scores at k=8 and shows a cleaner elbow in the curve. RobustScaler, designed to be resistant to outliers via median/IQR centering, performs worse here because the outlier separation step carried out in Notebook 1 already removed the most extreme observations — leaving the remaining distribution compact enough that robust centering offers no additional benefit. The advantage of MinMaxScaler is that it maps each feature to [0, 1], preserving relative spread within each variable while equalising their contribution to the Euclidean distance. This behaviour is appropriate for the spend feature set, where individual categories span very different absolute ranges but each contributes meaningful behavioural signal at any scale.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Elbow + silhouette
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Elbow curve and silhouette score vs k</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "elbow_silhouette.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The left panel shows the within-cluster sum of squares (inertia) as a function of k. The curve bends most sharply between k=3 and k=6, after which the rate of decrease slows considerably. The "elbow" is not pronounced at a single value but rather forms a gradual plateau from k=7 onward, which is consistent with datasets that contain many overlapping clusters of similar size. The right panel plots the average silhouette score, which measures how well each customer fits its own cluster relative to the nearest alternative. The silhouette peaks locally near k=4 and k=8, with k=8 providing the best balance between geometric separation and the number of actionable segments. The silhouette score at k=8 (0.249) is modest in absolute terms — typical for real-world retail datasets where customer behaviours overlap naturally — but is the best achievable value given the intrinsic structure of the feature space. Neither criterion alone is decisive; k=8 was selected because it is supported simultaneously by the silhouette plateau, the Ward dendrogram cut, and the business interpretability of the resulting segments.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Ward dendrogram
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Ward dendrogram — 3,000 customer subsample (cut height = 6.4)</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "ward_dendrogram.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The Ward dendrogram merges clusters bottom-up by minimising the within-cluster sum of squares at each step, producing the same objective as KMeans but from a hierarchical perspective. A random subsample of 3,000 customers is used because computing full linkage on 32,015 observations is computationally prohibitive in a single session. The red dashed line marks the cut height of 6.4, which is the value at which the dendrogram is split to yield 8 macro-groups. This cut was chosen because the vertical segment lengths (representing merge costs) are substantially longer below this point, indicating that the 8 groups at this level are meaningfully separated from one another. Cutting higher would merge communities with genuinely different spend profiles; cutting lower would produce groups too small or too similar to be actionable. The dendrogram independently confirms k=8 as the natural partition depth, providing hierarchical validation for the flat KMeans solution.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Alternative dendrograms
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Alternative linkage methods — complete, average, single (500 customer subsample)</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "alt_dendrograms.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Three alternative linkage strategies are shown for comparison: complete linkage (maximum pairwise distance), average linkage (mean pairwise distance), and single linkage (minimum pairwise distance). Complete linkage tends to produce compact, equally-sized clusters and is robust to outliers, but generates a complex dendrogram structure that is harder to cut cleanly. Average linkage is a compromise that balances compactness and sensitivity, but also results in a complex tree at this sample size. Single linkage, the most sensitive to noise, exhibits the chaining effect — long strands of incremental merges — which produces very unbalanced trees and is inappropriate for well-separated segment identification. The Ward linkage used in the final model produces the cleanest tree structure with the most interpretable cut point, which is why it was selected as the primary hierarchical validation tool. The alternative dendrograms are included here to document that the Ward method was not adopted arbitrarily but compared against standard alternatives.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Silhouette grid
-    st.markdown("""
-<div id="nb3-5" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">5) Diagnostics B - Silhouette score grid — feature sets vs number of clusters (k=6 to 10)</h2></div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "silhouette_grid.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The grid evaluates six candidate feature sets against five values of k (6 through 10), with each cell reporting the average silhouette score on a green-yellow-red scale where green represents better separation. The feature set "spend + promo no groceries" — which corresponds to the 10 non-groceries lifetime spend columns plus the promotional sensitivity variable — produces the best or near-best silhouette score at k=8 across multiple feature set variants. Removing groceries consistently improves scores because groceries acts as a near-universal baseline: most customers buy groceries at moderate levels regardless of their broader spending profile, and its inclusion compresses inter-cluster distances without adding discriminative information. The grid also confirms that k=8 is the optimal choice within the range tested: scores do not improve meaningfully at k=9 or k=10, while the segment interpretability would decrease with more clusters. This systematic grid replaces the informal "try one configuration" approach and provides reproducible justification for the final feature set and k selection.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Silhouette blades
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Silhouette blades — KMeans k=8 (final model)</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "silhouette_blades.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The silhouette blade plot shows the individual silhouette coefficient for every customer in the dataset, grouped by cluster and sorted in descending order. Each "blade" (filled horizontal bar) represents one cluster: a wide, tall blade extending well to the right of the global average line (red dashed) indicates a compact, well-separated cluster. A blade with a large negative portion (extending left of zero) indicates customers that may fit a neighbouring cluster better than their assigned one. In the final k=8 model, all clusters show predominantly positive silhouette values, with the global average around 0.249. Some clusters are narrower and taller, indicating tighter internal cohesion; others are wider and shorter, reflecting a naturally more dispersed population. The absence of large negative "valleys" across all clusters confirms that the KMeans solution does not force clearly misclassified customers into wrong segments — a critical quality check for retail segmentation, where a customer appearing in the wrong community would receive inappropriate campaign messaging.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # PCA projection
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>PCA projection — 2D embedding of cluster assignments</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "pca_projection.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Principal Component Analysis reduces the 11-dimensional feature space to its two highest-variance directions, projecting each customer to a 2D point coloured by cluster assignment. PC1 and PC2 together explain the percentage of total variance noted in the axis labels. The PCA projection is the most conservative dimensionality reduction: it is a linear transformation and therefore cannot "unfold" non-linear manifold structure. Where clusters appear well-separated along the principal axes, the separation is genuine and would be detectable by any linear classifier. Where clusters overlap in this view, the separation may still be real in higher dimensions — it is simply not visible in the two principal directions. The Techies and Loyalists clusters tend to separate along the technology-spend axis that dominates PC1, while the Promoters cluster separates along the promotional-sensitivity axis visible in PC2. Some overlapping between adjacent clusters (Wellness, Regulars, Economizers) is expected given their moderate spending profiles; these are the communities whose naming decisions required the most supporting evidence from multiple chart types.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # UMAP projection
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>UMAP projection — non-linear 2D embedding (n=3,000 subsample)</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "umap_projection.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>UMAP (Uniform Manifold Approximation and Projection) is a non-linear dimensionality reduction method that preserves local neighbourhood structure more faithfully than PCA. Points that are close together in the 11-dimensional feature space remain close in the 2D embedding; the global distances between clusters are less interpretable but the within-cluster density and local boundaries are meaningful. In the UMAP projection, the clusters that are most behaviourally distinct — Techies, Promoters, Vegetarians — appear as more isolated and compact islands, confirming that the KMeans solution has identified genuinely separable groups. Clusters that overlap substantially in the UMAP (Regulars, Economizers, Wellness) share the most feature space in reality: they occupy the moderate-spend, moderate-promo region of the customer population, and their differentiation relies on subtle but consistent deviations visible in the spend profile and radar charts. UMAP was used as a validation tool at multiple stages of model selection, including to compare MinMaxScaler versus RobustScaler configurations, and the scaler that produced more structured UMAP topology was preferred.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # t-SNE projection
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>t-SNE projection — stochastic 2D embedding (n=3,000 subsample)</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "tsne_projection.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>t-SNE (t-distributed Stochastic Neighbour Embedding) is a probabilistic dimensionality reduction technique optimised for visualising high-dimensional cluster structure. Unlike PCA, t-SNE does not preserve global distances: the spacing between well-separated clusters in the t-SNE plot is not proportional to their actual feature-space distance. What it does preserve is local density: points within each cluster remain tightly grouped, and nearby clusters in the original space tend to appear adjacent. The t-SNE projection is included here as a third independent visual check alongside PCA and UMAP. Concordance across all three projections — that the same clusters appear compact and distinct in each — provides strong evidence that the KMeans partition is not an artefact of any single visualisation method. The perplexity parameter was set to 40 (a value appropriate for datasets of this size), and a subsample of 3,000 customers was used to make the computation tractable. Colour mapping is identical to the PCA and UMAP panels to facilitate direct comparison.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Z-score behavioural heatmap
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Standardised behavioural z-score heatmap — all features by cluster</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "zscore_heatmap.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Each cell shows the z-score deviation of a cluster's mean from the global dataset mean for that feature: red indicates above-average, blue below-average. Z-scores standardise across features with different scales, enabling direct comparison of how strongly each cluster deviates from baseline on each dimension. The heatmap makes naming decisions transparent: Techies show strong positive z-scores for electronics, technology, and videogames; Vegetarians for vegetables and non-alcoholic drinks; Promoters for the promotional sensitivity variable. Economizers and Wellness show uniformly near-zero or slightly negative z-scores, reflecting their moderate, below-average positioning across most categories — which explains why they are the most challenging segments to characterise from a single variable and require the full multivariate profile. Loyalists show above-average scores across multiple spend categories simultaneously, consistent with their status as the highest-lifetime-value segment. This heatmap was one of the primary tools used to validate cluster names before they were finalised.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    st.markdown("""
-        <div id="nb3-10"></div>
-        <div id="nb3-11" style='padding:24px; border-radius:16px; background:#f9fafb; border:1px solid #e5e7eb; margin-top:32px;'>
-          <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>11) Final modelling conclusion</div>
-          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>The final model is KMeans with k=8, MinMaxScaler, and the feature set "spend + promo no groceries" (11 features). This configuration was selected after systematically testing six feature sets, two scalers, and five k values using silhouette scores, elbow curves, Ward dendrogram, and three dimensionality reduction projections. No single diagnostic was decisive; k=8 was selected because it is consistently supported across all evaluation tools simultaneously.</p>
-          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>DBSCAN was rejected because it classified most customers as noise and did not produce a rich multi-segment structure. The petfood alternative feature set produced a slightly less clean UMAP structure and was not adopted. SOM and hierarchical centroid Ward were run as benchmarks and confirmed KMeans as the best-performing model in terms of silhouette score and segment interpretability.</p>
-          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The z-score heatmap and three 2D projections (PCA, UMAP, t-SNE) serve as independent geometric validators: concordance across all three confirms that the eight-segment structure is not an artefact of any single visualisation method. The characterisation of each segment is carried out in Notebook 4.</p>
-        </div>
-    """, unsafe_allow_html=True)
+      <div id="nb3-11" style='padding:24px; border-radius:16px; background:#f9fafb; border:1px solid #e5e7eb; margin-top:32px;'>
+        <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>11) Final modelling conclusion</div>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The final model is KMeans with k=8, MinMaxScaler, and the feature set "spend + promo no groceries". The characterisation of each segment is carried out in Notebook 4.</p>
+      </div>
+    ''', unsafe_allow_html=True)
     render_footer()
-
 elif selected_page == "NB4 Characterisation":
     cluster_id_map = {0: "Vegetarians", 1: "Regulars", 2: "Wellness", 3: "Promoters", 4: "Loyalists", 5: "Families", 6: "Economizers", 7: "Techies"}
 
@@ -2235,7 +2313,7 @@ elif selected_page == "NB4 Characterisation":
     st.markdown("""
       <div id="nb4-1"></div><div id="nb4-3"></div><div id="nb4-4"></div><div id="nb4-5"></div><div id="nb4-6"></div><div id="nb4-7"></div><div id="nb4-8"></div><div id="nb4-9"></div><div id="nb4-10"></div>
       <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-bottom:28px;'>
-        <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>1) Imports & data loading - Naming protocol</div>
+        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:8px;'>1) Imports & data loading - Naming protocol</div>
         <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Business names are assigned only after the modelling stage is complete. A name is only confirmed when the same pattern appears consistently across at least three views: the spend deviation table, the radar plot, the spend profile heatmap, and the demographic/behavioural profile. "The final name of each segment is chosen only when the same pattern appears in more than one view." This prevents confirmation bias and ensures that names reflect stable, data-grounded patterns rather than single-chart impressions.</div>
       </div>
     </div>
@@ -2245,7 +2323,7 @@ elif selected_page == "NB4 Characterisation":
     st.markdown("""
 <div id="nb4-2" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">2) Segment sizes - Customer count per community</h2></div>
 """, unsafe_allow_html=True)
-    id_cluster_df = pd.read_csv(BASE_DIR / "datasets" / "id_and_cluster.csv")
+    id_cluster_df = load_csv_data("id_and_cluster.csv")
     cluster_counts = id_cluster_df.groupby("cluster_name").size().reset_index(name="customers")
     cluster_counts = cluster_counts.sort_values("customers", ascending=False)
     cluster_size_chart = alt.Chart(cluster_counts).mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
@@ -2265,10 +2343,10 @@ elif selected_page == "NB4 Characterisation":
     # Interactive spend heatmap
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Normalised spend profile per cluster — interactive heatmap</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Normalised spend profile per cluster — interactive heatmap</div>
 </div>
 """, unsafe_allow_html=True)
-    seg_spend_df = pd.read_csv(BASE_DIR / "datasets" / "segment_spend_profile.csv")
+    seg_spend_df = load_csv_data("segment_spend_profile.csv")
     spend_heat_cols = [c for c in seg_spend_df.columns if c.startswith("lifetime_spend_")]
     seg_spend_df["cluster"] = pd.to_numeric(seg_spend_df["cluster"], errors="coerce")
     seg_spend_df = seg_spend_df.dropna(subset=["cluster"])
@@ -2293,11 +2371,11 @@ elif selected_page == "NB4 Characterisation":
     # Interactive behavioural heatmap
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Normalised behavioural profile per cluster — interactive heatmap</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Normalised behavioural profile per cluster — interactive heatmap</div>
 </div>
 """, unsafe_allow_html=True)
-    info_unscaled_comm = pd.read_csv(BASE_DIR / "datasets" / "info_clustering_unscaled.csv")
-    customer_segments_comm = pd.read_csv(BASE_DIR / "datasets" / "customer_segments.csv")
+    info_unscaled_comm = load_csv_data("info_clustering_unscaled.csv")
+    customer_segments_comm = load_csv_data("customer_segments.csv")
     merged_comm = info_unscaled_comm.merge(customer_segments_comm, on="customer_id", how="inner")
     behav_features = ["percentage_of_products_bought_promotion", "tenure", "total_children", "number_complaints"]
     behav_by_cluster = merged_comm.groupby("cluster")[behav_features].mean().reset_index()
@@ -2321,7 +2399,7 @@ elif selected_page == "NB4 Characterisation":
 
     # Community cards
     try:
-        seg_summary = pd.read_csv(BASE_DIR / "datasets" / "segment_summary.csv")
+        seg_summary = load_csv_data("segment_summary.csv")
         seg_meta_grid = {
             0: {"name": "Vegetarians", "desc": "Full-price, promotion-resistant shoppers. Lead with curation/quality framing rather than discounts.", "icon_idx": 0},
             1: {"name": "Regulars", "desc": "Active but newer, deal-aware shoppers. Strong targets for onboarding to the loyalty program.", "icon_idx": 1},
@@ -2354,11 +2432,13 @@ elif selected_page == "NB4 Characterisation":
     # Spend profile heatmap (NB4 version)
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Spend profile heatmap — average lifetime spend per cluster (€)</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Spend profile heatmap — average lifetime spend per cluster (€)</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "spend_heatmap.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
+    if _p.exists():
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
@@ -2369,11 +2449,13 @@ elif selected_page == "NB4 Characterisation":
     # Behavioural + demographic heatmap (NB4)
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Behavioural and demographic profile heatmap — z-scores by cluster</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Behavioural and demographic profile heatmap — z-scores by cluster</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "behavioural_heatmap.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
+    if _p.exists():
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
@@ -2384,11 +2466,13 @@ elif selected_page == "NB4 Characterisation":
     # Individual radar profiles
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Individual radar profiles — all 8 clusters (9-axis spider chart)</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Individual radar profiles — all 8 clusters (9-axis spider chart)</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "radar_individual.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
+    if _p.exists():
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
@@ -2399,11 +2483,13 @@ elif selected_page == "NB4 Characterisation":
     # Combined radar
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Combined radar — all 8 clusters overlaid</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Combined radar — all 8 clusters overlaid</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "radar_combined.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
+    if _p.exists():
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
@@ -2414,11 +2500,13 @@ elif selected_page == "NB4 Characterisation":
     # Feature barplots
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Average spend per category by cluster — grouped bar charts</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Average spend per category by cluster — grouped bar charts</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "feature_barplots.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
+    if _p.exists():
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
@@ -2429,11 +2517,13 @@ elif selected_page == "NB4 Characterisation":
     # Boxplot grid
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Key variable distributions by cluster — boxplot grid</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Key variable distributions by cluster — boxplot grid</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "boxplot_grid.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
+    if _p.exists():
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
@@ -2444,11 +2534,13 @@ elif selected_page == "NB4 Characterisation":
     # Geographic scatter by cluster (NB4)
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Geographic distribution by cluster — static scatter</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Geographic distribution by cluster — static scatter</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "geo_scatter.png"
-    if _p.exists(): st.image(str(_p), use_container_width=True)
+    if _p.exists():
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
@@ -2459,9 +2551,9 @@ elif selected_page == "NB4 Characterisation":
     st.markdown("<h3 style='margin-top: 48px; margin-bottom: 24px;'>Explore Clustered Data</h3>", unsafe_allow_html=True)
 
     try:
-        seg_summary = pd.read_csv(BASE_DIR / "datasets" / "segment_summary.csv")
-        seg_spend = pd.read_csv(BASE_DIR / "datasets" / "segment_spend_profile.csv")
-        seg_complaints = pd.read_csv(BASE_DIR / "datasets" / "segment_complaints_profile.csv")
+        seg_summary = load_csv_data("segment_summary.csv")
+        seg_spend = load_csv_data("segment_spend_profile.csv")
+        seg_complaints = load_csv_data("segment_complaints_profile.csv")
         
         cluster_options = {
             0: "Cluster 0: Vegetarians",
@@ -2550,6 +2642,7 @@ elif selected_page == "Targeter Promotion":
 
       <div style='background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); margin-top:20px;'>
         <div style='font-size:14px; font-weight:800; color:#111827; margin-bottom:16px; border-bottom:2px solid #f3eee6; padding-bottom:8px;'>Notebook 5 Index</div>
+        <div style='display:flex; flex-wrap:wrap; gap:12px; align-items:center;'>
           <a href="#nb5-1" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>1) Imports & data loading</div></a>
           <div style='color:#d1d5db;'>•</div>
           <a href="#nb5-2" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>2) Transaction preparation per segment</div></a>
@@ -2566,6 +2659,7 @@ elif selected_page == "Targeter Promotion":
           <div style='color:#d1d5db;'>•</div>
           <a href="#nb5-8" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>8) Final interpretation</div></a>
         </div>
+        </div>
       </div>
     </div>
     """, unsafe_allow_html=True)
@@ -2574,19 +2668,19 @@ elif selected_page == "Targeter Promotion":
       <div id="nb5-1"></div><div id="nb5-2"></div>
       <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:24px;'>
         <div style='border-left:3px solid #111827; padding-left:20px;'>
-          <div id="nb5-3" style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>3) Apriori parameters - Why support is set at 1%</div>
+          <div id="nb5-3" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>3) Apriori parameters - Why support is set at 1%</div>
           <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Rules are mined per segment — each sub-population has far fewer transactions than the full dataset. A 1% support threshold ensures enough rules are discovered while still requiring meaningful co-occurrence frequency within each community.</div>
         </div>
         <div style='border-left:3px solid #111827; padding-left:20px;'>
-          <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Lift-derived campaign discounts</div>
+          <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Lift-derived campaign discounts</div>
           <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Suggested campaign discounts are not fixed — they are derived from the lift value of each rule. A higher lift means a stronger-than-random co-purchase signal, which justifies a larger promotional incentive. This ties the commercial decision directly to statistical evidence.</div>
         </div>
         <div style='border-left:3px solid #111827; padding-left:20px;'>
-          <div id="nb5-7" style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>7) Campaign suggestions - Excluded recommendations: Vegetarians (cluster 0)</div>
+          <div id="nb5-7" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>7) Campaign suggestions - Excluded recommendations: Vegetarians (cluster 0)</div>
           <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Chicken, meat, and fish are excluded from recommendations for cluster 0 (Vegetarians). The Apriori rules initially suggested these items, but they contradict the segment's defining behavioural trait. Notebook 4 confirms that this segment's identity is plant-based — the exclusion ensures campaign coherence.</div>
         </div>
         <div style='border-left:3px solid #111827; padding-left:20px;'>
-          <div id="nb5-6" style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>6) Rule robustness check - Robustness validation</div>
+          <div id="nb5-6" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>6) Rule robustness check - Robustness validation</div>
           <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Each segment's rules are validated on an 80/20 train/test split. Segments with many matched rules and low mean lift difference between train and test have stable co-purchase patterns. Segments with few matched rules should be interpreted with caution.</div>
         </div>
       </div>
@@ -2598,7 +2692,7 @@ elif selected_page == "Targeter Promotion":
     st.markdown("""
 <div id="nb5-4" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">4) Association rules per segment - Association rules by lift per segment</h2></div>
 """, unsafe_allow_html=True)
-    rules_df = pd.read_csv(BASE_DIR / "datasets" / "segment_campaign_rules.csv")
+    rules_df = load_csv_data("segment_campaign_rules.csv")
     rules_df["rule_label"] = rules_df["if_buys"] + " -> " + rules_df["promote"]
     lift_chart = alt.Chart(rules_df).mark_bar(cornerRadiusTopRight=4, cornerRadiusBottomRight=4).encode(
         y=alt.Y("rule_label:N", sort="-x", title="Rule (if buys -> promote)"),
@@ -2640,7 +2734,7 @@ elif selected_page == "Targeter Promotion":
     st.markdown("<div style='height:1px; background:#e5e7eb; margin-bottom:24px;'></div>", unsafe_allow_html=True)
 
     try:
-        campaign_rules = pd.read_csv(BASE_DIR / "datasets" / "segment_campaign_rules.csv")
+        campaign_rules = load_csv_data("segment_campaign_rules.csv")
         unique_segments = campaign_rules['segment'].unique()
         
         # Segment label map to color rules by matching SEGMENT_COLORS keys
@@ -2655,7 +2749,7 @@ elif selected_page == "Targeter Promotion":
         
         segment_rules = campaign_rules[campaign_rules['segment'] == selected_segment]
         
-        st.markdown(f"<div id='nb5-8'></div>\n\n#### Top Association Rules for {selected_segment}")
+        st.markdown(f"<div id='nb5-8'></div>\n\n#### Top Association Rules for {selected_segment}", unsafe_allow_html=True)
         
         for idx, rule in segment_rules.iterrows():
             if_buys = rule['if_buys']
@@ -3022,7 +3116,16 @@ elif selected_page == "Customer Simulator":
             with _grid_cols[_i % 4]:
                 _qty = st.session_state.shop_cart.get(_product, 0)
                 _badge = f" ×{_qty}" if _qty else ""
-                _label = f"{_SHOP_EMOJI.get(_product,'🛒')} {_product.title()}{_badge}\n€{_SHOP_PRICES[_product]:.2f}"
+                _img_name = _product.title() + ".png"
+                _img_path = BASE_DIR / "imagens" / "guardadas" / _img_name
+                
+                # Check if we have an image for this product
+                if _img_path.exists():
+                    st.image(str(_img_path), use_container_width=True)
+                    _label = f"{_product.title()}{_badge}\n€{_SHOP_PRICES[_product]:.2f}"
+                else:
+                    _label = f"{_SHOP_EMOJI.get(_product,'🛒')} {_product.title()}{_badge}\n€{_SHOP_PRICES[_product]:.2f}"
+                    
                 if st.button(_label, key=f"shop_add_{_product}",
                              disabled=st.session_state.shop_checked_out,
                              use_container_width=True):
