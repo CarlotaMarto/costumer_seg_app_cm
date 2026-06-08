@@ -137,6 +137,12 @@ div.block-container, [data-testid="stAppViewBlockContainer"] {
 .stMarkdown, .stText, .css-1d391kg {
     color: #1a1a1a;
 }
+div.block-container p, div.block-container div[data-testid="stMarkdownContainer"] > p {
+    text-align: justify !important;
+}
+[data-testid="stSidebar"] p, [data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] > p, div[role="radiogroup"] p {
+    text-align: left !important;
+}
 div[data-testid="stImage"] img {
     border-radius: 16px;
 }
@@ -519,14 +525,25 @@ span[data-testid="stIconMaterial"] {
 st.markdown(css, unsafe_allow_html=True)
 
 SEGMENT_COLORS = {
-    0: "#10b981",  # Vegetarians -> Emerald Green
-    1: "#f97316",  # Regulars -> Orange
-    2: "#0d9488",  # Wellness -> Teal
-    3: "#ef4444",  # Promoters -> Red
-    4: "#8b5cf6",  # Loyalists -> Purple
-    5: "#3b82f6",  # Families -> Blue
-    6: "#b45309",  # Economizers -> Amber/Brown
-    7: "#ec4899"   # Techies -> Pink
+    0: "#b76563",  # Vegetarians -> Dusty Rose
+    1: "#bc7933",  # Regulars -> Ochre
+    2: "#687643",  # Wellness -> Olive Green
+    3: "#b64828",  # Promoters -> Rust Red
+    4: "#c88d40",  # Loyalists -> Mustard
+    5: "#368689",  # Families -> Teal
+    6: "#36668d",  # Economizers -> Dark Blue
+    7: "#6c4d36"   # Techies -> Dark Brown
+}
+
+SEGMENT_NAME_COLORS = {
+    "Vegetarians": SEGMENT_COLORS[0],
+    "Regulars": SEGMENT_COLORS[1],
+    "Wellness": SEGMENT_COLORS[2],
+    "Promoters": SEGMENT_COLORS[3],
+    "Loyalists": SEGMENT_COLORS[4],
+    "Families": SEGMENT_COLORS[5],
+    "Economizers": SEGMENT_COLORS[6],
+    "Techies": SEGMENT_COLORS[7],
 }
 
 
@@ -543,13 +560,20 @@ _page_labels = {
 }
 
 st.sidebar.markdown("<div style='font-size: 32px; font-weight: 800; color: #000000; margin-top: 15px; margin-bottom: 25px; font-family: \"Plus Jakarta Sans\", \"Inter\", sans-serif !important; letter-spacing: -0.03em; line-height: 1.1; padding-left: 14px;'>Costumer<br/>Segmentation</div>", unsafe_allow_html=True)
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "Overview"
+
+page_list = list(_page_labels.keys())
+current_index = page_list.index(st.session_state.current_page) if st.session_state.current_page in page_list else 0
+
 selected_page = st.sidebar.radio(
     label="Index",
-    options=list(_page_labels.keys()),
+    options=page_list,
+    index=current_index,
     format_func=lambda x: _page_labels[x],
-    key="sidebar_radio_selection",
     label_visibility="collapsed"
 )
+st.session_state.current_page = selected_page
 
 def render_footer():
     st.markdown(
@@ -608,30 +632,31 @@ def render_footer():
 # Page conditional routing
 if selected_page == "Overview":
     st.markdown(f"""
-    <div style='display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 32px; margin-top: 0px; margin-bottom: 24px; font-family: "Plus Jakarta Sans", "Inter", sans-serif; width: 100%;'>
+    <div style='display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 32px; margin-top: 0px; margin-bottom: 56px; font-family: "Plus Jakarta Sans", "Inter", sans-serif; width: 100%;'>
         <div style='flex: 1.5; min-width: 320px;'>
             <h1 style='font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; color: #000000; line-height: 1.05; margin: 0 0 20px 0; letter-spacing: -0.04em;'>Understand every customer.<br/>Grow with purpose.</h1>
-            <p style='font-size: 17px; color: #5f6368; line-height: 1.7; margin: 0; max-width: 520px;'>A machine learning project that segments 34,060 supermarket customers into 8 distinct communities — uncovering who they are, how they shop, and what drives their decisions.</p>
+            <p style='font-size: 17px; color: #5f6368; line-height: 1.7; margin: 0; max-width: 520px;'>A machine learning project that segments 33,038 supermarket customers into 8 distinct communities — uncovering who they are, how they shop, and what drives their decisions.</p>
         </div>
-        <div style='flex: none; display: flex; flex-direction: column; gap: 24px; white-space: nowrap; min-width: 150px;'>
-            <div>
-                <div style='font-size: clamp(2rem, 3.5vw, 3.2rem); font-weight: 800; color: #000000; line-height: 1;'>34,060</div>
-                <div style='font-size: 14px; color: #5f6368; margin-top: 4px;'>customers analyzed</div>
+        <div style='flex: 1; min-width: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0px;'>
+            <img src='{CESTO_URI}' style='max-height: 250px; width: auto; max-width: 100%; object-fit: contain;' />
+            <div style='display: flex; gap: 40px; text-align: center; margin-top: -10px;'>
+                <div>
+                    <div style='font-size: clamp(1.6rem, 2.5vw, 2.2rem); font-weight: 800; color: #000000; line-height: 1;'>33,038</div>
+                    <div style='font-size: 13px; color: #5f6368; margin-top: 4px;'>customers analyzed</div>
+                </div>
+                <div>
+                    <div style='font-size: clamp(1.6rem, 2.5vw, 2.2rem); font-weight: 800; color: #000000; line-height: 1;'>8</div>
+                    <div style='font-size: 13px; color: #5f6368; margin-top: 4px;'>communities discovered</div>
+                </div>
             </div>
-            <div>
-                <div style='font-size: clamp(2rem, 3.5vw, 3.2rem); font-weight: 800; color: #000000; line-height: 1;'>8</div>
-                <div style='font-size: 14px; color: #5f6368; margin-top: 4px;'>communities discovered</div>
-            </div>
-        </div>
-        <div style='flex: 1; min-width: 250px; display: flex; justify-content: center; align-items: center;'>
-            <img src='{CESTO_URI}' style='max-height: 380px; width: auto; max-width: 100%; object-fit: contain;' />
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    if st.button("Explore your communities →", key="btn_explore"):
-        st.session_state.sidebar_radio_selection = "Customer Communities"
-        st.rerun()
+    def _go_to_comm():
+        st.session_state.current_page = "NB4 Characterisation"
+        
+    st.button("Explore your communities →", key="btn_explore", on_click=_go_to_comm)
 
     # Mini Community Cards — Overview preview
     import pandas as _pd
@@ -719,23 +744,23 @@ if selected_page == "Overview":
           background:#fff;
           border:1px solid #e5e7eb;
           border-radius:14px;
-          padding:16px 14px;
+          padding:14px 12px;
           display:flex;
           flex-direction:column;
           justify-content:space-between;
-          min-height:510px;
-          flex: 0 0 280px;
+          min-height:290px;
+          flex: 0 0 200px;
           box-sizing: border-box;
       }}
-      .ov-img-wrap {{ height:320px; display:flex; align-items:center; justify-content:center; overflow:hidden; }}
-      .ov-img-wrap img {{ max-height:320px; max-width:100%; object-fit:contain; }}
-      .ov-name {{ font-size:18px; font-weight:700; color:#111827; margin-bottom:6px; }}
-      .ov-pct {{ font-size:42px; font-weight:800; color:#111827; line-height:1; }}
-      .ov-sub {{ font-size:14px; color:#9ca3af; margin-top:4px; margin-bottom:8px; }}
-      .ov-desc {{ font-size:13px; color:#6b7280; line-height:1.5; }}
-      .ov-arrow {{ font-size:18px; color:#9ca3af; margin-top:12px; }}
-      .ov-header {{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }}
-      .ov-header-title {{ font-size:16px; font-weight:700; color:#111827; }}
+      .ov-img-wrap {{ height:120px; display:flex; align-items:center; justify-content:center; overflow:hidden; }}
+      .ov-img-wrap img {{ max-height:120px; max-width:100%; object-fit:contain; }}
+      .ov-name {{ font-size:14px; font-weight:700; color:#111827; margin-bottom:4px; }}
+      .ov-pct {{ font-size:26px; font-weight:800; color:#111827; line-height:1; }}
+      .ov-sub {{ font-size:11px; color:#9ca3af; margin-top:2px; margin-bottom:6px; }}
+      .ov-desc {{ font-size:11px; color:#6b7280; line-height:1.4; }}
+      .ov-arrow {{ font-size:14px; color:#9ca3af; margin-top:8px; }}
+      .ov-header {{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }}
+      .ov-header-title {{ font-size:15px; font-weight:700; color:#111827; }}
       .ov-header-link {{ font-size:13px; color:#6b7280; }}
     </style>
     <div class='ov-header'>
@@ -745,7 +770,7 @@ if selected_page == "Overview":
     <div class='ov-grid'>
       {_cards_html}
     </div>"""
-    _components.html(_overview_cards_html, height=720, scrolling=False)
+    _components.html(_overview_cards_html, height=340, scrolling=False)
 
     # Key Metrics Bar
     st.markdown("""
@@ -803,7 +828,7 @@ if selected_page == "Overview":
         <h2 style='font-size: 28px; font-weight: 800; color: #111827; margin: 0 0 16px 0; letter-spacing: -0.02em; line-height: 1.2;'>What data was used?</h2>
         <div style='display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;'>
           <div style='background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px 22px;'>
-            <div style='font-size: 32px; font-weight: 800; color: #111827; line-height: 1;'>34,060</div>
+            <div style='font-size: 32px; font-weight: 800; color: #111827; line-height: 1;'>33,038</div>
             <div style='font-size: 13px; color: #6b7280; margin-top: 4px;'>unique customers</div>
           </div>
           <div style='background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px 22px;'>
@@ -887,14 +912,12 @@ elif selected_page == "Data Analysis":
     st.markdown("""
     <div style='display:flex; gap:24px; margin-bottom:32px; align-items:flex-start; flex-wrap:wrap;'>
       <div style='flex:1; min-width:300px;'>
+    <div style='margin-bottom:32px;'>
+      <div>
         <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 0 — Data Analysis</div>
-        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 14px 0;'>
-          Before any modelling decisions are made, the raw <code>customer_info.csv</code> dataset is subjected to a thorough exploratory analysis. The dataset contains <strong>33,038 unique customers</strong> described across <strong>21 numerical variables</strong> and a set of categorical and identifier fields. This notebook's purpose is diagnostic: no cleaning or transformation is applied here — every finding is deferred to the preprocessing stage.
+        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0; text-align: justify;'>
+          This notebook establishes the baseline understanding of the raw customer dataset. The objective is to identify data quality issues — missing values, erroneous entries, outliers, and skews — before any modelling takes place. No data is modified or removed in this notebook; it serves purely as a diagnostic stage to inform the decisions made in Notebook 1.
         </p>
-        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0;'>
-          The analysis checks for exact and logical duplicates (customers matched by name and birthdate), inspects missing value rates per feature, categorises all columns, and produces distribution plots and boxplots for every numerical variable. A skewness table is computed to quantify the degree of asymmetry in each spending feature.
-        </p>
-
         <div style='display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:16px; margin-bottom:28px;'>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
             <div style='font-size:28px; font-weight:800; color:#c94f38; line-height:1;'>33,038</div>
@@ -911,62 +934,52 @@ elif selected_page == "Data Analysis":
         </div>
       </div>
 
-      <div style='flex:0 0 350px; background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);'>
+      <div style='background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);'>
         <div style='font-size:14px; font-weight:800; color:#111827; margin-bottom:16px; border-bottom:2px solid #f3eee6; padding-bottom:8px;'>Notebook 0 Index</div>
-        
-        <div style='display:flex; align-items:center; margin-bottom:10px;'>
-          <div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div>
-          <div style='font-size:13px; color:#374151; font-weight:500;'>1. Imports and Data Loading</div>
-        </div>
-        <div style='display:flex; align-items:center; margin-bottom:10px; padding-left:16px;'>
-          <div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div>
-          <div style='font-size:13px; color:#6b7280;'>1.1 Initial Data Analysis</div>
-        </div>
-        <div style='display:flex; align-items:center; margin-bottom:10px; padding-left:16px;'>
-          <div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div>
-          <div style='font-size:13px; color:#6b7280;'>1.2 Duplicate Rows Analysis</div>
-        </div>
-        <div style='display:flex; align-items:center; margin-bottom:10px; padding-left:32px;'>
-          <div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div>
-          <div style='font-size:13px; color:#6b7280;'>1.2.1 Surname Repetition Check</div>
-        </div>
-        <div style='display:flex; align-items:center; margin-bottom:10px; padding-left:16px;'>
-          <div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div>
-          <div style='font-size:13px; color:#6b7280;'>1.3 Missing Values Analysis</div>
-        </div>
-        <div style='display:flex; align-items:center; margin-bottom:10px; padding-left:16px;'>
-          <div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div>
-          <div style='font-size:13px; color:#6b7280;'>1.4 Numerical and Categorical Columns</div>
-        </div>
-        <div style='display:flex; align-items:center; margin-bottom:10px; padding-left:32px;'>
-          <div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div>
-          <div style='font-size:13px; color:#6b7280;'>1.4.1 Findings in Categorical Columns</div>
-        </div>
-        <div style='display:flex; align-items:center; margin-bottom:10px; padding-left:16px;'>
-          <div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div>
-          <div style='font-size:13px; color:#6b7280;'>1.5 Statistical Summary</div>
+        <div style='display:flex; flex-wrap:wrap; gap:12px; align-items:center;'>
+          <a href="#nb0-1" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>1. Imports and Data Loading</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb0-1-1" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>1.1 Initial Data Analysis</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb0-1-2" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>1.2 Duplicate Rows Analysis</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb0-1-2-1" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>1.2.1 Surname Repetition Check</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb0-1-3" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>1.3 Missing Values Analysis</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb0-1-4" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>1.4 Numerical and Categorical Columns</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb0-1-4-1" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>1.4.1 Findings in Categorical Columns</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb0-1-5" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>1.5 Statistical Summary</div></a>
         </div>
       </div>
     </div>
 
+    <div id="nb0-1"></div><div id="nb0-1-1"></div>
+
+    <div id="nb0-1-2" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.2 Duplicate Rows Analysis & <span id="nb0-1-2-1">1.2.1 Surname Repetition Check</span></h2></div>
+    <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
+      <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Duplicate check</div>
+      <div style='font-size:16px; color:#6b7280; line-height:1.8;'>No exact duplicate rows were found. A logical duplicate check (matching on customer name AND birthdate) was also performed. A surname-only proximity test was also run but produced too many false positives due to common surnames. The conclusion is that the dataset does not contain systematic duplicate records requiring removal.</div>
+    </div>
+
+    <div id="nb0-1-3" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.3 Missing Values Analysis</h2></div>
     <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
       <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Missing value strategy</div>
       <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Features with more than 30% missing values were flagged as too sparse to impute reliably. The inspection confirmed that missing values are concentrated in a limited group of behavioural and spend variables, supporting imputation over row-dropping — the customer base does not need to be reduced.</div>
     </div>
 
+    <div id="nb0-1-4-1" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.4.1 Findings in Categorical Columns</h2></div>
     <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
       <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Education level as a proxy feature</div>
       <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Customer names contain academic prefixes — BSc., MSc., PhD. — across all 33,038 unique names. These prefixes are flagged as an education-level proxy and earmarked for feature engineering in Notebook 1. Surname repetition alone was found to be too common to be a useful household signal; it was not carried into the modelling feature set.</div>
     </div>
 
-    <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
+    <div id="nb0-1-5" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.5 Statistical Summary</h2></div>
+    <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:8px;'>
       <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Impossible values detected</div>
       <div style='font-size:16px; color:#6b7280; line-height:1.8;'><code>percentage_of_products_bought_promotion</code> was found to contain values outside the valid [0, 1] range — both below 0.0 and above 1.0 — indicating data entry errors. These are flagged here and corrected in preprocessing. Spending variables show strong right-skew, confirming that a small group of customers spends disproportionately more than the majority.</div>
-    </div>
-
-    <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:8px;'>
-      <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Duplicate check</div>
-      <div style='font-size:16px; color:#6b7280; line-height:1.8;'>No exact duplicate rows were found. A logical duplicate check (matching on customer name AND birthdate) was also performed. A surname-only proximity test was also run but produced too many false positives due to common surnames. The conclusion is that the dataset does not contain systematic duplicate records requiring removal.</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -982,7 +995,7 @@ elif selected_page == "Data Analysis":
     missing_pct.columns = ["feature", "missing_pct"]
     missing_pct = missing_pct.sort_values("missing_pct", ascending=False)
     missing_pct = missing_pct[missing_pct["missing_pct"] > 0]
-    base_missing = alt.Chart(missing_pct).mark_bar(color="#111827", cornerRadiusTopRight=4, cornerRadiusBottomRight=4).encode(
+    base_missing = alt.Chart(missing_pct).mark_bar(color=SEGMENT_COLORS[7], cornerRadiusTopRight=4, cornerRadiusBottomRight=4).encode(
         y=alt.Y("feature:N", sort="-x", title="Feature"),
         x=alt.X("missing_pct:Q", title="Missing (%)"),
         tooltip=["feature", alt.Tooltip("missing_pct:Q", format=".2f", title="Missing %")]
@@ -1000,26 +1013,24 @@ elif selected_page == "Data Analysis":
 
     # Chart 2: Distribution of key numerical features
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Distribution of key numerical features</div>
-</div>
+<div id="nb0-1-4" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.4 Numerical and Categorical Columns - Distribution of key numerical features</h2></div>
 """, unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
     c1.markdown("<div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>Lifetime spend: Groceries</div>", unsafe_allow_html=True)
     c2.markdown("<div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>Lifetime spend: Electronics</div>", unsafe_allow_html=True)
     c3.markdown("<div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>Total distinct products</div>", unsafe_allow_html=True)
 
-    hist_groceries = alt.Chart(customer_info.dropna(subset=["lifetime_spend_groceries"])).mark_bar(color="#374151", opacity=0.85).encode(
+    hist_groceries = alt.Chart(customer_info.dropna(subset=["lifetime_spend_groceries"])).mark_bar(color=SEGMENT_COLORS[3], opacity=0.85).encode(
         x=alt.X("lifetime_spend_groceries:Q", bin=alt.Bin(maxbins=30), title="Groceries spend"),
         y=alt.Y("count():Q", title="Customers"),
         tooltip=[alt.Tooltip("count():Q", title="Customers")]
     ).properties(height=280)
-    hist_electronics = alt.Chart(customer_info.dropna(subset=["lifetime_spend_electronics"])).mark_bar(color="#374151", opacity=0.85).encode(
+    hist_electronics = alt.Chart(customer_info.dropna(subset=["lifetime_spend_electronics"])).mark_bar(color=SEGMENT_COLORS[5], opacity=0.85).encode(
         x=alt.X("lifetime_spend_electronics:Q", bin=alt.Bin(maxbins=30), title="Electronics spend"),
         y=alt.Y("count():Q", title="Customers"),
         tooltip=[alt.Tooltip("count():Q", title="Customers")]
     ).properties(height=280)
-    hist_products = alt.Chart(customer_info.dropna(subset=["lifetime_total_distinct_products"])).mark_bar(color="#374151", opacity=0.85).encode(
+    hist_products = alt.Chart(customer_info.dropna(subset=["lifetime_total_distinct_products"])).mark_bar(color=SEGMENT_COLORS[4], opacity=0.85).encode(
         x=alt.X("lifetime_total_distinct_products:Q", bin=alt.Bin(maxbins=30), title="Distinct products"),
         y=alt.Y("count():Q", title="Customers"),
         tooltip=[alt.Tooltip("count():Q", title="Customers")]
@@ -1044,7 +1055,7 @@ elif selected_page == "Data Analysis":
         (customer_info["percentage_of_products_bought_promotion"] >= 0) &
         (customer_info["percentage_of_products_bought_promotion"] <= 1)
     ].copy()
-    promo_hist = alt.Chart(promo_valid).mark_bar(color="#374151", opacity=0.85).encode(
+    promo_hist = alt.Chart(promo_valid).mark_bar(color=SEGMENT_COLORS[1], opacity=0.85).encode(
         x=alt.X("percentage_of_products_bought_promotion:Q", bin=alt.Bin(maxbins=30), title="Proportion of products bought on promotion"),
         y=alt.Y("count():Q", title="Customers"),
         tooltip=[alt.Tooltip("count():Q", title="Customers")]
@@ -1065,7 +1076,7 @@ elif selected_page == "Data Analysis":
 """, unsafe_allow_html=True)
     gender_counts = customer_info["customer_gender"].value_counts().reset_index()
     gender_counts.columns = ["customer_gender", "count"]
-    gender_bar = alt.Chart(gender_counts).mark_bar(color="#374151", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+    gender_bar = alt.Chart(gender_counts).mark_bar(color=SEGMENT_COLORS[6], cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
         x=alt.X("customer_gender:N", title="Gender"),
         y=alt.Y("count:Q", title="Number of customers"),
         tooltip=["customer_gender", alt.Tooltip("count:Q", title="Customers", format=",")]
@@ -1132,35 +1143,51 @@ elif selected_page == "Data Preprocessing":
     """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div style='display:flex; gap:24px; margin-bottom:32px; align-items:flex-start; flex-wrap:wrap;'>
-      <div style='flex:1; min-width:300px;'>
+    <div style='margin-bottom:32px;'>
+      <div>
         <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 1 — Data Preprocessing</div>
-        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0;'>
+        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0; text-align: justify;'>
           This notebook applies all transformations identified during the exploratory analysis. The goal is to produce a clean, analysis-ready dataset without losing customers unnecessarily. Every decision is justified by domain logic or statistical evidence — no arbitrary removals are made.
         </p>
       </div>
 
-      <div style='flex:0 0 350px; background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);'>
+      <div style='background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);'>
         <div style='font-size:14px; font-weight:800; color:#111827; margin-bottom:16px; border-bottom:2px solid #f3eee6; padding-bottom:8px;'>Notebook 1 Index</div>
-        <div style='display:flex; align-items:center; margin-bottom:10px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#374151; font-weight:500;'>1. Imports and Data Loading</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#374151; font-weight:500;'>2. Data Cleaning</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px; padding-left:16px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#6b7280;'>2.1 Detecting Invalid Future Years</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px; padding-left:16px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#6b7280;'>2.2 Detecting Negative Values</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px; padding-left:16px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#6b7280;'>2.3 Fixing Negative Percentages</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px; padding-left:16px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#6b7280;'>2.4 Fixing Data Types</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px; padding-left:16px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#6b7280;'>2.5 Missing Values Treatment</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#374151; font-weight:500;'>3. Aggregation Feature Engineering</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#374151; font-weight:500;'>4. Consensus Outlier Separation</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#374151; font-weight:500;'>5. Transformation Feature Engineering</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#374151; font-weight:500;'>6. Outlier Diagnostics</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#374151; font-weight:500;'>7. Multivariate Analysis</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#374151; font-weight:500;'>8. Feature Selection</div></div>
+        <div style='display:flex; flex-wrap:wrap; gap:12px; align-items:center;'>
+          <a href="#nb1-1" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>1. Imports and Data Loading</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb1-2" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>2. Data Cleaning</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb1-2-1" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>2.1 Detecting Invalid Future Years</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb1-2-2" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>2.2 Detecting Negative Values</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb1-2-3" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>2.3 Fixing Negative Percentages</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb1-2-4" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>2.4 Fixing Data Types</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb1-2-5" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>2.5 Missing Values Treatment</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb1-3" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>3. Aggregation Feature Engineering</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb1-4" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>4. Consensus Outlier Separation</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb1-5" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>5. Transformation Feature Engineering</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb1-6" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>6. Outlier Diagnostics</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb1-7" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>7. Multivariate Analysis</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb1-8" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>8. Feature Selection</div></a>
+        </div>
       </div>
     </div>
     """, unsafe_allow_html=True)
 
+    st.markdown("""
+      <div id="nb1-1"></div>
       <!-- Stage 2: Data Cleaning -->
-      <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
+      <div id="nb1-2" style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
         <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>2. Data Cleaning</div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
           Data cleaning and missing value treatment are crucial initial steps to prevent downstream model bias and mathematical distance calculation errors. In this phase, logical inconsistencies are corrected, raw types are structured, and missing entries are addressed using custom domain logic and KNN imputation.
@@ -1168,12 +1195,12 @@ elif selected_page == "Data Preprocessing":
       </div>
 
       <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:28px;'>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Future years → NaN</div>
+        <div id="nb1-2-1" style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>2.1 Detecting Invalid Future Years</div>
           <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Future transaction years exceeding 2026 are logical errors. They are set to NaN rather than dropping the customer row.</div>
         </div>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Invalid promotion → NaN</div>
+        <div id="nb1-2-3" style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
+          <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>2.3 Fixing Negative Percentages</div>
           <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Promotion ratios outside the valid [0, 1] range are set to NaN, as they represent invalid measurements.</div>
         </div>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
@@ -1187,14 +1214,15 @@ elif selected_page == "Data Preprocessing":
       </div>
 
       <div style='margin-bottom:28px;'>
-        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 12px 0;'>
-          <strong>Negative Value Analysis:</strong> We scan all numerical columns for values below zero. While negative values in <code>longitude</code> are logically valid (since Lisbon is located west of the Greenwich meridian), negative values in <code>percentage_of_products_bought_promotion</code> represent a logical error and are set to NaN.
+      <div style='margin-bottom:28px;'>
+        <p id="nb1-2-2" style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 12px 0;'>
+          <strong>2.2 Detecting Negative Values:</strong> We scan all numerical columns for values below zero. While negative values in <code>longitude</code> are logically valid (since Lisbon is located west of the Greenwich meridian), negative values in <code>percentage_of_products_bought_promotion</code> represent a logical error and are set to NaN.
         </p>
-        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 12px 0;'>
-          <strong>Data Type Coercion:</strong> Mixed types in object columns are coerced. For instance, <code>customer_birthdate</code> is parsed to <code>datetime64</code> to compute age, and counts like <code>kids_home</code> and <code>number_complaints</code> are cast to nullable integers to handle noise.
+        <p id="nb1-2-4" style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 12px 0;'>
+          <strong>2.4 Fixing Data Types:</strong> Mixed types in object columns are coerced. For instance, <code>customer_birthdate</code> is parsed to <code>datetime64</code> to compute age, and counts like <code>kids_home</code> and <code>number_complaints</code> are cast to nullable integers to handle noise.
         </p>
-        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>
-          <strong>KNN Imputation:</strong> Remaining missing values in variables such as typical hour, age, and spend categories are handled using a K-Nearest Neighbors (KNN) model with $k=5$. Imputation is only executed after outliers are separated to ensure that extreme multivariate observations do not bias the imputations of the regular customer base.
+        <p id="nb1-2-5" style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>
+          <strong>2.5 Missing Values Treatment:</strong> Remaining missing values in variables such as typical hour, age, and spend categories are handled using a K-Nearest Neighbors (KNN) model with $k=5$. Imputation is only executed after outliers are separated to ensure that extreme multivariate observations do not bias the imputations of the regular customer base.
         </p>
       </div>
     </div>
@@ -1226,7 +1254,7 @@ elif selected_page == "Data Preprocessing":
 </div>
 """, unsafe_allow_html=True)
 
-    missing_chart = alt.Chart(raw_missing).mark_bar(color="#c94f38", cornerRadiusTopRight=4, cornerRadiusBottomRight=4).encode(
+    missing_chart = alt.Chart(raw_missing).mark_bar(color=SEGMENT_COLORS[3], cornerRadiusTopRight=4, cornerRadiusBottomRight=4).encode(
         y=alt.Y("Column:N", sort="-x", title="Feature"),
         x=alt.X("Missing %:Q", title="Missing Percentage (%)"),
         tooltip=["Column", alt.Tooltip("Missing Count:Q", format=","), alt.Tooltip("Missing %:Q", format=".2f")]
@@ -1278,7 +1306,7 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
       <!-- Stage 3: Aggregation Feature Engineering -->
       <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
-        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>3. Aggregation Feature Engineering</div>
+        <div id="nb1-3" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>3. Aggregation Feature Engineering</div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
           Before outlier separation and final transformation, we create broader demographic and loyalty features by parsing raw identifiers and dates:
         </p>
@@ -1305,7 +1333,7 @@ elif selected_page == "Data Preprocessing":
     gender_df.columns = ["Gender", "Customers"]
     gender_df["Gender"] = gender_df["Gender"].astype(str).str.title()
     
-    gender_chart = alt.Chart(gender_df).mark_bar(color="#8c6f53", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+    gender_chart = alt.Chart(gender_df).mark_bar(color=SEGMENT_COLORS[7], cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
         x=alt.X("Gender:N", title="Gender"),
         y=alt.Y("Customers:Q", title="Customers"),
         tooltip=["Gender", alt.Tooltip("Customers:Q", format=",")]
@@ -1315,7 +1343,7 @@ elif selected_page == "Data Preprocessing":
     loyalty_df.columns = ["Loyalty", "Customers"]
     loyalty_df["Loyalty"] = loyalty_df["Loyalty"].map({1: "Loyal", 0: "Non-Loyal"})
     
-    loyalty_chart = alt.Chart(loyalty_df).mark_bar(color="#b77b45", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+    loyalty_chart = alt.Chart(loyalty_df).mark_bar(color=SEGMENT_COLORS[1], cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
         x=alt.X("Loyalty:N", title="Loyalty Card Flag"),
         y=alt.Y("Customers:Q", title="Customers"),
         tooltip=["Loyalty", alt.Tooltip("Customers:Q", format=",")]
@@ -1337,7 +1365,7 @@ elif selected_page == "Data Preprocessing":
     edu_df = edu_series.value_counts().reset_index()
     edu_df.columns = ["Education", "Customers"]
     
-    edu_chart = alt.Chart(edu_df).mark_bar(color="#c94f38", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+    edu_chart = alt.Chart(edu_df).mark_bar(color=SEGMENT_COLORS[3], cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
         x=alt.X("Education:N", title="Education Level", sort=["High School (12y)", "BSc (15y)", "MSc (17y)", "PhD (22y)"]),
         y=alt.Y("Customers:Q", title="Customers"),
         tooltip=["Education", alt.Tooltip("Customers:Q", format=",")]
@@ -1360,7 +1388,7 @@ elif selected_page == "Data Preprocessing":
     # 3. Household distributions
     kids_df = info_unscaled["kids_home"].value_counts().reset_index()
     kids_df.columns = ["Kids", "Customers"]
-    kids_chart = alt.Chart(kids_df).mark_bar(color="#b77b45", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+    kids_chart = alt.Chart(kids_df).mark_bar(color=SEGMENT_COLORS[1], cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
         x=alt.X("Kids:N", title="Kids at Home"),
         y=alt.Y("Customers:Q", title="Customers"),
         tooltip=["Kids", alt.Tooltip("Customers:Q", format=",")]
@@ -1368,7 +1396,7 @@ elif selected_page == "Data Preprocessing":
 
     teens_df = info_unscaled["teens_home"].value_counts().reset_index()
     teens_df.columns = ["Teens", "Customers"]
-    teens_chart = alt.Chart(teens_df).mark_bar(color="#8c6f53", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+    teens_chart = alt.Chart(teens_df).mark_bar(color=SEGMENT_COLORS[7], cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
         x=alt.X("Teens:N", title="Teens at Home"),
         y=alt.Y("Customers:Q", title="Customers"),
         tooltip=["Teens", alt.Tooltip("Customers:Q", format=",")]
@@ -1376,7 +1404,7 @@ elif selected_page == "Data Preprocessing":
 
     complaints_df = info_unscaled["number_complaints"].value_counts().reset_index()
     complaints_df.columns = ["Complaints", "Customers"]
-    complaints_chart = alt.Chart(complaints_df).mark_bar(color="#c94f38", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+    complaints_chart = alt.Chart(complaints_df).mark_bar(color=SEGMENT_COLORS[3], cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
         x=alt.X("Complaints:N", title="Number of Complaints"),
         y=alt.Y("Customers:Q", title="Customers"),
         tooltip=["Complaints", alt.Tooltip("Customers:Q", format=",")]
@@ -1405,7 +1433,7 @@ elif selected_page == "Data Preprocessing":
     customer_info_pre["customer_birthdate"] = pd.to_datetime(customer_info_pre["customer_birthdate"], errors="coerce")
     customer_info_pre["customer_age"] = 2026 - customer_info_pre["customer_birthdate"].dt.year
     age_clean = customer_info_pre.dropna(subset=["customer_age"])
-    age_hist = alt.Chart(age_clean).mark_bar(color="#b77b45", opacity=0.85).encode(
+    age_hist = alt.Chart(age_clean).mark_bar(color=SEGMENT_COLORS[1], opacity=0.85).encode(
         x=alt.X("customer_age:Q", bin=alt.Bin(maxbins=25), title="Age (years)"),
         y=alt.Y("count():Q", title="Customers"),
         tooltip=[alt.Tooltip("count():Q", title="Customers")]
@@ -1423,7 +1451,7 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
       <!-- Stage 4: Outlier Separation -->
       <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
-        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>4. Consensus Outlier Separation and KNN Imputation</div>
+        <div id="nb1-4" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>4. Consensus Outlier Separation and KNN Imputation</div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
           Rather than capping or removing outliers based on a single method, a <strong>conservative consensus rule</strong> is applied: a customer is set aside only when simultaneously flagged as an outlier by all three of the following methods:
         </p>
@@ -1463,7 +1491,7 @@ elif selected_page == "Data Preprocessing":
         "Dataset": ["Regular base", "Outlier dataset"],
         "Customers": [len(info_unscaled), len(outlier_df)]
     })
-    split_chart = alt.Chart(split_df).mark_bar(color="#b77b45", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+    split_chart = alt.Chart(split_df).mark_bar(color=SEGMENT_COLORS[1], cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
         x=alt.X("Dataset:N", title=""),
         y=alt.Y("Customers:Q", title="Number of customers"),
         tooltip=["Dataset", alt.Tooltip("Customers:Q", format=",")]
@@ -1481,7 +1509,7 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
       <!-- Stage 5: Transformation Feature Engineering -->
       <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
-        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>5. Transformation Feature Engineering</div>
+        <div id="nb1-5" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>5. Transformation Feature Engineering</div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
           After outlier separation, we apply mathematical transformations to prepare our variables for modeling, ensuring distance metrics operate correctly across circular dimensions and spending volume:
         </p>
@@ -1513,7 +1541,7 @@ elif selected_page == "Data Preprocessing":
   <div style='font-size:13px; font-weight:700; color:#111827;'>Cyclic typical shopping hour scatter plot</div>
 </div>
 """, unsafe_allow_html=True)
-    hour_scatter = alt.Chart(info_unscaled.sample(min(5000, len(info_unscaled)), random_state=42)).mark_circle(color="#c94f38", opacity=0.4, size=15).encode(
+    hour_scatter = alt.Chart(info_unscaled.sample(min(5000, len(info_unscaled)), random_state=42)).mark_circle(color=SEGMENT_COLORS[3], opacity=0.4, size=15).encode(
         x=alt.X("typical_hour_sin:Q", title="sin(hour)", scale=alt.Scale(domain=[-1.1, 1.1])),
         y=alt.Y("typical_hour_cos:Q", title="cos(hour)", scale=alt.Scale(domain=[-1.1, 1.1])),
         tooltip=["typical_hour_sin", "typical_hour_cos"]
@@ -1531,7 +1559,7 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
       <!-- Stage 6: Outlier Diagnostics -->
       <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
-        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>6. Outlier Diagnostics</div>
+        <div id="nb1-6" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>6. Outlier Diagnostics</div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
           The plots below are used as a final visual check of the main skewed variables after preprocessing. At this point, the extreme consensus subset has already been separated, so these diagnostics help confirm whether the regular customer base is more stable before the clustering stage.
         </p>
@@ -1548,7 +1576,7 @@ elif selected_page == "Data Preprocessing":
     spend_melt = info_unscaled[annual_cols].melt(var_name="category", value_name="annual_spend")
     spend_melt["category"] = spend_melt["category"].str.replace("annual_spend_", "", regex=False).str.replace("_", " ").str.title()
     spend_melt = spend_melt.dropna(subset=["annual_spend"])
-    box_chart_pre = alt.Chart(spend_melt).mark_boxplot(color="#8c6f53", outliers={"size": 4, "opacity": 0.2}).encode(
+    box_chart_pre = alt.Chart(spend_melt).mark_boxplot(color=SEGMENT_COLORS[7], outliers={"size": 4, "opacity": 0.2}).encode(
         x=alt.X("category:N", title="Category"),
         y=alt.Y("annual_spend:Q", title="Annual spend"),
         tooltip=["category"]
@@ -1566,7 +1594,7 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
       <!-- Stage 7: Multivariate Analysis: Feature Correlation -->
       <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
-        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>7. Multivariate Analysis: Feature Correlation</div>
+        <div id="nb1-7" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>7. Multivariate Analysis: Feature Correlation</div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
           Highly redundant features can distort distance metrics by double-weighting similar signals. We inspect the correlation matrix to ensure no features exceed a collinearity threshold of 0.7.
         </p>
@@ -1585,7 +1613,7 @@ elif selected_page == "Data Preprocessing":
         corr_matrix.values,
         x=corr_labels,
         y=corr_labels,
-        color_continuous_scale="RdBu_r",
+        color_continuous_scale=list(SEGMENT_COLORS.values()),
         zmin=-1,
         zmax=1,
         text_auto=".2f"
@@ -1621,7 +1649,7 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
       <!-- Stage 8: Feature Selection and Final Export -->
       <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
-        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>8. Feature Selection and Final Export</div>
+        <div id="nb1-8" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>8. Feature Selection and Final Export</div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
           This final step prepares the dataset that will be used in the clustering notebook. Keeping the export step separate makes the transition from preprocessing to clustering clear and reproducible.
         </p>
@@ -1666,18 +1694,16 @@ elif selected_page == "Data in Geography":
     st.markdown("""
     <div style='display:flex; gap:24px; margin-bottom:32px; align-items:flex-start; flex-wrap:wrap;'>
       <div style='flex:1; min-width:300px;'>
+    <div style='margin-bottom:32px;'>
+      <div>
         <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 2 — Geographic Analysis</div>
-        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 14px 0;'>
-          Geographic data is available for a significant portion of the customer base in the form of latitude and longitude coordinates. This notebook investigates whether the spatial distribution of customers reveals behavioural patterns beyond what the demographic and spend variables capture. Crucially, <strong>geography is intentionally excluded from the clustering distance</strong> — including it would risk creating geographic groups rather than behavioural segments.
+        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0; text-align: justify;'>
+          With the data cleaned, Notebook 2 isolates the two geographic variables — latitude and longitude — to understand the spatial distribution of the customer base. The primary objective is to detect spatial patterns and concentrations that might correlate with distinct spending behaviours or demographics.
         </p>
-        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0;'>
-          The analysis uses four complementary visualisations: a scatter plot of coordinates, an interactive Plotly scatter mapbox, a Folium map with MarkerCluster, and a hexbin density map. The hotspot is identified programmatically using a coordinate grid (bins=50) — not visually — to ensure the finding is data-driven and reproducible.
-        </p>
-
         <div style='display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:16px; margin-bottom:28px;'>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
-            <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Hotspot location</div>
-            <div style='font-size:14px; color:#7a6454; line-height:1.6;'>Dense concentration near <strong>Cidade Universitária</strong> and <strong>Entrecampos</strong>.</div>
+            <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Core spatial pattern</div>
+            <div style='font-size:14px; color:#7a6454; line-height:1.6;'>Strong concentration along a specific linear band, interpreted as a major coastal or river-adjacent urban corridor (consistent with Lisbon/Cascais profile).</div>
           </div>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
             <div style='font-size:13px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Dominant age group</div>
@@ -1690,17 +1716,25 @@ elif selected_page == "Data in Geography":
         </div>
       </div>
 
-      <div style='flex:0 0 350px; background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);'>
+      <div style='background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); margin-top:20px;'>
         <div style='font-size:14px; font-weight:800; color:#111827; margin-bottom:16px; border-bottom:2px solid #f3eee6; padding-bottom:8px;'>Notebook 2 Index</div>
-        <div style='display:flex; align-items:center; margin-bottom:10px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#374151; font-weight:500;'>1) Imports</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#374151; font-weight:500;'>2) Data loading</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#374151; font-weight:500;'>3) Basic geographic statistics</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#374151; font-weight:500;'>4) Customer geographic distribution</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px; padding-left:16px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#6b7280;'>Insights from Geospatial Mapping</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#374151; font-weight:500;'>5) Customer density map</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:10px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:13px; color:#374151; font-weight:500;'>6) Hotspot profile</div></div>
+        <div style='display:flex; flex-wrap:wrap; gap:12px; align-items:center;'>
+          <a href="#nb2-1" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>1) Imports & 2) Data loading</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb2-3" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>3) Basic geographic statistics</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb2-4" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>4) Customer geographic distribution</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb2-insights" style="text-decoration:none;"><div style='font-size:13px; color:#6b7280;'>Insights from Geospatial Mapping</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb2-5" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>5) Customer density map</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb2-6" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>6) Hotspot profile</div></a>
+        </div>
       </div>
     </div>
+
+    <div id="nb2-1"></div><div id="nb2-3"></div><div id="nb2-insights" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">Insights from Geospatial Mapping</h2></div>
 
     <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
       <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Behavioural differences: hotspot vs. rest of base</div>
@@ -1718,7 +1752,8 @@ elif selected_page == "Data in Geography":
     customer_info["promo_ratio"] = customer_info["percentage_of_products_bought_promotion"] * 100
     customer_info["size_spend"] = customer_info["lifetime_total_distinct_products"].fillna(0) / 50
 
-    st.subheader("Customer geographic distribution")
+    st.markdown("<div id='nb2-4'></div>", unsafe_allow_html=True)
+    st.subheader("4) Customer geographic distribution")
     scatter_map = px.scatter_mapbox(
         customer_info,
         lat="latitude",
@@ -1728,13 +1763,14 @@ elif selected_page == "Data in Geography":
         size_max=8,
         zoom=9,
         mapbox_style="open-street-map",
-        color_continuous_scale="OrRd",
+        color_continuous_scale=list(SEGMENT_COLORS.values()),
         hover_data={"customer_gender":True, "promo_ratio":True, "lifetime_total_distinct_products":True},
     )
     scatter_map.update_layout(margin=dict(l=0, r=0, t=0, b=0), coloraxis_colorbar=dict(title="Promo %"), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(scatter_map, width=1080, config={"scrollZoom": True})
 
-    st.subheader("Customer density map")
+    st.markdown("<div id='nb2-5'></div>", unsafe_allow_html=True)
+    st.subheader("5) Customer density map")
     density_map = px.density_mapbox(
         customer_info,
         lat="latitude",
@@ -1742,7 +1778,7 @@ elif selected_page == "Data in Geography":
         radius=15,
         zoom=9,
         mapbox_style="open-street-map",
-        color_continuous_scale="YlOrRd",
+        color_continuous_scale=list(SEGMENT_COLORS.values()),
         hover_data={"promo_ratio":True},
     )
     density_map.update_layout(margin=dict(l=0, r=0, t=0, b=0), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
@@ -1772,11 +1808,12 @@ elif selected_page == "Data in Geography":
     compare_chart = alt.Chart(hotspot_compare).mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
         x=alt.X("metric:N", title="Metric"),
         y=alt.Y("value:Q", title="Value"),
-        color=alt.Color("group:N", title="Group", scale=alt.Scale(range=["#c2410c", "#f97316"])),
+        color=alt.Color("group:N", title="Group", scale=alt.Scale(range=[SEGMENT_COLORS[0], SEGMENT_COLORS[1]])),
         column=alt.Column("metric:N", header=alt.Header(labelAngle=0, labelAlign="left", title=""))
     ).properties(height=260)
 
-    st.subheader("Hotspot profile vs outside")
+    st.markdown("<div id='nb2-6'></div>", unsafe_allow_html=True)
+    st.subheader("6) Hotspot profile vs outside")
     st.altair_chart(compare_chart, use_container_width=True)
 
     # Chart: Age distribution hotspot vs outside
@@ -1802,7 +1839,7 @@ elif selected_page == "Data in Geography":
     age_hotspot_chart = alt.Chart(age_geo_clean).mark_bar(opacity=0.6).encode(
         x=alt.X("customer_age:Q", bin=alt.Bin(maxbins=25), title="Age (years)"),
         y=alt.Y("count():Q", stack=None, title="Customers"),
-        color=alt.Color("geo_group:N", scale=alt.Scale(domain=["Hotspot", "Rest of base"], range=["#111827", "#9ca3af"]), title="Group"),
+        color=alt.Color("geo_group:N", scale=alt.Scale(domain=["Hotspot", "Rest of base"], range=[SEGMENT_COLORS[0], SEGMENT_COLORS[1]]), title="Group"),
         tooltip=["geo_group", alt.Tooltip("count():Q", title="Customers")]
     ).properties(height=320)
     st.altair_chart(age_hotspot_chart, use_container_width=True)
@@ -1836,7 +1873,7 @@ elif selected_page == "Data in Geography":
     
     # Set border color
     for spine in ax_geo.spines.values():
-        spine.set_color('rgba(111, 79, 53, 0.16)')
+        spine.set_color((111/255, 79/255, 53/255, 0.16))
     
     fig_geo.patch.set_facecolor('none')
     ax_geo.set_facecolor('none')
@@ -1862,61 +1899,71 @@ elif selected_page == "Data in Geography":
 elif selected_page == "NB3 Clustering":
     st.markdown("""
     <div style='margin-top: 0px; margin-bottom: 24px;'>
-        <h2 style='font-size: 56px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.03em;'>NB3 - Clustering</h2>
+        <h2 style='font-size: 56px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.03em;'>Clustering</h2>
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div style='display:flex; gap:24px; margin-bottom:32px; align-items:flex-start; flex-wrap:wrap;'>
-      <div style='flex:1; min-width:300px;'>
+    <div style='margin-bottom:32px;'>
+      <div>
         <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 3 — Clustering</div>
-        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 14px 0;'>
-          This notebook contains the full model selection process. No single diagnostic drives the final choice: instead, six candidate feature sets, two scalers, and five values of k (6 to 10) are evaluated simultaneously using silhouette scores, elbow curves, Ward dendrograms, and dimensionality reduction projections. Every decision is documented and every alternative is tested before being accepted or rejected.
+        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0; text-align: justify;'>
+          Notebook 3 is the core modelling stage. It systematically evaluates combinations of feature sets, scalers, and cluster counts (k=6 to 10) to determine the partition that best captures the underlying behavioural diversity in the customer base. The process is fully transparent: every diagnostic — silhouette, elbow, dendrogram, and PCA/UMAP projection — is documented and benchmarked.
         </p>
-        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 14px 0;'>
-          The dataset entering this notebook is <code>info_clustering_unscaled.csv</code> — 32,015 customers after the consensus outlier separation carried out in NB1. Each record is described by 11 features: the 10 non-groceries lifetime spend columns plus <code>percentage_of_products_bought_promotion</code>. Groceries are deliberately excluded from the clustering distance because they act as a near-universal baseline with low discriminating power; they are retained for profiling in NB4.
-        </p>
+        <div style='display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:14px; margin-bottom:28px;'>
+          <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
+            <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Algorithm</div>
+            <div style='font-size:22px; font-weight:800; color:#c94f38;'>K-Means</div>
+          </div>
+          <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
+            <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>K selected</div>
+            <div style='font-size:22px; font-weight:800; color:#c94f38;'>8</div>
+          </div>
+          <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
+            <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Scaler</div>
+            <div style='font-size:22px; font-weight:800; color:#c94f38;'>MinMax</div>
+          </div>
+          <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
+            <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Feature set</div>
+            <div style='font-size:16px; font-weight:800; color:#c94f38; line-height:1.2;'>spend + promo<br/>no groceries</div>
+          </div>
+        </div>
       </div>
 
-      <div style='flex:0 0 350px; background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);'>
+      <div style='background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); margin-top:20px;'>
         <div style='font-size:14px; font-weight:800; color:#111827; margin-bottom:16px; border-bottom:2px solid #f3eee6; padding-bottom:8px;'>Notebook 3 Index</div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>1) Imports and data loading</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>2) Outlier strategy check</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>3) Candidate feature sets and scalers</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>4) Diagnostics A - scalers & elbow</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>5) Diagnostics B - feature set & k grid</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>6) Model configuration</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>7) Model fitting and validation</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>8) Method benchmarks</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>9) Segment profiling</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>10) Reattach outliers and export</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>11) Final modelling conclusion</div></div>
+        <div style='display:flex; flex-wrap:wrap; gap:12px; align-items:center;'>
+          <a href="#nb3-1" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>1) Imports & data loading</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb3-2" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>2) Outlier strategy check</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb3-3" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>3) Candidate feature sets & scalers</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb3-4" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>4) Diagnostics A - scalers & elbow</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb3-5" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>5) Diagnostics B - feature set & k grid</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb3-6" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>6) Model configuration</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb3-7" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>7) Model fitting & validation</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb3-8" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>8) Method benchmarks</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb3-9" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>9) Segment profiling</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb3-10" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>10) Reattach outliers & export</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb3-11" style="text-decoration:none;"><div style='font-size:13px; color:#374151; font-weight:500;'>11) Final modelling conclusion</div></a>
+        </div>
       </div>
     </div>
     """, unsafe_allow_html=True)
 
-      <div style='display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px;'>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
-          <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Algorithm</div>
-          <div style='font-size:22px; font-weight:800; color:#c94f38;'>K-Means</div>
-        </div>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
-          <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>K selected</div>
-          <div style='font-size:22px; font-weight:800; color:#c94f38;'>8</div>
-        </div>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
-          <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Scaler</div>
-          <div style='font-size:22px; font-weight:800; color:#c94f38;'>MinMax</div>
-        </div>
-        <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
-          <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Feature set</div>
-          <div style='font-size:16px; font-weight:800; color:#c94f38; line-height:1.2;'>spend + promo<br/>no groceries</div>
-        </div>
-      </div>
-
+    st.markdown("""
+      <div id="nb3-1"></div><div id="nb3-2"></div><div id="nb3-3"></div>
       <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:28px;'>
         <div>
-          <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:12px;'>Model selection decisions</div>
+          <div id="nb3-6" style='font-size:13px; font-weight:700; color:#111827; margin-bottom:12px;'>6) Model configuration & 7) Model fitting & validation - Model selection decisions</div>
           <div style='display:flex; flex-direction:column; gap:10px;'>
             <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
               <div style='font-size:13px; font-weight:600; color:#111827;'>Why K=8?</div>
@@ -1933,7 +1980,7 @@ elif selected_page == "NB3 Clustering":
           </div>
         </div>
         <div>
-          <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:12px;'>Alternatives tested & rejected</div>
+          <div id="nb3-8" style='font-size:13px; font-weight:700; color:#111827; margin-bottom:12px;'>8) Method benchmarks - Alternatives tested & rejected</div>
           <div style='display:flex; flex-direction:column; gap:10px;'>
             <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
               <div style='font-size:13px; font-weight:600; color:#111827;'>DBSCAN — rejected</div>
@@ -1951,8 +1998,8 @@ elif selected_page == "NB3 Clustering":
         </div>
       </div>
 
-      <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-bottom:28px;'>
-        <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>Naming rationale (Notebook 4)</div>
+      <div id="nb3-9" style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-bottom:28px;'>
+        <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>9) Segment profiling - Naming rationale (Notebook 4)</div>
         <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Business names are assigned only after the modelling stage is complete. A name is only confirmed when the same pattern appears consistently across <strong>at least three views</strong>: the spend deviation table, the radar plot, the spend profile heatmap, and the demographic/behavioural profile. "The final name of each segment is chosen only when the same pattern appears in more than one view."</div>
       </div>
     </div>
@@ -1968,9 +2015,7 @@ elif selected_page == "NB3 Clustering":
 
     # Scaler comparison
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Scaler comparison — silhouette score vs k (MinMax vs Robust)</div>
-</div>
+<div id="nb3-4" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">4) Diagnostics A - Scaler comparison — silhouette score vs k (MinMax vs Robust)</h2></div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "scaler_comparison.png"
     if _p.exists(): st.image(str(_p), use_container_width=True)
@@ -2028,9 +2073,7 @@ elif selected_page == "NB3 Clustering":
 
     # Silhouette grid
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Silhouette score grid — feature sets vs number of clusters (k=6 to 10)</div>
-</div>
+<div id="nb3-5" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">5) Diagnostics B - Silhouette score grid — feature sets vs number of clusters (k=6 to 10)</h2></div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "silhouette_grid.png"
     if _p.exists(): st.image(str(_p), use_container_width=True)
@@ -2117,8 +2160,9 @@ elif selected_page == "NB3 Clustering":
 """, unsafe_allow_html=True)
 
     st.markdown("""
-        <div style='padding:24px; border-radius:16px; background:#f9fafb; border:1px solid #e5e7eb; margin-top:32px;'>
-          <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 3 — Conclusions</div>
+        <div id="nb3-10"></div>
+        <div id="nb3-11" style='padding:24px; border-radius:16px; background:#f9fafb; border:1px solid #e5e7eb; margin-top:32px;'>
+          <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>11) Final modelling conclusion</div>
           <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>The final model is KMeans with k=8, MinMaxScaler, and the feature set "spend + promo no groceries" (11 features). This configuration was selected after systematically testing six feature sets, two scalers, and five k values using silhouette scores, elbow curves, Ward dendrogram, and three dimensionality reduction projections. No single diagnostic was decisive; k=8 was selected because it is consistently supported across all evaluation tools simultaneously.</p>
           <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>DBSCAN was rejected because it classified most customers as noise and did not produce a rich multi-segment structure. The petfood alternative feature set produced a slightly less clean UMAP structure and was not adopted. SOM and hierarchical centroid Ward were run as benchmarks and confirmed KMeans as the best-performing model in terms of silhouette score and segment interpretability.</p>
           <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The z-score heatmap and three 2D projections (PCA, UMAP, t-SNE) serve as independent geometric validators: concordance across all three confirms that the eight-segment structure is not an artefact of any single visualisation method. The characterisation of each segment is carried out in Notebook 4.</p>
@@ -2131,21 +2175,17 @@ elif selected_page == "NB4 Characterisation":
 
     st.markdown("""
     <div style='margin-top: 0px; margin-bottom: 24px;'>
-        <h2 style='font-size: 56px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.03em;'>NB4 - Cluster Characterisation</h2>
+        <h2 style='font-size: 56px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.03em;'>Cluster Characterisation</h2>
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div style='display:flex; gap:24px; margin-bottom:32px; align-items:flex-start; flex-wrap:wrap;'>
-      <div style='flex:1; min-width:300px;'>
+    <div style='margin-bottom:32px;'>
+      <div>
         <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 4 — Cluster Characterisation</div>
-        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 14px 0;'>
-          Notebook 4 takes the cluster assignments produced by the KMeans model in NB3 and applies a systematic characterisation process to each of the eight communities. The goal is twofold: first, to understand what distinguishes each cluster from the rest of the customer base across spend, behaviour, and demographic dimensions; second, to assign interpretable business names that are grounded in the data rather than imposed a priori.
+        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0; text-align: justify;'>
+          Notebook 4 operationalises the clustering model by profiling each segment. It identifies the distinct behavioural and spending traits that define the eight communities, assigns data-grounded business names, and validates these labels against demographic and geographic metadata. The goal is to translate abstract cluster assignments into clear, distinct customer personas.
         </p>
-        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0;'>
-          The naming protocol is strict: a name is only confirmed when the same pattern appears consistently in at least three independent views — the spend profile heatmap, the z-score deviation table, the radar chart, and the demographic/behavioural profile. No segment is named from a single chart. This multi-view requirement prevents overfitting a name to a visual artefact and ensures that the label reflects a genuine and stable behavioural pattern.
-        </p>
-
         <div style='display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:14px; margin-bottom:28px;'>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
             <div style='font-size:11px; font-weight:600; color:#7a6454; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Segments named</div>
@@ -2166,25 +2206,36 @@ elif selected_page == "NB4 Characterisation":
         </div>
       </div>
 
-      <div style='flex:0 0 350px; background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);'>
+      <div style='background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); margin-top:20px;'>
         <div style='font-size:14px; font-weight:800; color:#111827; margin-bottom:16px; border-bottom:2px solid #f3eee6; padding-bottom:8px;'>Notebook 4 Index</div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>1) Imports and data loading</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>2) Segment sizes</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>3) Spend profile</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>4) Behavioural and demographic profile</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>5) Loyalty, gender and household checks</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>6) Normalised comparison</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>7) Feature by feature plots</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>8) Main differentiators by cluster</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>9) Cluster interpretation & naming rationale</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>10) Geographic check</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>11) Final segment names</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>12) Export ID and cluster mapping</div></div>
+        <div style='display:flex; flex-wrap:wrap; gap:12px; align-items:center;'>
+          <a href="#nb4-1" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>1) Imports & data loading</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb4-2" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>2) Segment sizes</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb4-3" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>3) Spend profile</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb4-4" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>4) Behavioural & demographic profile</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb4-5" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>5) Loyalty & metadata checks</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb4-6" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>6) Normalised comparison</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb4-7" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>7) Feature plots</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb4-8" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>8) Cluster interpretation</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb4-9" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>9) Geographic check</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb4-10" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>10) Final segment names & export</div></a>
+        </div>
       </div>
     </div>
     """, unsafe_allow_html=True)
+    st.markdown("""
+      <div id="nb4-1"></div><div id="nb4-3"></div><div id="nb4-4"></div><div id="nb4-5"></div><div id="nb4-6"></div><div id="nb4-7"></div><div id="nb4-8"></div><div id="nb4-9"></div><div id="nb4-10"></div>
       <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-bottom:28px;'>
-        <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>Naming protocol</div>
+        <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:8px;'>1) Imports & data loading - Naming protocol</div>
         <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Business names are assigned only after the modelling stage is complete. A name is only confirmed when the same pattern appears consistently across at least three views: the spend deviation table, the radar plot, the spend profile heatmap, and the demographic/behavioural profile. "The final name of each segment is chosen only when the same pattern appears in more than one view." This prevents confirmation bias and ensures that names reflect stable, data-grounded patterns rather than single-chart impressions.</div>
       </div>
     </div>
@@ -2192,16 +2243,15 @@ elif selected_page == "NB4 Characterisation":
 
     # Cluster sizes
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Customer count per community</div>
-</div>
+<div id="nb4-2" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">2) Segment sizes - Customer count per community</h2></div>
 """, unsafe_allow_html=True)
     id_cluster_df = pd.read_csv(BASE_DIR / "datasets" / "id_and_cluster.csv")
     cluster_counts = id_cluster_df.groupby("cluster_name").size().reset_index(name="customers")
     cluster_counts = cluster_counts.sort_values("customers", ascending=False)
-    cluster_size_chart = alt.Chart(cluster_counts).mark_bar(color="#374151", cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
+    cluster_size_chart = alt.Chart(cluster_counts).mark_bar(cornerRadiusTopLeft=6, cornerRadiusTopRight=6).encode(
         x=alt.X("cluster_name:N", sort="-y", title="Segment"),
         y=alt.Y("customers:Q", title="Number of customers"),
+        color=alt.Color("cluster_name:N", scale=alt.Scale(domain=list(SEGMENT_NAME_COLORS.keys()), range=list(SEGMENT_NAME_COLORS.values())), legend=None),
         tooltip=["cluster_name", alt.Tooltip("customers:Q", format=",")]
     ).properties(height=320)
     st.altair_chart(cluster_size_chart, use_container_width=True)
@@ -2230,13 +2280,13 @@ elif selected_page == "NB4 Characterisation":
     spend_matrix_norm = (spend_matrix - col_min) / col_range
     spend_col_labels = [c.replace("lifetime_spend_", "").replace("_", " ").title() for c in spend_heat_cols]
     spend_heat_fig = px.imshow(spend_matrix_norm, x=spend_col_labels, y=seg_spend_df["segment_name"].tolist(),
-        color_continuous_scale="Blues", zmin=0, zmax=1, text_auto=".2f")
+        color_continuous_scale=list(SEGMENT_COLORS.values()), zmin=0, zmax=1, text_auto=".2f")
     spend_heat_fig.update_layout(margin=dict(l=80, r=20, t=60, b=80), height=420, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(spend_heat_fig, use_container_width=True)
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Each cell is normalised to [0, 1] across segments per column, so the darkest cell identifies the highest-spending segment in that category. Techies concentrate spending in electronics, videogames, and technology. Vegetarians over-index in vegetables and non-alcoholic drinks. Families show elevated spend across groceries and hygiene. Groceries show similar shading across nearly all segments, confirming that its exclusion from the clustering distance was correct — it adds little discriminative power. Alcohol and petfood show very low values across all segments, confirming their niche status in the customer base. Hover over any cell to see the normalised score; compare columns to identify which category most cleanly separates one segment from the rest.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Each cell is normalised to [0, 1] across segments per column, so the darkest cell identifies the highest-spending segment in that category. Techies concentrate spending in electronics, technology, and videogames. Vegetarians over-index in vegetables and non-alcoholic drinks. Families show elevated spend across groceries and hygiene. Groceries show similar shading across nearly all segments, confirming that its exclusion from the clustering distance was correct — it adds little discriminative power. Alcohol and petfood show very low values across all segments, confirming their niche status in the customer base. Hover over any cell to see the normalised score; compare columns to identify which category most cleanly separates one segment from the rest.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -2258,7 +2308,7 @@ elif selected_page == "NB4 Characterisation":
     b_range = b_max - b_min; b_range[b_range == 0] = 1
     behav_matrix_norm = (behav_matrix - b_min) / b_range
     behav_heat_fig = px.imshow(behav_matrix_norm, x=["Promo sensitivity", "Tenure (years)", "Total children", "Avg complaints"],
-        y=behav_by_cluster["segment_name"].tolist(), color_continuous_scale="Blues", zmin=0, zmax=1,
+        y=behav_by_cluster["segment_name"].tolist(), color_continuous_scale=list(SEGMENT_COLORS.values()), zmin=0, zmax=1,
         text_auto=".2f")
     behav_heat_fig.update_layout(margin=dict(l=80, r=20, t=60, b=80), height=420, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(behav_heat_fig, use_container_width=True)
@@ -2327,7 +2377,7 @@ elif selected_page == "NB4 Characterisation":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>This heatmap captures non-spend dimensions: customer age, tenure as a customer, number of children at home, number of teenagers at home, number of complaints, stores visited, and promotional sensitivity. Z-scores allow direct comparison across variables with different units and scales. Families show the strongest positive deviation on the children and teens dimensions, which is the primary naming driver for this segment. Loyalists score highest on tenure, consistent with their long-standing relationship with the retailer. Promoters show by far the strongest positive z-score on promotional sensitivity (percentage of products bought on promotion), confirming that this is their defining and differentiating characteristic. Regulars and Economizers have relatively flat profiles across behavioural dimensions, which contributes to their lower distinctiveness in the z-score space — their differentiation comes from the spend profile rather than demographic or behavioural attributes. Complaints vary modestly across segments; no cluster is systematically dissatisfied, reducing the risk that any identified community represents a cohort at high churn risk due to service quality alone.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>This heatmap captures non-spend dimensions: customer age, tenure as a customer, number of children at home, number of teenagers at home, number of complaints, stores visited, and promotional sensitivity. Z-scores allow direct comparison across variables with different units and scales. Families show the strongest positive deviation on the children and teens dimensions, which is the primary naming driver for this segment. Loyalists score highest on tenure, consistent with their long-standing relationship with the retailer. Promoters score by far the strongest positive z-score on promotional sensitivity (percentage of products bought on promotion), confirming that this is their defining and differentiating characteristic. Regulars and Economizers have relatively flat profiles across behavioural dimensions, which contributes to their lower distinctiveness in the z-score space — their differentiation comes from the spend profile rather than demographic or behavioural attributes. Complaints vary modestly across segments; no cluster is systematically dissatisfied, reducing the risk that any identified community represents a cohort at high churn risk due to service quality alone.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -2470,13 +2520,12 @@ elif selected_page == "Targeter Promotion":
     """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div style='display:flex; gap:24px; margin-bottom:32px; align-items:flex-start; flex-wrap:wrap;'>
-      <div style='flex:1; min-width:300px;'>
+    <div style='margin-bottom:32px;'>
+      <div>
         <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 5 — Association Rules</div>
-        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 14px 0;'>
-          Association rule mining is applied as a <strong>post-segmentation interpretation tool</strong> — it does not change the cluster assignments in any way. The Apriori algorithm is run independently on the basket transaction data for each of the 8 segments, revealing which product combinations are statistically more likely to co-occur within each community.
+        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0; text-align: justify;'>
+          The final notebook operationalises the cluster definitions by mining product associations specific to each community. Using the Apriori algorithm on the transaction-level <code>customer_basket</code> dataset, it discovers what products are frequently bought together by each segment. These patterns are then translated into concrete, data-driven cross-selling campaigns.
         </p>
-
         <div style='display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:14px; margin-bottom:28px;'>
           <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 18px; text-align:center;'>
             <div style='font-size:11px; font-weight:600; color:#9ca3af; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Min Support</div>
@@ -2499,23 +2548,33 @@ elif selected_page == "Targeter Promotion":
         </div>
       </div>
 
-      <div style='flex:0 0 350px; background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);'>
+      <div style='background:linear-gradient(145deg, #ffffff, #f9fafb); border:1px solid #e5e7eb; border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); margin-top:20px;'>
         <div style='font-size:14px; font-weight:800; color:#111827; margin-bottom:16px; border-bottom:2px solid #f3eee6; padding-bottom:8px;'>Notebook 5 Index</div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>1) Imports and data loading</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>2) Transaction preparation per segment</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>3) Apriori parameters</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>4) Association rules per segment</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>5) Top rules per segment</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>6) Rule robustness check</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>7) Campaign suggestions</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px; padding-left:16px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#6b7280;'>Creative campaign texts</div></div>
-        <div style='display:flex; align-items:center; margin-bottom:8px;'><div style='color:#10b981; margin-right:8px; font-weight:bold;'>✓</div><div style='font-size:12px; color:#374151; font-weight:500;'>8) Final interpretation</div></div>
+          <a href="#nb5-1" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>1) Imports & data loading</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb5-2" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>2) Transaction preparation per segment</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb5-3" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>3) Apriori parameters</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb5-4" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>4) Association rules per segment</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb5-5" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>5) Top rules per segment</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb5-6" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>6) Rule robustness check</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb5-7" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>7) Campaign suggestions & Creative campaign texts</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb5-8" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>8) Final interpretation</div></a>
+        </div>
       </div>
     </div>
     """, unsafe_allow_html=True)
+
+    st.markdown("""
+      <div id="nb5-1"></div><div id="nb5-2"></div>
       <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:24px;'>
         <div style='border-left:3px solid #111827; padding-left:20px;'>
-          <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Why support is set at 1%</div>
+          <div id="nb5-3" style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>3) Apriori parameters - Why support is set at 1%</div>
           <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Rules are mined per segment — each sub-population has far fewer transactions than the full dataset. A 1% support threshold ensures enough rules are discovered while still requiring meaningful co-occurrence frequency within each community.</div>
         </div>
         <div style='border-left:3px solid #111827; padding-left:20px;'>
@@ -2523,11 +2582,11 @@ elif selected_page == "Targeter Promotion":
           <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Suggested campaign discounts are not fixed — they are derived from the lift value of each rule. A higher lift means a stronger-than-random co-purchase signal, which justifies a larger promotional incentive. This ties the commercial decision directly to statistical evidence.</div>
         </div>
         <div style='border-left:3px solid #111827; padding-left:20px;'>
-          <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Excluded recommendations: Vegetarians (cluster 0)</div>
+          <div id="nb5-7" style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>7) Campaign suggestions - Excluded recommendations: Vegetarians (cluster 0)</div>
           <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Chicken, meat, and fish are excluded from recommendations for cluster 0 (Vegetarians). The Apriori rules initially suggested these items, but they contradict the segment's defining behavioural trait. Notebook 4 confirms that this segment's identity is plant-based — the exclusion ensures campaign coherence.</div>
         </div>
         <div style='border-left:3px solid #111827; padding-left:20px;'>
-          <div style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>Robustness validation</div>
+          <div id="nb5-6" style='font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;'>6) Rule robustness check - Robustness validation</div>
           <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Each segment's rules are validated on an 80/20 train/test split. Segments with many matched rules and low mean lift difference between train and test have stable co-purchase patterns. Segments with few matched rules should be interpreted with caution.</div>
         </div>
       </div>
@@ -2537,16 +2596,14 @@ elif selected_page == "Targeter Promotion":
 
     # Chart 1: Top rules by lift per segment (grouped horizontal bar)
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Association rules by lift per segment</div>
-</div>
+<div id="nb5-4" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">4) Association rules per segment - Association rules by lift per segment</h2></div>
 """, unsafe_allow_html=True)
     rules_df = pd.read_csv(BASE_DIR / "datasets" / "segment_campaign_rules.csv")
     rules_df["rule_label"] = rules_df["if_buys"] + " -> " + rules_df["promote"]
     lift_chart = alt.Chart(rules_df).mark_bar(cornerRadiusTopRight=4, cornerRadiusBottomRight=4).encode(
         y=alt.Y("rule_label:N", sort="-x", title="Rule (if buys -> promote)"),
         x=alt.X("lift:Q", title="Lift"),
-        color=alt.Color("segment:N", title="Segment"),
+        color=alt.Color("segment:N", title="Segment", scale=alt.Scale(domain=list(SEGMENT_NAME_COLORS.keys()), range=list(SEGMENT_NAME_COLORS.values()))),
         tooltip=["segment", "if_buys", "promote", alt.Tooltip("confidence:Q", format=".2f", title="Confidence"), alt.Tooltip("lift:Q", format=".2f", title="Lift")]
     ).properties(height=520)
     st.altair_chart(lift_chart, use_container_width=True)
@@ -2559,15 +2616,14 @@ elif selected_page == "Targeter Promotion":
 
     # Chart 2: Confidence vs lift scatter
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Confidence vs. lift across all segments</div>
-</div>
+<div id="nb5-5" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">5) Top rules per segment - Confidence vs. lift across all segments</h2></div>
 """, unsafe_allow_html=True)
     scatter_fig = px.scatter(
         rules_df,
         x="confidence",
         y="lift",
         color="segment",
+        color_discrete_map=SEGMENT_NAME_COLORS,
         hover_data={"if_buys": True, "promote": True, "segment": True, "confidence": ":.2f", "lift": ":.2f"},
         labels={"confidence": "Confidence", "lift": "Lift", "segment": "Segment"}
     )
@@ -2599,7 +2655,7 @@ elif selected_page == "Targeter Promotion":
         
         segment_rules = campaign_rules[campaign_rules['segment'] == selected_segment]
         
-        st.markdown(f"#### Top Association Rules for {selected_segment}")
+        st.markdown(f"<div id='nb5-8'></div>\n\n#### Top Association Rules for {selected_segment}")
         
         for idx, rule in segment_rules.iterrows():
             if_buys = rule['if_buys']
