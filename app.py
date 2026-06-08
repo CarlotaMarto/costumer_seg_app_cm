@@ -1707,12 +1707,33 @@ elif selected_page == "Data in Geography":
     # Chart: Static scatter (NB2)
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:13px; font-weight:700; color:#111827;'>Static geographic scatter — all customers (raw coordinates)</div>
+  <div style='font-size:13px; font-weight:700; color:#111827;'>Geographic distribution of all customers (raw)</div>
 </div>
 """, unsafe_allow_html=True)
-    geo_raw_path = IMAGENS_DIR / "charts" / "geo_scatter_raw.png"
-    if geo_raw_path.exists():
-        st.image(str(geo_raw_path), use_container_width=True)
+
+    import matplotlib.pyplot as plt
+    fig_geo, ax_geo = plt.subplots(figsize=(10, 6.5))
+    ax_geo.scatter(
+        customer_info['longitude'], 
+        customer_info['latitude'], 
+        s=2, 
+        alpha=0.3, 
+        color='#A8B7BA'
+    )
+    ax_geo.set_xlabel('Longitude', fontsize=10, color='#7a6454')
+    ax_geo.set_ylabel('Latitude', fontsize=10, color='#7a6454')
+    ax_geo.tick_params(colors='#7a6454', labelsize=9)
+    ax_geo.grid(True, linestyle='--', alpha=0.3)
+    
+    # Set border color
+    for spine in ax_geo.spines.values():
+        spine.set_color('rgba(111, 79, 53, 0.16)')
+    
+    fig_geo.patch.set_facecolor('none')
+    ax_geo.set_facecolor('none')
+    plt.tight_layout()
+    
+    st.pyplot(fig_geo)
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
