@@ -2340,11 +2340,57 @@ elif selected_page == "NB4 Characterisation":
 </div>
 """, unsafe_allow_html=True)
 
+    st.markdown("""
+<div style='margin-top:48px; margin-bottom:6px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:6px;'>Notebook 4 — Segment profiling charts</div>
+  <div style='font-size:20px; font-weight:800; color:#111827; margin-bottom:4px;'>Deep-dive characterisation — all charts from NB4</div>
+</div>
+""", unsafe_allow_html=True)
+
+    # Spend profile heatmap (NB4 version)
+    st.markdown("""
+<div id="nb4-3" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">3) Spend profile heatmap</h2></div>
+<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>Average lifetime spend per cluster (€)</div>
+""", unsafe_allow_html=True)
+    _p = IMAGENS_DIR / "charts" / "spend_heatmap.png"
+    if _p.exists():
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
+    st.markdown("""
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The spend profile heatmap shows raw average lifetime spend in euros per cluster-category pair, with colour normalised across clusters per column so that the darkest cell identifies the highest-spending segment in each category. Cell annotations show the actual euro values. Techies stand out strongly in electronics, technology, and videogames — confirming they are the technology-oriented segment and making them the priority audience for any cross-sell campaign targeting premium devices. Vegetarians dominate vegetables and non-alcoholic drinks, consistent with a health- and diet-conscious profile. Families show elevated spend across groceries and hygiene, reflecting large household purchasing patterns. Loyalists rank highly across multiple categories simultaneously, consistent with a long-tenure, broad-basket profile. Economizers show consistently low raw spend values across all categories, reflecting a restrained purchasing style — importantly, this is not driven by promotion sensitivity (their promo usage is near the median), but by genuinely lower absolute spending levels. This raw-values version of the heatmap complements the normalised plotly version shown above by revealing the actual scale differences between clusters, which the normalised view compresses.</p>
+</div>
+""", unsafe_allow_html=True)
+
+    # Behavioural + demographic heatmap (NB4)
+    st.markdown("""
+<div id="nb4-4" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">4) Behavioural & demographic profile</h2></div>
+<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>Z-scores by cluster</div>
+""", unsafe_allow_html=True)
+    _p = IMAGENS_DIR / "charts" / "behavioural_heatmap.png"
+    if _p.exists():
+        col1, col2, col3 = st.columns([1, 8, 1])
+        with col2: st.image(str(_p), use_container_width=True)
+    st.markdown("""
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>This heatmap captures non-spend dimensions: customer age, tenure as a customer, number of children at home, number of teenagers at home, number of complaints, stores visited, and promotional sensitivity. Z-scores allow direct comparison across variables with different units and scales. Families show the strongest positive deviation on the children and teens dimensions, which is the primary naming driver for this segment. Loyalists score highest on tenure, consistent with their long-standing relationship with the retailer. Promoters score by far the strongest positive z-score on promotional sensitivity (percentage of products bought on promotion), confirming that this is their defining and differentiating characteristic. Regulars and Economizers have relatively flat profiles across behavioural dimensions, which contributes to their lower distinctiveness in the z-score space — their differentiation comes from the spend profile rather than demographic or behavioural attributes. Complaints vary modestly across segments; no cluster is systematically dissatisfied, reducing the risk that any identified community represents a cohort at high churn risk due to service quality alone.</p>
+</div>
+""", unsafe_allow_html=True)
+
+
+    # 5) Loyalty & metadata checks
+    st.markdown("""
+<div id="nb4-5" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">5) Loyalty & metadata checks</h2></div>
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Loyalty program participation varies substantially by segment. Cluster 5 (Families) and Cluster 1 (Wellness Urbanites) show the highest share of loyalty card holders, suggesting strong brand attachment and habitual shopping patterns. Conversely, Cluster 4 (Tech Enthusiasts) and Cluster 2 (Students) demonstrate lower participation rates, reinforcing their opportunistic or purpose-driven behavior. Gender distribution appears relatively balanced across all clusters, confirming that segmentation was driven more by behavioral and transactional variables than by demographic traits.</p>
+</div>
+""", unsafe_allow_html=True)
     # Interactive spend heatmap
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:18px; font-weight:700; color:#111827;'>Normalised spend profile per cluster — interactive heatmap</div>
-</div>
+<div id="nb4-6" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">6) Normalised comparison</h2></div>
+<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>6.1) Normalised spend profile per cluster — interactive heatmap</div>
 """, unsafe_allow_html=True)
     seg_spend_df = load_csv_data("segment_spend_profile.csv")
     spend_heat_cols = [c for c in seg_spend_df.columns if c.startswith("lifetime_spend_")]
@@ -2370,8 +2416,8 @@ elif selected_page == "NB4 Characterisation":
 
     # Interactive behavioural heatmap
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:18px; font-weight:700; color:#111827;'>Normalised behavioural profile per cluster — interactive heatmap</div>
+<div style="margin-top:36px; margin-bottom:12px; padding-top:24px;">
+<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>6.2) Normalised behavioural profile per cluster — interactive heatmap</div>
 </div>
 """, unsafe_allow_html=True)
     info_unscaled_comm = load_csv_data("info_clustering_unscaled.csv")
@@ -2397,77 +2443,10 @@ elif selected_page == "NB4 Characterisation":
 </div>
 """, unsafe_allow_html=True)
 
-    # Community cards
-    try:
-        seg_summary = load_csv_data("segment_summary.csv")
-        seg_meta_grid = {
-            0: {"name": "Vegetarians", "desc": "Full-price, promotion-resistant shoppers. Lead with curation/quality framing rather than discounts.", "icon_idx": 0},
-            1: {"name": "Regulars", "desc": "Active but newer, deal-aware shoppers. Strong targets for onboarding to the loyalty program.", "icon_idx": 1},
-            2: {"name": "Wellness", "desc": "Quiet, low-maintenance, and low-complaint shoppers. Exert low friction and buy full price.", "icon_idx": 2},
-            3: {"name": "Promoters", "desc": "The ultimate deal-seekers (+145% promo share). Perfect for price-led campaign stacking.", "icon_idx": 3},
-            4: {"name": "Loyalists", "desc": "Highest LTV, highest tenure (13.6 years), and highest loyalty flag adoption (76.8%). Reward and protect.", "icon_idx": 4},
-            5: {"name": "Families", "desc": "Large households (avg. 5.41 kids). Loyal without needing promotions. Target with bulk-buying bundles.", "icon_idx": 5},
-            6: {"name": "Economizers", "desc": "Restrained, low-friction spenders who buy at baseline. NOT deal-chasers; value baseline pricing.", "icon_idx": 6},
-            7: {"name": "Techies", "desc": "Small households buying high-value tech. Cleanest electronics and audio cross-sell campaign audience.", "icon_idx": 7}
-        }
-        cluster_images = {0:VEGETARIANS_URI,1:REGULARS_URI,2:WELLNESS_URI,3:PROMOTERS_URI,4:LOYALISTS_URI,5:FAMILIES_URI,6:ECONOMIZERS_URI,7:TECHIES_URI}
-        st.markdown("<div style='font-size:20px; font-weight:700; color:#111827; margin-top:40px; margin-bottom:4px;'>Your 8 customer communities</div>", unsafe_allow_html=True)
-        cards_list_html = []
-        for idx, row in seg_summary.iterrows():
-            c_id = int(row['cluster']); share = row['share_%']; custs = int(row['customers'])
-            meta = seg_meta_grid.get(c_id, {"name": f"Cluster {c_id}", "desc": "No description.", "icon_idx": 0})
-            img_uri = cluster_images.get(c_id, SLICES_URIS[c_id % len(SLICES_URIS)])
-            cards_list_html.append(f"<div class='community-card'><div class='community-card-icon-container'><img src='{img_uri}' class='community-card-img' /></div><div><h3 class='community-card-title'>{meta['name']}</h3><div class='community-card-value'>{share:.1f}%</div><div class='community-card-sub'>{custs:,} customers</div><div class='community-card-desc'>{meta['desc']}</div></div><div class='community-card-arrow'>→</div></div>")
-        st.markdown(f"<div class='communities-grid'>{''.join(cards_list_html)}</div>", unsafe_allow_html=True)
-    except Exception as e:
-        st.error(f"Error loading segment summary: {e}")
-
-    st.markdown("""
-<div style='margin-top:48px; margin-bottom:6px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:6px;'>Notebook 4 — Segment profiling charts</div>
-  <div style='font-size:20px; font-weight:800; color:#111827; margin-bottom:4px;'>Deep-dive characterisation — all charts from NB4</div>
-</div>
-""", unsafe_allow_html=True)
-
-    # Spend profile heatmap (NB4 version)
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:18px; font-weight:700; color:#111827;'>Spend profile heatmap — average lifetime spend per cluster (€)</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "spend_heatmap.png"
-    if _p.exists():
-        col1, col2, col3 = st.columns([1, 8, 1])
-        with col2: st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The spend profile heatmap shows raw average lifetime spend in euros per cluster-category pair, with colour normalised across clusters per column so that the darkest cell identifies the highest-spending segment in each category. Cell annotations show the actual euro values. Techies stand out strongly in electronics, technology, and videogames — confirming they are the technology-oriented segment and making them the priority audience for any cross-sell campaign targeting premium devices. Vegetarians dominate vegetables and non-alcoholic drinks, consistent with a health- and diet-conscious profile. Families show elevated spend across groceries and hygiene, reflecting large household purchasing patterns. Loyalists rank highly across multiple categories simultaneously, consistent with a long-tenure, broad-basket profile. Economizers show consistently low raw spend values across all categories, reflecting a restrained purchasing style — importantly, this is not driven by promotion sensitivity (their promo usage is near the median), but by genuinely lower absolute spending levels. This raw-values version of the heatmap complements the normalised plotly version shown above by revealing the actual scale differences between clusters, which the normalised view compresses.</p>
-</div>
-""", unsafe_allow_html=True)
-
-    # Behavioural + demographic heatmap (NB4)
-    st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:18px; font-weight:700; color:#111827;'>Behavioural and demographic profile heatmap — z-scores by cluster</div>
-</div>
-""", unsafe_allow_html=True)
-    _p = IMAGENS_DIR / "charts" / "behavioural_heatmap.png"
-    if _p.exists():
-        col1, col2, col3 = st.columns([1, 8, 1])
-        with col2: st.image(str(_p), use_container_width=True)
-    st.markdown("""
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>This heatmap captures non-spend dimensions: customer age, tenure as a customer, number of children at home, number of teenagers at home, number of complaints, stores visited, and promotional sensitivity. Z-scores allow direct comparison across variables with different units and scales. Families show the strongest positive deviation on the children and teens dimensions, which is the primary naming driver for this segment. Loyalists score highest on tenure, consistent with their long-standing relationship with the retailer. Promoters score by far the strongest positive z-score on promotional sensitivity (percentage of products bought on promotion), confirming that this is their defining and differentiating characteristic. Regulars and Economizers have relatively flat profiles across behavioural dimensions, which contributes to their lower distinctiveness in the z-score space — their differentiation comes from the spend profile rather than demographic or behavioural attributes. Complaints vary modestly across segments; no cluster is systematically dissatisfied, reducing the risk that any identified community represents a cohort at high churn risk due to service quality alone.</p>
-</div>
-""", unsafe_allow_html=True)
-
     # Individual radar profiles
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:18px; font-weight:700; color:#111827;'>Individual radar profiles — all 8 clusters (9-axis spider chart)</div>
-</div>
+<div id="nb4-7" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">7) Feature plots</h2></div>
+<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>7.1) Individual radar profiles — all 8 clusters (9-axis spider chart)</div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "radar_individual.png"
     if _p.exists():
@@ -2482,8 +2461,8 @@ elif selected_page == "NB4 Characterisation":
 
     # Combined radar
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:18px; font-weight:700; color:#111827;'>Combined radar — all 8 clusters overlaid</div>
+<div style='margin-top:36px; margin-bottom:12px; padding-top:24px;'>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>7.2) Combined radar — all 8 clusters overlaid</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "radar_combined.png"
@@ -2499,8 +2478,8 @@ elif selected_page == "NB4 Characterisation":
 
     # Feature barplots
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:18px; font-weight:700; color:#111827;'>Average spend per category by cluster — grouped bar charts</div>
+<div style='margin-top:36px; margin-bottom:12px; padding-top:24px;'>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>7.3) Average spend per category by cluster — grouped bar charts</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "feature_barplots.png"
@@ -2516,8 +2495,8 @@ elif selected_page == "NB4 Characterisation":
 
     # Boxplot grid
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:18px; font-weight:700; color:#111827;'>Key variable distributions by cluster — boxplot grid</div>
+<div style='margin-top:36px; margin-bottom:12px; padding-top:24px;'>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>7.4) Key variable distributions by cluster — boxplot grid</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "boxplot_grid.png"
@@ -2531,11 +2510,35 @@ elif selected_page == "NB4 Characterisation":
 </div>
 """, unsafe_allow_html=True)
 
+    # Community cards
+    try:
+        seg_summary = load_csv_data("segment_summary.csv")
+        seg_meta_grid = {
+            0: {"name": "Vegetarians", "desc": "Full-price, promotion-resistant shoppers. Lead with curation/quality framing rather than discounts.", "icon_idx": 0},
+            1: {"name": "Regulars", "desc": "Active but newer, deal-aware shoppers. Strong targets for onboarding to the loyalty program.", "icon_idx": 1},
+            2: {"name": "Wellness", "desc": "Quiet, low-maintenance, and low-complaint shoppers. Exert low friction and buy full price.", "icon_idx": 2},
+            3: {"name": "Promoters", "desc": "The ultimate deal-seekers (+145% promo share). Perfect for price-led campaign stacking.", "icon_idx": 3},
+            4: {"name": "Loyalists", "desc": "Highest LTV, highest tenure (13.6 years), and highest loyalty flag adoption (76.8%). Reward and protect.", "icon_idx": 4},
+            5: {"name": "Families", "desc": "Large households (avg. 5.41 kids). Loyal without needing promotions. Target with bulk-buying bundles.", "icon_idx": 5},
+            6: {"name": "Economizers", "desc": "Restrained, low-friction spenders who buy at baseline. NOT deal-chasers; value baseline pricing.", "icon_idx": 6},
+            7: {"name": "Techies", "desc": "Small households buying high-value tech. Cleanest electronics and audio cross-sell campaign audience.", "icon_idx": 7}
+        }
+        cluster_images = {0:VEGETARIANS_URI,1:REGULARS_URI,2:WELLNESS_URI,3:PROMOTERS_URI,4:LOYALISTS_URI,5:FAMILIES_URI,6:ECONOMIZERS_URI,7:TECHIES_URI}
+        st.markdown('<div id="nb4-8" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">8) Cluster interpretation - Your 8 customer communities</h2></div>', unsafe_allow_html=True)
+        cards_list_html = []
+        for idx, row in seg_summary.iterrows():
+            c_id = int(row['cluster']); share = row['share_%']; custs = int(row['customers'])
+            meta = seg_meta_grid.get(c_id, {"name": f"Cluster {c_id}", "desc": "No description.", "icon_idx": 0})
+            img_uri = cluster_images.get(c_id, SLICES_URIS[c_id % len(SLICES_URIS)])
+            cards_list_html.append(f"<div class='community-card'><div class='community-card-icon-container'><img src='{img_uri}' class='community-card-img' /></div><div><h3 class='community-card-title'>{meta['name']}</h3><div class='community-card-value'>{share:.1f}%</div><div class='community-card-sub'>{custs:,} customers</div><div class='community-card-desc'>{meta['desc']}</div></div><div class='community-card-arrow'>→</div></div>")
+        st.markdown(f"<div class='communities-grid'>{''.join(cards_list_html)}</div>", unsafe_allow_html=True)
+    except Exception as e:
+        st.error(f"Error loading segment summary: {e}")
+
     # Geographic scatter by cluster (NB4)
     st.markdown("""
-<div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:18px; font-weight:700; color:#111827;'>Geographic distribution by cluster — static scatter</div>
-</div>
+<div id="nb4-9" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">9) Geographic check</h2></div>
+<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>Geographic distribution by cluster — static scatter</div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "geo_scatter.png"
     if _p.exists():
@@ -2548,7 +2551,7 @@ elif selected_page == "NB4 Characterisation":
 </div>
 """, unsafe_allow_html=True)
 
-    st.markdown("<h3 style='margin-top: 48px; margin-bottom: 24px;'>Explore Clustered Data</h3>", unsafe_allow_html=True)
+    st.markdown("""<div id="nb4-10" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">10) Final segment names & export</h2></div><div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>Explore Clustered Data</div>""", unsafe_allow_html=True)
 
     try:
         seg_summary = load_csv_data("segment_summary.csv")
@@ -2658,36 +2661,36 @@ elif selected_page == "Targeter Promotion":
           <a href="#nb5-7" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>7) Campaign suggestions & Creative campaign texts</div></a>
           <div style='color:#d1d5db;'>•</div>
           <a href="#nb5-8" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>8) Final interpretation</div></a>
+          <div style='color:#d1d5db;'>•</div>
+          <a href="#nb5-9" style="text-decoration:none;"><div style='font-size:12px; color:#374151; font-weight:500;'>9) Cupons</div></a>
         </div>
         </div>
       </div>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("""
-      <div id="nb5-1"></div><div id="nb5-2"></div>
-      <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:24px;'>
-        <div style='border-left:3px solid #111827; padding-left:20px;'>
-          <div id="nb5-3" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>3) Apriori parameters - Why support is set at 1%</div>
-          <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Rules are mined per segment — each sub-population has far fewer transactions than the full dataset. A 1% support threshold ensures enough rules are discovered while still requiring meaningful co-occurrence frequency within each community.</div>
-        </div>
-        <div style='border-left:3px solid #111827; padding-left:20px;'>
-          <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Lift-derived campaign discounts</div>
-          <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Suggested campaign discounts are not fixed — they are derived from the lift value of each rule. A higher lift means a stronger-than-random co-purchase signal, which justifies a larger promotional incentive. This ties the commercial decision directly to statistical evidence.</div>
-        </div>
-        <div style='border-left:3px solid #111827; padding-left:20px;'>
-          <div id="nb5-7" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>7) Campaign suggestions - Excluded recommendations: Vegetarians (cluster 0)</div>
-          <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Chicken, meat, and fish are excluded from recommendations for cluster 0 (Vegetarians). The Apriori rules initially suggested these items, but they contradict the segment's defining behavioural trait. Notebook 4 confirms that this segment's identity is plant-based — the exclusion ensures campaign coherence.</div>
-        </div>
-        <div style='border-left:3px solid #111827; padding-left:20px;'>
-          <div id="nb5-6" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>6) Rule robustness check - Robustness validation</div>
-          <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Each segment's rules are validated on an 80/20 train/test split. Segments with many matched rules and low mean lift difference between train and test have stable co-purchase patterns. Segments with few matched rules should be interpreted with caution.</div>
-        </div>
-      </div>
-    </div>
-    <div style='height:1px; background:#e5e7eb; margin-bottom:24px;'></div>
-    """, unsafe_allow_html=True)
 
+    st.markdown('''
+<div id="nb5-1" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1) Imports & data loading</h2></div>
+<div style='font-size:16px; color:#6b7280; line-height:1.8; margin-bottom:24px;'>Initialisation of the environment, loading the customer transactions and cluster assignments.</div>
+
+<div id="nb5-2" style="margin-top:32px; margin-bottom:24px; border-top:1px solid #e5e7eb; padding-top:24px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">2) Transaction preparation per segment</h2></div>
+<div style='font-size:16px; color:#6b7280; line-height:1.8; margin-bottom:24px;'>Separating the global transactions into segment-specific baskets to run Apriori per community.</div>
+''', unsafe_allow_html=True)
+
+    st.markdown('''
+<div id="nb5-3" style="margin-top:32px; margin-bottom:24px; border-top:1px solid #e5e7eb; padding-top:24px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">3) Apriori parameters</h2></div>
+<div style='display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:24px;'>
+    <div style='border-left:3px solid #111827; padding-left:20px;'>
+        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Why support is set at 1%</div>
+        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Rules are mined per segment — each sub-population has far fewer transactions than the full dataset. A 1% support threshold ensures enough rules are discovered while still requiring meaningful co-occurrence frequency within each community.</div>
+    </div>
+    <div style='border-left:3px solid #111827; padding-left:20px;'>
+        <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Lift-derived campaign discounts</div>
+        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Suggested campaign discounts are not fixed — they are derived from the lift value of each rule. A higher lift means a stronger-than-random co-purchase signal, which justifies a larger promotional incentive. This ties the commercial decision directly to statistical evidence.</div>
+    </div>
+</div>
+''', unsafe_allow_html=True)
     # Chart 1: Top rules by lift per segment (grouped horizontal bar)
     st.markdown("""
 <div id="nb5-4" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">4) Association rules per segment - Association rules by lift per segment</h2></div>
@@ -2731,8 +2734,22 @@ elif selected_page == "Targeter Promotion":
 </div>
 """, unsafe_allow_html=True)
 
-    st.markdown("<div style='height:1px; background:#e5e7eb; margin-bottom:24px;'></div>", unsafe_allow_html=True)
 
+    st.markdown('''
+<div id="nb5-6" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">6) Rule robustness check</h2></div>
+<div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:24px;'>
+    <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Robustness validation</div>
+    <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Each segment's rules are validated on an 80/20 train/test split. Segments with many matched rules and low mean lift difference between train and test have stable co-purchase patterns. Segments with few matched rules should be interpreted with caution.</div>
+</div>
+''', unsafe_allow_html=True)
+
+    st.markdown('''
+<div id="nb5-7" style="margin-top:32px; margin-bottom:24px; border-top:1px solid #e5e7eb; padding-top:24px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">7) Campaign suggestions & Creative campaign texts</h2></div>
+<div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:24px;'>
+    <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Excluded recommendations: Vegetarians (cluster 0)</div>
+    <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Chicken, meat, and fish are excluded from recommendations for cluster 0 (Vegetarians). The Apriori rules initially suggested these items, but they contradict the segment's defining behavioural trait. Notebook 4 confirms that this segment's identity is plant-based — the exclusion ensures campaign coherence.</div>
+</div>
+''', unsafe_allow_html=True)
     try:
         campaign_rules = load_csv_data("segment_campaign_rules.csv")
         unique_segments = campaign_rules['segment'].unique()
@@ -2749,7 +2766,7 @@ elif selected_page == "Targeter Promotion":
         
         segment_rules = campaign_rules[campaign_rules['segment'] == selected_segment]
         
-        st.markdown(f"<div id='nb5-8'></div>\n\n#### Top Association Rules for {selected_segment}", unsafe_allow_html=True)
+        st.markdown(f"<div id='nb5-8' style='margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;'><h2 style='font-size:24px; font-weight:800; color:#111827; margin:0;'>8) Final interpretation</h2></div>\n\n#### Top Association Rules for {selected_segment}", unsafe_allow_html=True)
         
         for idx, rule in segment_rules.iterrows():
             if_buys = rule['if_buys']
@@ -2779,8 +2796,32 @@ elif selected_page == "Targeter Promotion":
             """, unsafe_allow_html=True)
     except Exception as e:
         st.info("No campaign rules CSV found. Add datasets/segment_campaign_rules.csv to enable targeter simulation.")
-    render_footer()
 
+    st.markdown('''
+<div id="nb5-9" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">9) Cupons (Campaign Creative)</h2></div>
+<div style='font-size:16px; color:#374151; line-height:1.9; margin-bottom:24px;'>
+Based on the basket analysis, we designed physical and digital coupons tailored to each cluster's preferences:
+<ul>
+  <li><b>Vegetarians</b>: Recipe-based marketing like distributing flyers with vegetarian and vegan recipes near the fresh produce section. Ex: <i>Buy a Pack of Seitan - Get a Fresh Avocado for Free</i>.</li>
+  <li><b>Wellness Urbanites</b>: Premium themed collections. Ex: <i>Healthy Pack featuring champagne, Bluetooth headphones, and yoga mats</i>.</li>
+  <li><b>Students</b>: Night study essentials and quick meal kits. Ex: <i>Fuel Your Study Night</i> or <i>Quick Meal Deal (pasta, veggies, oil)</i>.</li>
+  <li><b>Extended Households</b>: Cross-category family bundles. Ex: <i>Family Night Bundles - Buy Ratchet & Clank with any meal kit and get a dessert free</i>.</li>
+  <li><b>Tech Enthusiasts</b>: Gadgets paired with energy products. Ex: <i>Upgrade & Recharge (Device + Energy Bar)</i> or <i>Content Creator Survival Pack</i>.</li>
+  <li><b>Mature Independents</b>: Comfort groupings and cross-category. Ex: <i>Tea & Me Time (Cake + Tea + Hand Cream)</i>.</li>
+  <li><b>Makro Lovers</b>: Bulk buying essentials. Ex: <i>Kitchen Basics in Bulk (12L Oil, 24-pack Water, Meatballs)</i>.</li>
+</ul>
+</div>
+<div style="display:flex; flex-wrap:wrap; gap:16px; justify-content:center;">
+''', unsafe_allow_html=True)
+    import os
+    cupoes_dir = IMAGENS_DIR / "cupoes"
+    if cupoes_dir.exists():
+        for f in os.listdir(cupoes_dir):
+            if f.endswith(".png"):
+                st.image(str(cupoes_dir / f), width=400)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    render_footer()
 elif selected_page == "Conclusion & Recommendations":
     st.markdown("""
     <div style='margin-top: 0px; margin-bottom: 24px;'>

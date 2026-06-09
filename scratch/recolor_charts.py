@@ -1,5 +1,4 @@
 import os
-import glob
 import numpy as np
 from PIL import Image
 
@@ -50,8 +49,6 @@ def recolor_image(img_path):
     if len(colored_pixels) == 0:
         return
         
-    # We estimate the original solid color by assuming it's a blend of tab10 and white.
-    # We can just match the hue. To do this simply, we find the tab10 color that is closest in angle.
     # Normalize pixels and tab10 to have unit length for cosine similarity
     cp_norm = colored_pixels / np.linalg.norm(colored_pixels, axis=1, keepdims=True)
     tab10_norm = old_colors / np.linalg.norm(old_colors, axis=1, keepdims=True)
@@ -59,13 +56,6 @@ def recolor_image(img_path):
     # Compute cosine similarity
     similarity = np.dot(cp_norm, tab10_norm.T)
     best_match = np.argmax(similarity, axis=1)
-    
-    # Now we know which cluster each pixel belongs to.
-    # We want to replace it with the new color, keeping the same lightness/blend with white.
-    # A simple way: find how much white was mixed in.
-    # old_pixel = alpha * old_color + (1-alpha) * 255
-    # So alpha * (255 - old_color) = 255 - old_pixel
-    # alpha = mean((255 - old_pixel) / (255 - old_color))
     
     new_pixels = np.zeros_like(colored_pixels)
     for i in range(8):  # We only have 8 new colors
@@ -95,7 +85,7 @@ def recolor_image(img_path):
     print(f"Recolored {os.path.basename(img_path)}")
 
 charts_dir = r"c:\Users\carlo\Documents\Semestre 4\ML 2\costumer_seg_app_cm\imagens\charts"
-for img_name in ["pca_projection.png", "umap_projection.png", "tsne_projection.png", "silhouette_blades.png"]:
+for img_name in ["boxplot_grid.png", "feature_barplots.png", "radar_individual.png", "radar_combined.png", "geospatial_map.png"]:
     p = os.path.join(charts_dir, img_name)
     if os.path.exists(p):
         recolor_image(p)
