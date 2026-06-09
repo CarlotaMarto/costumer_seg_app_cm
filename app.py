@@ -2811,14 +2811,49 @@ Based on the basket analysis, we designed physical and digital coupons tailored 
   <li><b>Makro Lovers</b>: Bulk buying essentials. Ex: <i>Kitchen Basics in Bulk (12L Oil, 24-pack Water, Meatballs)</i>.</li>
 </ul>
 </div>
-<div style="display:flex; flex-wrap:wrap; gap:16px; justify-content:center;">
+<div class="coupons-grid-wrapper">
 ''', unsafe_allow_html=True)
     import os
     cupoes_dir = IMAGENS_DIR / "cupoes"
     if cupoes_dir.exists():
-        for f in os.listdir(cupoes_dir):
-            if f.endswith(".png"):
-                st.image(str(cupoes_dir / f), width=400)
+        # Display 8 images
+        st.markdown('<div class="coupons-scroller">', unsafe_allow_html=True)
+        cols = st.columns(4)
+        images = [f for f in os.listdir(cupoes_dir) if f.endswith(".png")]
+        for idx, f in enumerate(images):
+            # We want 2 rows, so we can just let them wrap in CSS or use columns
+            pass
+        # Actually it's easier to use raw HTML for the grid to ensure perfect horizontal scrolling and mix-blend-mode
+        import base64
+        html_imgs = ""
+        for f in images:
+            img_path = cupoes_dir / f
+            with open(img_path, "rb") as image_file:
+                encoded_string = base64.b64encode(image_file.read()).decode()
+            html_imgs += f'<div class="coupon-item"><img src="data:image/png;base64,{encoded_string}" style="width:100%; border-radius:12px; mix-blend-mode: multiply;"></div>'
+        
+        grid_html = f'''
+        <style>
+        .coupons-scroller {{
+            display: grid;
+            grid-template-columns: repeat(4, 300px);
+            grid-template-rows: repeat(2, auto);
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 16px;
+        }}
+        @media (max-width: 800px) {{
+            .coupons-scroller {{
+                grid-template-columns: repeat(4, 250px);
+            }}
+        }}
+        </style>
+        <div class="coupons-scroller">
+            {html_imgs}
+        </div>
+        '''
+        st.markdown(grid_html, unsafe_allow_html=True)
+        
     st.markdown("</div>", unsafe_allow_html=True)
 
     render_footer()
@@ -3157,15 +3192,7 @@ elif selected_page == "Customer Simulator":
             with _grid_cols[_i % 4]:
                 _qty = st.session_state.shop_cart.get(_product, 0)
                 _badge = f" ×{_qty}" if _qty else ""
-                _img_name = _product.title() + ".png"
-                _img_path = BASE_DIR / "imagens" / "guardadas" / _img_name
-                
-                # Check if we have an image for this product
-                if _img_path.exists():
-                    st.image(str(_img_path), use_container_width=True)
-                    _label = f"{_product.title()}{_badge}\n€{_SHOP_PRICES[_product]:.2f}"
-                else:
-                    _label = f"{_SHOP_EMOJI.get(_product,'🛒')} {_product.title()}{_badge}\n€{_SHOP_PRICES[_product]:.2f}"
+                _label = f"{_SHOP_EMOJI.get(_product,'🛒')} {_product.title()}{_badge}\n€{_SHOP_PRICES[_product]:.2f}"
                     
                 if st.button(_label, key=f"shop_add_{_product}",
                              disabled=st.session_state.shop_checked_out,
