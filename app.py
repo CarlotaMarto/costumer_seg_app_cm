@@ -1270,7 +1270,7 @@ elif selected_page == "Data Preprocessing":
         </div>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
           <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Loyalty indicator flag</div>
-          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Instead of discarding the 38% missing loyalty card numbers, we engineer a binary flag (1 if card exists, 0 otherwise).</div>
+          <div style='font-size:14px; color:#7a6454; line-height:1.5;'>Rather than discarding the 38% missing loyalty card numbers, a binary flag is engineered (1 if card exists, 0 otherwise).</div>
         </div>
       </div>
 
@@ -1359,7 +1359,7 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
 <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The data cleaning shows specific logical errors (such as future transaction years and negative promotion percentages) that were successfully resolved. The missing value map confirms that <code>loyalty_card_number</code> contains the largest volume of missing values (approx 38%). Instead of removing these records or imputing card numbers, we engineer a binary loyalty indicator. Features like spend categories (meat, fish, vegetables) and typical hour have less than 3% missing rates. These are cleanly handled later by KNN Imputation (k=5) inside the regular base, preserving customer rows without losing significant volume.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The data cleaning shows specific logical errors (such as future transaction years and negative promotion percentages) that were successfully resolved. The missing value map confirms that <code>loyalty_card_number</code> contains the largest volume of missing values (approx 38%). Rather than removing these records or imputing card numbers, a binary loyalty indicator is engineered. Features like spend categories (meat, fish, vegetables) and typical hour have less than 3% missing rates. These are cleanly handled later by KNN Imputation (k=5) inside the regular base, preserving customer rows without losing significant volume.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1369,7 +1369,7 @@ elif selected_page == "Data Preprocessing":
       <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
         <div id="nb1-3" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>3. Aggregation Feature Engineering</div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
-          Before outlier separation and final transformation, we create broader demographic and loyalty features by parsing raw identifiers and dates:
+          Before outlier separation and final transformation, broader demographic and loyalty features are created by parsing raw identifiers and dates:
         </p>
       </div>
 
@@ -1446,6 +1446,13 @@ elif selected_page == "Data Preprocessing":
     with col3:
         st.altair_chart(edu_chart, use_container_width=True)
 
+    st.markdown("""
+<div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:28px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The gender distribution is approximately balanced, with a slight male majority, indicating no significant gender-driven sampling bias. The loyalty flag distribution reveals that approximately 38% of customers had a missing loyalty card number; these are retained as a distinct binary class (no card) rather than excluded, preserving data volume. The education distribution, proxied from name prefixes, shows a broad range of qualification levels — BSc and MSc holders represent the largest shares, while PhD holders constitute a small but identifiable minority. These demographic features are not used as clustering inputs but serve as post-hoc segment validation variables in Notebook 4.</p>
+</div>
+""", unsafe_allow_html=True)
+
     # 3. Household distributions
     kids_df = info_unscaled["kids_home"].value_counts().reset_index()
     kids_df.columns = ["Kids", "Customers"]
@@ -1484,6 +1491,13 @@ elif selected_page == "Data Preprocessing":
         st.altair_chart(teens_chart, use_container_width=True)
     with col3_hh:
         st.altair_chart(complaints_chart, use_container_width=True)
+
+    st.markdown("""
+<div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:28px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The kids and teens distributions are right-skewed, with most customers having zero or one child at home. The majority of the customer base has no children (approximately 60%), which is consistent with a broad urban supermarket customer profile. The complaints distribution is strongly concentrated at zero, with very few customers reporting more than one complaint — confirming that this is a low-complaint dataset and that the complaints variable will have limited discriminative power in clustering. Zero-filling was applied to all three variables where missing values resulted from data entry gaps rather than genuine absence.</p>
+</div>
+""", unsafe_allow_html=True)
 
     # Customer age distribution
     st.markdown("""
@@ -1590,7 +1604,7 @@ elif selected_page == "Data Preprocessing":
       <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
         <div id="nb1-5" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>5. Transformation Feature Engineering</div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
-          After outlier separation, we apply mathematical transformations to prepare our variables for modeling, ensuring distance metrics operate correctly across circular dimensions and spending volume:
+          After outlier separation, mathematical transformations are applied to prepare the variables for modelling, ensuring distance metrics operate correctly across circular dimensions and spending volume:
         </p>
       </div>
 
@@ -1679,7 +1693,7 @@ elif selected_page == "Data Preprocessing":
       <div style='border-top:1px solid #e5e7eb; padding-top:24px; margin-bottom:20px;'>
         <div id="nb1-7" style='font-size:18px; font-weight:700; color:#111827; margin-bottom:10px;'>7. Multivariate Analysis: Feature Correlation</div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 16px 0;'>
-          Highly redundant features can distort distance metrics by double-weighting similar signals. We inspect the correlation matrix to ensure no features exceed a collinearity threshold of 0.7.
+          Highly redundant features can distort distance metrics by double-weighting similar signals. The correlation matrix is inspected to ensure no features exceed a collinearity threshold of 0.7.
         </p>
       </div>
     """, unsafe_allow_html=True)
@@ -1888,6 +1902,13 @@ elif selected_page == "Data in Geography":
     scatter_map.update_layout(margin=dict(l=0, r=0, t=0, b=0), coloraxis_colorbar=dict(title="Promo %"), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(scatter_map, width=1080, config={"scrollZoom": True})
 
+    st.markdown("""
+<div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:28px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The scatter map confirms that the customer base is geographically concentrated in the Lisbon Metropolitan Area, with a visible urban core and a sparser suburban periphery. Point size encodes lifetime spend — larger points indicate higher-value customers — while colour encodes promotion sensitivity, revealing that higher promotion usage is not exclusively an urban or suburban phenomenon but is distributed across the full geographic footprint. No distinct geographic cluster of uniformly high- or low-promotion customers is visible, supporting the decision to exclude geography from the clustering feature set.</p>
+</div>
+""", unsafe_allow_html=True)
+
     st.markdown("""<div id='nb2-5' style='margin-top:40px; margin-bottom:16px; border-top:2px solid #e5e7eb; padding-top:32px;'><h2 style='font-size:24px; font-weight:800; color:#111827; margin:0 0 12px 0;'>5) Customer density map</h2>
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 18px; margin-bottom:20px;'>
   <div style='font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#9ca3af; margin-bottom:6px;'>Why this chart?</div>
@@ -1905,6 +1926,13 @@ elif selected_page == "Data in Geography":
     )
     density_map.update_layout(margin=dict(l=0, r=0, t=0, b=0), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(density_map, width=1080, config={"scrollZoom": True})
+
+    st.markdown("""
+<div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:28px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The density map reveals a single dominant hotspot centred on central Lisbon, with a secondary concentration along the northern corridor of the metropolitan area. The gradient from peak density (core) to near-zero density (outer periphery) is steep, indicating that the majority of the customer base shops from a limited geographic radius. This concentration pattern is consistent with a single or small number of store locations rather than a geographically dispersed retail network, and it justifies the use of a city-level bounding box for geographic analysis.</p>
+</div>
+""", unsafe_allow_html=True)
 
     customer_info["lat_bin"] = (customer_info["latitude"] * 20).round(0) / 20
     customer_info["lon_bin"] = (customer_info["longitude"] * 20).round(0) / 20
@@ -1937,6 +1965,13 @@ elif selected_page == "Data in Geography":
     st.markdown("<div id='nb2-6'></div>", unsafe_allow_html=True)
     st.subheader("6) Hotspot profile vs outside")
     st.altair_chart(compare_chart, use_container_width=True)
+
+    st.markdown("""
+<div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:28px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The hotspot-vs-outside comparison reveals that customers located within the highest-density geographic cell show modestly higher promotion sensitivity and purchase a broader range of distinct products on average. The number of distinct stores visited is also slightly higher in the hotspot, consistent with a more urban, multi-channel shopping pattern. These differences are present but not large enough to constitute a distinct behavioural segment — they reflect geographic concentration effects rather than fundamentally different customer profiles, reinforcing the decision to treat the hotspot as a geographic observation rather than a behavioural cluster.</p>
+</div>
+""", unsafe_allow_html=True)
 
     # Chart: Age distribution hotspot vs outside
     st.markdown("""
@@ -2089,7 +2124,7 @@ elif selected_page == "NB3 Clustering":
 
       <div id="nb3-2" style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-bottom:28px;'>
         <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:8px;'>2) Outlier strategy check</div>
-        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Verifying the impact of the Isolation Forest outlier removal from Notebook 1 on the cluster structures. Ensuring extreme values do not disproportionately pull the centroids.</div>
+        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Verifying the impact of the consensus outlier separation from Notebook 1 on the cluster structures. Only customers flagged simultaneously by IQR, DBSCAN, and a third detection method were excluded (982 customers, 3.0%), ensuring extreme multivariate values do not disproportionately pull the centroids.</div>
       </div>
 
       <div id="nb3-3" style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-bottom:28px;'>
@@ -2155,32 +2190,6 @@ elif selected_page == "NB3 Clustering":
 </div>
 ''', unsafe_allow_html=True)
 
-    st.markdown('''
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Both MinMaxScaler and RobustScaler were tested. MinMaxScaler consistently produces higher silhouette scores at k=8 and shows a cleaner elbow in the curve.</p>
-</div>
-''', unsafe_allow_html=True)
-
-    _p = IMAGENS_DIR / "charts" / "elbow_silhouette.png"
-    if _p.exists():
-        col1, col2, col3 = st.columns([1, 8, 1])
-        with col2: st.image(str(_p), use_container_width=True)
-    st.markdown('''
-<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The silhouette peaks locally near k=4 and k=8, with k=8 providing the best balance between geometric separation and the number of actionable segments.</p>
-</div>
-''', unsafe_allow_html=True)
-
-    _p = IMAGENS_DIR / "charts" / "ward_dendrogram.png"
-    if _p.exists():
-        col1, col2, col3 = st.columns([1, 8, 1])
-        with col2: st.image(str(_p), use_container_width=True)
-    _p = IMAGENS_DIR / "charts" / "alt_dendrograms.png"
-    if _p.exists():
-        col1, col2, col3 = st.columns([1, 8, 1])
-        with col2: st.image(str(_p), use_container_width=True)
 
 
     # 5) Diagnostics B
