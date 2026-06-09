@@ -2228,12 +2228,32 @@ elif selected_page == "NB3 Clustering":
         st.markdown("<div style='margin-bottom:12px;'><div style='font-size:18px; font-weight:700; color:#111827;'>PCA Projection (2D)</div></div>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 8, 1])
         with col2: st.image(str(_p), use_container_width=True)
+        st.markdown('''
+<div style='background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:16px 20px; margin-top:8px; margin-bottom:8px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#0369a1; margin-bottom:6px;'>Why this chart?</div>
+  <p style='font-size:15px; color:#374151; line-height:1.8; margin:0;'>Principal Component Analysis (PCA) projects the scaled feature space onto the two directions of greatest variance. As a linear technique, it is computationally efficient and deterministic, making it a reliable first-pass sanity check: if clusters are separable in PCA space, they are linearly well-defined. Because PCA cannot capture non-linear structure, partial overlap in this view does not invalidate the segmentation — it motivates the subsequent UMAP and t-SNE checks.</p>
+</div>
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The PCA projection shows partial but meaningful separation across the two principal components. Several clusters form recognisable groupings along the principal axes, particularly Loyalists and Promoters, whose high spend and high promotional response respectively align with the dominant variance direction. The degree of overlap visible here is expected given PCA's linear constraint on a feature space with known non-linear interactions (e.g., promotion response scaling differently with income bracket). This partial separability in two linear dimensions already provides evidence that the clusters capture distinct behavioural profiles.</p>
+</div>
+''', unsafe_allow_html=True)
 
     _p = IMAGENS_DIR / "charts" / "umap_projection.png"
     if _p.exists():
         st.markdown("<div style='margin-bottom:12px;'><div style='font-size:18px; font-weight:700; color:#111827;'>UMAP Projection (2D)</div></div>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 8, 1])
         with col2: st.image(str(_p), use_container_width=True)
+        st.markdown('''
+<div style='background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:16px 20px; margin-top:8px; margin-bottom:8px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#0369a1; margin-bottom:6px;'>Why this chart?</div>
+  <p style='font-size:15px; color:#374151; line-height:1.8; margin:0;'>Uniform Manifold Approximation and Projection (UMAP) is a non-linear dimensionality reduction technique that preserves both local and global topological structure. Unlike PCA, UMAP can reveal non-linear cluster boundaries and curved manifolds. It is used here as a secondary validation layer: strong visual separation in UMAP space provides robust evidence that the K-Means partitions correspond to genuinely distinct regions of the behavioural manifold, not artefacts of the Euclidean distance assumption.</p>
+</div>
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The UMAP projection reveals considerably cleaner cluster separation than the linear PCA view, confirming that the segment boundaries are non-trivially structured in the original feature space. Several clusters form compact, well-bounded islands — most notably the high-spend segments (Loyalists, Techies) which appear as spatially isolated groups. The Promoters cluster, defined primarily by promotional responsiveness rather than absolute spend, occupies a distinct region with limited overlap. Segments with overlapping behavioural profiles (e.g., Regulars and Economizers, both characterised by moderate or low spend) show some proximity in UMAP space, which is consistent with the intuition that these groups lie on a continuum of spend intensity. The overall topology validates the k=8 partition: eight identifiable regions exist in the low-dimensional manifold.</p>
+</div>
+''', unsafe_allow_html=True)
 
     _p = IMAGENS_DIR / "charts" / "tsne_projection.png"
     if _p.exists():
@@ -2687,6 +2707,12 @@ elif selected_page == "NB4 Characterisation":
             ).properties(height=300)
             
             st.altair_chart(spend_chart_cluster, use_container_width=True)
+            st.markdown(f'''
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>This bar chart displays the average lifetime spend per product category for the selected cluster. The categories are sorted in descending order of spend, making the dominant consumption driver immediately visible. Comparing this breakdown across clusters reveals the behavioural specialisation that distinguishes each segment: Loyalists and Families show elevated grocery spend, Techies exhibit disproportionate electronics expenditure, and Vegetarians record near-zero meat and fish categories. This per-cluster decomposition is the primary evidence base for the campaign targeting logic in Notebook 5 — it confirms that product associations discovered by the Apriori algorithm are consistent with the underlying spend structure of each segment.</p>
+</div>
+''', unsafe_allow_html=True)
     except Exception as e:
         st.info("Dynamic cluster files not fully loaded. Displaying static mockup.")
     render_footer()
