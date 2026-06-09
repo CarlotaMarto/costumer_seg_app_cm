@@ -640,7 +640,7 @@ def visualize_dimensionality_reduction(transformation, labels, title="Embedding"
     labels = np.asarray(labels).astype(int)
     transformation = np.asarray(transformation)
     unique_labels = np.unique(labels)
-    default_cmap = "tab10" if len(unique_labels) <= 10 else "tab20"
+    default_cmap = "Set1" if len(unique_labels) <= 9 else "tab20"
     cmap = plt.get_cmap(cmap_name or default_cmap, len(unique_labels))
 
     plt.figure(figsize=(9, 7))
@@ -650,7 +650,7 @@ def visualize_dimensionality_reduction(transformation, labels, title="Embedding"
             transformation[mask, 0],
             transformation[mask, 1],
             s=8,
-            alpha=0.65,
+            alpha=0.9,
             color=cmap(i),
             label=f"Cluster {label}",
         )

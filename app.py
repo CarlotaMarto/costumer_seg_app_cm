@@ -2019,9 +2019,9 @@ elif selected_page == "Data in Geography":
     ax_geo.scatter(
         customer_info['longitude'], 
         customer_info['latitude'], 
-        s=2, 
-        alpha=0.3, 
-        color='#A8B7BA'
+        s=3, 
+        alpha=0.7, 
+        color='#2563EB'
     )
     ax_geo.set_xlabel('Longitude', fontsize=10, color='#7a6454')
     ax_geo.set_ylabel('Latitude', fontsize=10, color='#7a6454')
