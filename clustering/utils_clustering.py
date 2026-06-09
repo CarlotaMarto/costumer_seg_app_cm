@@ -451,6 +451,7 @@ def plot_profile_heatmap(profile_df, title="Cluster profile"):
     plt.ylabel("Cluster")
     plt.xticks(rotation=45, ha="right")
     plt.tight_layout()
+    plt.subplots_adjust(bottom=0.25)
     plt.show()
 
 
@@ -883,6 +884,7 @@ def plot_profile_heatmap_z(profile_df, title="Cluster profile (standardised per 
     plt.ylabel("Cluster")
     plt.xticks(rotation=45, ha="right")
     plt.tight_layout()
+    plt.subplots_adjust(bottom=0.25)
     plt.show()
     return z.round(2)
 

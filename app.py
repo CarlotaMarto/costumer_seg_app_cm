@@ -3101,13 +3101,7 @@ elif selected_page == "Conclusion & Recommendations":
 
     </div>
 
-    <!-- Limitations -->
-    <div style='background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:20px 24px; margin-bottom:32px;'>
-      <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#92400e; margin-bottom:10px;'>Limitations & next steps</div>
-      <div style='font-size:16px; color:#374151; line-height:1.8;'>
-        The model was trained on a static snapshot of customer data. Segment membership should be refreshed quarterly as customer behaviour evolves. The 982 outlier customers are currently assigned to their nearest centroid but their profiles are atypical — a dedicated micro-segment analysis for the outlier base is recommended. Education level was proxied from name prefixes (BSc, MSc, PhD) rather than directly measured, which limits its reliability as a demographic feature. Association rules were mined at segment level; product-level personalisation would require individual-level collaborative filtering beyond the scope of this project.
-      </div>
-    </div>
+
     """, unsafe_allow_html=True)
     render_footer()
 

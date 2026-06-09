@@ -64,7 +64,7 @@ def recolor_heatmap(img_path, cmap_name, new_colors_hex, crop_top=60):
     padding_left = 10
     padding_top = 10
     padding_right = 10
-    padding_bottom = 10
+    padding_bottom = 20
     
     new_width = img_out.width + padding_left + padding_right
     new_height = img_out.height + padding_top + padding_bottom

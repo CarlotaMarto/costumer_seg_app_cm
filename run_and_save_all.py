@@ -53,7 +53,7 @@ def custom_show(*args, **kwargs):
         
     filepath = os.path.join(TARGET_DIR, filename)
     print(f"Saving plot '{title}' -> {filename}")
-    plt.savefig(filepath, bbox_inches="tight", dpi=150)
+    plt.savefig(filepath, bbox_inches="tight", pad_inches=0.4, dpi=150)
     plt.close('all')
 
 plt.show = custom_show
