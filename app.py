@@ -22,6 +22,9 @@ def load_image_as_base64(path):
             return f"data:image/{ext};base64,{data}"
     return ""
 
+BAR_URI = load_image_as_base64(IMAGENS_DIR / "bar.png")
+PRODUTOS_TECH_URI = load_image_as_base64(IMAGENS_DIR / "produtos" / "image (1).png")
+PRODUTOS_MEAT_URI = load_image_as_base64(IMAGENS_DIR / "produtos" / "image (2).png")
 INITIAL_BG_URI = load_image_as_base64(IMAGENS_DIR / "initial.png")
 SEG_IMG_URI = load_image_as_base64(IMAGENS_DIR / "customer_segmentation_imagem.png")
 GROCERY_BASKET_URI = load_image_as_base64(IMAGENS_DIR / "grocery_basket.jpg")
@@ -589,7 +592,7 @@ if st.session_state.previous_page != selected_page:
 
 def render_footer():
     st.markdown(
-        """
+        f"""
         <div style='margin-top: 24px; font-family:"Plus Jakarta Sans", "Inter", sans-serif; background-color: #fcfbf8; padding: 32px; border-radius: 16px; border: 1px solid #f0ece1;'>
           <div style='width:100%; display:grid; grid-template-columns:repeat(4, 1fr); gap:24px; align-items:start;'>
             <div>
@@ -631,7 +634,10 @@ def render_footer():
               <div style='color:#64748b; line-height:1.6; margin:0; font-size:14px; padding-top: 27px; text-align: left !important;'>This project is optimized for executive-level business intelligence and strategic decision making.</div>
             </div>
           </div>
-          <div style='background-color: #f7e6e1; color: #a36154; padding: 16px 32px; margin-top: 32px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; width: 100%; border-radius: 12px; box-sizing: border-box;'>
+          <div style='margin-top: 32px; width: 100%; overflow: hidden; border-radius: 12px;'>
+            <img src='{BAR_URI}' style='width: 100%; display: block; border-radius: 12px 12px 0 0;' />
+          </div>
+          <div style='background-color: #f7e6e1; color: #a36154; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; width: 100%; border-radius: 0 0 12px 12px; box-sizing: border-box;'>
             <span>&copy; 2026 Customer Segmentation Project - Academic Use Only</span>
             <span>Built for Machine Learning II</span>
           </div>
@@ -677,7 +683,7 @@ if selected_page == "Overview":
     <div style='display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 32px; margin-top: 0px; margin-bottom: 56px; font-family: "Plus Jakarta Sans", "Inter", sans-serif; width: 100%;'>
         <div style='flex: 1.5; min-width: 320px;'>
             <h1 style='font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; color: #000000; line-height: 1.05; margin: 0 0 20px 0; letter-spacing: -0.04em;'>Understand every customer.<br/>Grow with purpose.</h1>
-            <p style='font-size: 16px; color: #5f6368; line-height: 1.7; margin: 0; max-width: 520px;'>A machine learning project that segments 33,038 supermarket customers into 8 distinct communities — uncovering who they are, how they shop, and what drives their decisions.</p>
+            <p style='font-size: 16px; color: #5f6368; line-height: 1.7; margin: 0; max-width: 520px;'>A machine learning project that segments 33,038 supermarket customers into 8 distinct communities, uncovering who they are, how they shop, and what drives their decisions.</p>
         </div>
         <div style='flex: 1; min-width: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0px;'>
             <img src='{CESTO_URI}' style='max-height: 250px; width: auto; max-width: 100%; object-fit: contain;' />
@@ -703,7 +709,7 @@ if selected_page == "Overview":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-top:16px; margin-bottom:8px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Scientific reference</div>
-  <p style='font-size:16px; color:#374151; line-height:1.7; margin:0 0 8px 0;'>This project follows the methodology supported by recent literature on unsupervised machine learning applied to retail segmentation. Spiegel et al. (2022) demonstrate that K-Means with silhouette-based cluster selection consistently outperforms alternative unsupervised methods when the goal is actionable, interpretable customer profiles for targeted marketing — a finding directly aligned with the approach adopted here.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.7; margin:0 0 8px 0;'>This project follows the methodology supported by recent literature on unsupervised machine learning applied to retail segmentation. Spiegel et al. (2022) demonstrate that K-Means with silhouette-based cluster selection consistently outperforms alternative unsupervised methods when the goal is actionable, interpretable customer profiles for targeted marketing, a finding directly aligned with the approach adopted here.</p>
   <p style='font-size:16px; color:#9ca3af; margin:0;'>Spiegel, R. et al. (2022). K-Means Clustering Approach for Intelligent Customer Segmentation Using Customer Purchase Behavior Data. <em>Sustainability</em>, 14(12), 7243. MDPI. https://doi.org/10.3390/su14127243</p>
 </div>
 """, unsafe_allow_html=True)
@@ -862,10 +868,10 @@ if selected_page == "Overview":
         <div style='font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #9ca3af; margin-bottom: 12px;'>Project Objective</div>
         <h2 style='font-size: 28px; font-weight: 800; color: #111827; margin: 0 0 16px 0; letter-spacing: -0.02em; line-height: 1.2;'>Why segment customers at all?</h2>
         <p style='font-size: 16px; color: #374151; line-height: 1.8; margin: 0 0 14px 0;'>
-          Traditional retail analytics treat the customer base as a single, homogeneous mass — averaging out behaviors that are fundamentally different from one another. This project challenges that assumption. The central objective of this work is to apply unsupervised machine learning to a real-world supermarket dataset and discover whether meaningful, stable, and actionable customer groups exist within the data.
+          Traditional retail analytics treat the customer base as a single, homogeneous mass, averaging out behaviors that are fundamentally different from one another. This project challenges that assumption. The central objective of this work is to apply unsupervised machine learning to a real-world supermarket dataset and discover whether meaningful, stable, and actionable customer groups exist within the data.
         </p>
         <p style='font-size: 16px; color: #374151; line-height: 1.8; margin: 0;'>
-          Rather than relying on intuition or demographic proxies, this analysis is driven entirely by observed behavior — spending patterns across product categories, promotional sensitivity, household composition, loyalty card usage, shopping frequency, and geographic footprint. The goal is to surface communities that are genuinely distinct and that carry real implications for marketing, product, and retention strategy.
+          Rather than relying on intuition or demographic proxies, this analysis is driven entirely by observed behavior: spending patterns across product categories, promotional sensitivity, household composition, loyalty card usage, shopping frequency, and geographic footprint. The goal is to surface communities that are genuinely distinct and that carry real implications for marketing, product, and retention strategy.
         </p>
       </div>
 
@@ -894,7 +900,7 @@ if selected_page == "Overview":
           The dataset covers two linked tables: <strong>customer_info</strong>, containing demographic attributes, geographic coordinates, loyalty flag, and lifetime spend broken down by 10 product categories; and <strong>customer_basket</strong>, containing transaction-level purchase logs used for association rule mining.
         </p>
         <p style='font-size: 16px; color: #374151; line-height: 1.8; margin: 0;'>
-          Prior to modelling, the data required substantial cleaning — removal of negative spend values introduced by return corrections, filtering of future-dated transactions, and outlier capping at the 99th percentile to prevent extreme spenders from distorting cluster centroids. Feature engineering added tenure (years since first transaction), annual spend rates, total children, a technology spend aggregate, and cyclical encodings of typical shopping hour.
+          Prior to modelling, the data required substantial cleaning: removal of negative spend values introduced by return corrections, filtering of future-dated transactions, and outlier capping at the 99th percentile to prevent extreme spenders from distorting cluster centroids. Feature engineering added tenure (years since first transaction), annual spend rates, total children, a technology spend aggregate, and cyclical encodings of typical shopping hour.
         </p>
       </div>
 
@@ -907,19 +913,19 @@ if selected_page == "Overview":
         <h2 style='font-size: 28px; font-weight: 800; color: #111827; margin: 0 0 16px 0; letter-spacing: -0.02em; line-height: 1.2;'>How were the communities found?</h2>
         <div style='display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;'>
           <div style='border-left: 3px solid #111827; padding-left: 16px;'>
-            <div style='font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 6px;'>1 — Exploratory Analysis</div>
+            <div style='font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 6px;'>1. Exploratory Analysis</div>
             <div style='font-size: 13px; color: #6b7280; line-height: 1.6;'>Distribution checks, missing value mapping, spend category breakdowns, and geographic density analysis across the customer base.</div>
           </div>
           <div style='border-left: 3px solid #111827; padding-left: 16px;'>
-            <div style='font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 6px;'>2 — Preprocessing</div>
+            <div style='font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 6px;'>2. Preprocessing</div>
             <div style='font-size: 13px; color: #6b7280; line-height: 1.6;'>Outlier capping, negative value correction, feature engineering of annual rates, tenure, and technology spend. StandardScaler normalization before clustering.</div>
           </div>
           <div style='border-left: 3px solid #111827; padding-left: 16px;'>
-            <div style='font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 6px;'>3 — K-Means Clustering</div>
+            <div style='font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 6px;'>3. K-Means Clustering</div>
             <div style='font-size: 13px; color: #6b7280; line-height: 1.6;'>K=8 selected via the Elbow Method and Silhouette Score analysis. Multiple random seeds tested for centroid stability. Final model validated against key behavioral axes.</div>
           </div>
           <div style='border-left: 3px solid #111827; padding-left: 16px;'>
-            <div style='font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 6px;'>4 — Association Rules</div>
+            <div style='font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 6px;'>4. Association Rules</div>
             <div style='font-size: 13px; color: #6b7280; line-height: 1.6;'>Apriori algorithm applied per cluster to customer basket data, extracting high-confidence cross-sell rules for targeted campaign design.</div>
           </div>
         </div>
@@ -935,7 +941,7 @@ if selected_page == "Overview":
         <div style='display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;'>
           <div style='background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px 22px;'>
             <div style='font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 6px;'>Data Analysis</div>
-            <div style='font-size: 13px; color: #6b7280; line-height: 1.6;'>Raw dataset exploration — spend distributions, category breakdowns, and customer demographic profiles.</div>
+            <div style='font-size: 13px; color: #6b7280; line-height: 1.6;'>Raw dataset exploration: spend distributions, category breakdowns, and customer demographic profiles.</div>
           </div>
           <div style='background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px 22px;'>
             <div style='font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 6px;'>Customer Communities</div>
@@ -964,9 +970,9 @@ elif selected_page == "Data Analysis":
       <div style='flex:1; min-width:300px;'>
     <div style='margin-bottom:32px;'>
       <div>
-        <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 0 — Data Analysis</div>
+        <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 0: Data Analysis</div>
         <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0; text-align: justify;'>
-          This notebook establishes the baseline understanding of the raw customer dataset. The objective is to identify data quality issues — missing values, erroneous entries, outliers, and skews — before any modelling takes place. No data is modified or removed in this notebook; it serves purely as a diagnostic stage to inform the decisions made in Notebook 1.
+          This notebook establishes the baseline understanding of the raw customer dataset. The objective is to identify data quality issues: missing values, erroneous entries, outliers, and skews, before any modelling takes place. No data is modified or removed in this notebook; it serves purely as a diagnostic stage to inform the decisions made in Notebook 1.
         </p>
         <div style='display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:16px; margin-bottom:28px;'>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
@@ -1022,7 +1028,7 @@ elif selected_page == "Data Analysis":
     <div id="nb0-1-3" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.3 Missing Values Analysis</h2></div>
     <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
       <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Missing value strategy</div>
-      <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Features with more than 30% missing values were flagged as too sparse to impute reliably. The inspection confirmed that missing values are concentrated in a limited group of behavioural and spend variables, supporting imputation over row-dropping — the customer base does not need to be reduced.</div>
+      <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Features with more than 30% missing values were flagged as too sparse to impute reliably. The inspection confirmed that missing values are concentrated in a limited group of behavioural and spend variables, supporting imputation over row-dropping: the customer base does not need to be reduced.</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1096,7 +1102,7 @@ elif selected_page == "Data Analysis":
 <div id="nb0-1-4-1" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.4.1 Findings in Categorical Columns</h2></div>
 <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
   <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Education level as a proxy feature</div>
-  <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Customer names contain academic prefixes — BSc., MSc., PhD. — across all 33,038 unique names. These prefixes are flagged as an education-level proxy and earmarked for feature engineering in Notebook 1. Surname repetition alone was found to be too common to be a useful household signal; it was not carried into the modelling feature set.</div>
+  <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Customer names contain academic prefixes (BSc., MSc., PhD.) across all 33,038 unique names. These prefixes are flagged as an education-level proxy and earmarked for feature engineering in Notebook 1. Surname repetition alone was found to be too common to be a useful household signal; it was not carried into the modelling feature set.</div>
 </div>
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
   <div style='font-size:18px; font-weight:700; color:#111827;'>Gender distribution</div>
@@ -1122,7 +1128,7 @@ elif selected_page == "Data Analysis":
 <div id="nb0-1-5" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">1.5 Statistical Summary</h2></div>
 <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:8px;'>
   <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Impossible values detected</div>
-  <div style='font-size:16px; color:#6b7280; line-height:1.8;'><code>percentage_of_products_bought_promotion</code> was found to contain values outside the valid [0, 1] range — both below 0.0 and above 1.0 — indicating data entry errors. These are flagged here and corrected in preprocessing. Spending variables show strong right-skew, confirming that a small group of customers spends disproportionately more than the majority.</div>
+  <div style='font-size:16px; color:#6b7280; line-height:1.8;'><code>percentage_of_products_bought_promotion</code> was found to contain values outside the valid [0, 1] range: both below 0.0 and above 1.0, indicating data entry errors. These are flagged here and corrected in preprocessing. Spending variables show strong right-skew, confirming that a small group of customers spends disproportionately more than the majority.</div>
 </div>
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
   <div style='font-size:18px; font-weight:700; color:#111827;'>Promotion ratio distribution (valid range only)</div>
@@ -1168,7 +1174,7 @@ elif selected_page == "Data Analysis":
     # Chart: Numeric boxplots (from NB0)
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; border-top:1px solid #e5e7eb; padding-top:24px;'>
-  <div style='font-size:18px; font-weight:700; color:#111827;'>Numerical variable distributions — boxplots</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>Numerical variable distributions: boxplots</div>
 </div>
 """, unsafe_allow_html=True)
     nb00_boxplot_path = IMAGENS_DIR / "charts" / "numeric_boxplots.png"
@@ -1183,10 +1189,10 @@ elif selected_page == "Data Analysis":
 
     st.markdown("""
         <div style='padding:24px; border-radius:16px; background:#f9fafb; border:1px solid #e5e7eb; margin-top:12px;'>
-          <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 0 — Conclusions</div>
+          <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 0: Conclusions</div>
           <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>The raw customer data contains missing values, skewed spending variables, identifier columns, date fields and several variables that require type conversion before modelling. These findings motivate the preprocessing notebook, where invalid values are handled, categorical variables are encoded and outliers are addressed.</p>
           <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>The distribution plots confirm that spending variables are highly skewed. This supports two later decisions: separating the most atypical customers before fitting the clustering model, and leaving scaling as a modelling choice.</p>
-          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The missing value inspection shows that the dataset is usable without dropping large parts of the customer base. No cleaning is applied in this notebook — all transformations are deferred to NB1.</p>
+          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The missing value inspection shows that the dataset is usable without dropping large parts of the customer base. No cleaning is applied in this notebook; all transformations are deferred to NB1.</p>
         </div>
     """, unsafe_allow_html=True)
     render_footer()
@@ -1201,9 +1207,9 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
     <div style='margin-bottom:32px;'>
       <div>
-        <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 1 — Data Preprocessing</div>
+        <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 1: Data Preprocessing</div>
         <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0; text-align: justify;'>
-          This notebook applies all transformations identified during the exploratory analysis. The goal is to produce a clean, analysis-ready dataset without losing customers unnecessarily. Every decision is justified by domain logic or statistical evidence — no arbitrary removals are made.
+          This notebook applies all transformations identified during the exploratory analysis. The goal is to produce a clean, analysis-ready dataset without losing customers unnecessarily. Every decision is justified by domain logic or statistical evidence; no arbitrary removals are made.
         </p>
       </div>
 
@@ -1449,7 +1455,7 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
 <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:28px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The gender distribution is approximately balanced, with a slight male majority, indicating no significant gender-driven sampling bias. The loyalty flag distribution reveals that approximately 38% of customers had a missing loyalty card number; these are retained as a distinct binary class (no card) rather than excluded, preserving data volume. The education distribution, proxied from name prefixes, shows a broad range of qualification levels — BSc and MSc holders represent the largest shares, while PhD holders constitute a small but identifiable minority. These demographic features are not used as clustering inputs but serve as post-hoc segment validation variables in Notebook 4.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The gender distribution is approximately balanced, with a slight male majority, indicating no significant gender-driven sampling bias. The loyalty flag distribution reveals that approximately 38% of customers had a missing loyalty card number; these are retained as a distinct binary class (no card) rather than excluded, preserving data volume. The education distribution, proxied from name prefixes, shows a broad range of qualification levels: BSc and MSc holders represent the largest shares, while PhD holders constitute a small but identifiable minority. These demographic features are not used as clustering inputs but serve as post-hoc segment validation variables in Notebook 4.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1495,7 +1501,7 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
 <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:28px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The kids and teens distributions are right-skewed, with most customers having zero or one child at home. The majority of the customer base has no children (approximately 60%), which is consistent with a broad urban supermarket customer profile. The complaints distribution is strongly concentrated at zero, with very few customers reporting more than one complaint — confirming that this is a low-complaint dataset and that the complaints variable will have limited discriminative power in clustering. Zero-filling was applied to all three variables where missing values resulted from data entry gaps rather than genuine absence.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The kids and teens distributions are right-skewed, with most customers having zero or one child at home. The majority of the customer base has no children (approximately 60%), which is consistent with a broad urban supermarket customer profile. The complaints distribution is strongly concentrated at zero, with very few customers reporting more than one complaint, confirming that this is a low-complaint dataset and that the complaints variable will have limited discriminative power in clustering. Zero-filling was applied to all three variables where missing values resulted from data entry gaps rather than genuine absence.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1554,11 +1560,11 @@ elif selected_page == "Data Preprocessing":
         <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin:16px 0;'>
           <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
             <div style='font-size:14px; font-weight:700; color:#111827; margin-bottom:5px;'>Why a consensus rule instead of a single method?</div>
-            <div style='font-size:16px; color:#374151; line-height:1.6;'>Any single outlier detector has blind spots. IQR flags univariate extremes; DBSCAN flags multivariate density gaps. A customer with unusually high electronics spend but otherwise normal behaviour would be caught by IQR but not DBSCAN. The consensus requirement means only genuine multivariate extremes — flagged by all methods — are removed, keeping the separation rate conservative (≈3%).</div>
+            <div style='font-size:16px; color:#374151; line-height:1.6;'>Any single outlier detector has blind spots. IQR flags univariate extremes; DBSCAN flags multivariate density gaps. A customer with unusually high electronics spend but otherwise normal behaviour would be caught by IQR but not DBSCAN. The consensus requirement means only genuine multivariate extremes, flagged by all methods, are removed, keeping the separation rate conservative (≈3%).</div>
           </div>
           <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
             <div style='font-size:14px; font-weight:700; color:#111827; margin-bottom:5px;'>Why separate instead of cap or remove?</div>
-            <div style='font-size:16px; color:#374151; line-height:1.6;'>Capping compresses extreme values to the 99th percentile — distorting genuine behaviour. Permanent removal loses the customer. Separation keeps the outlier intact in its own dataset and reattaches it to the nearest cluster centroid after model fitting, so every customer gets a segment label and no information is lost.</div>
+            <div style='font-size:16px; color:#374151; line-height:1.6;'>Capping compresses extreme values to the 99th percentile, distorting genuine behaviour. Permanent removal loses the customer. Separation keeps the outlier intact in its own dataset and reattaches it to the nearest cluster centroid after model fitting, so every customer gets a segment label and no information is lost.</div>
           </div>
           <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
             <div style='font-size:14px; font-weight:700; color:#111827; margin-bottom:5px;'>Why KNN imputation (k=5)?</div>
@@ -1566,11 +1572,11 @@ elif selected_page == "Data Preprocessing":
           </div>
           <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px;'>
             <div style='font-size:14px; font-weight:700; color:#111827; margin-bottom:5px;'>Why not log-transform spending?</div>
-            <div style='font-size:16px; color:#374151; line-height:1.6;'>Log transforms collapse the tail of the spend distribution, reducing the distance between moderate and high spenders. For this dataset, the goal is precisely to preserve spending magnitude differences — Techies should be far from Economizers in feature space. MinMaxScaler on the post-separation distribution retains those differences while controlling scale, making log transformation unnecessary.</div>
+            <div style='font-size:16px; color:#374151; line-height:1.6;'>Log transforms collapse the tail of the spend distribution, reducing the distance between moderate and high spenders. For this dataset, the goal is precisely to preserve spending magnitude differences: Techies should be far from Economizers in feature space. MinMaxScaler on the post-separation distribution retains those differences while controlling scale, making log transformation unnecessary.</div>
           </div>
         </div>
         <p style='font-size:16px; color:#374151; line-height:1.9; margin:14px 0;'>
-          Customers flagged by all three methods are exported to <code>outlier_dataset.csv</code>. The regular base is then processed with KNN imputation. This approach ensures that only multivariate extremes are removed — customers with one extreme variable but otherwise normal behaviour are retained. Outliers are later <strong>reattached to their nearest cluster centroid</strong> after the model is fitted.
+          Customers flagged by all three methods are exported to <code>outlier_dataset.csv</code>. The regular base is then processed with KNN imputation. This approach ensures that only multivariate extremes are removed: customers with one extreme variable but otherwise normal behaviour are retained. Outliers are later <strong>reattached to their nearest cluster centroid</strong> after the model is fitted.
         </p>
     """, unsafe_allow_html=True)
 
@@ -1612,7 +1618,7 @@ elif selected_page == "Data Preprocessing":
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
           <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#b07060; margin-bottom:6px;'>Lifecycle feature</div>
           <div style='font-size:16px; font-weight:700; color:#c94f38; margin-bottom:6px;'>tenure (years of relationship)</div>
-          <div style='font-size:16px; color:#374151; line-height:1.6;'>Raw <code>year_first_transaction</code> is an absolute year label (e.g. 2014) — meaningless as a distance metric. Converting it to years-since-first-purchase produces a continuous, interpretable feature (e.g. 9.3 years) that captures customer lifecycle stage. Longer tenure is associated with higher loyalty, so this feature is a direct input to loyalty-based profiling.</div>
+          <div style='font-size:16px; color:#374151; line-height:1.6;'>Raw <code>year_first_transaction</code> is an absolute year label (e.g. 2014), meaninglessss as a distance metric. Converting it to years-since-first-purchase produces a continuous, interpretable feature (e.g. 9.3 years) that captures customer lifecycle stage. Longer tenure is associated with higher loyalty, so this feature is a direct input to loyalty-based profiling.</div>
         </div>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
           <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#b07060; margin-bottom:6px;'>Circular encoding</div>
@@ -1622,12 +1628,12 @@ elif selected_page == "Data Preprocessing":
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
           <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#b07060; margin-bottom:6px;'>Tenure normalisation</div>
           <div style='font-size:16px; font-weight:700; color:#c94f38; margin-bottom:6px;'>Annual spend rates (spend ÷ tenure)</div>
-          <div style='font-size:16px; color:#374151; line-height:1.6;'>A customer who joined 15 years ago will have higher lifetime spend than an identical-behaviour customer who joined 2 years ago — purely because they have had more time to accumulate transactions. Dividing lifetime spend by tenure normalises for relationship length, making the spend features reflect behavioural intensity rather than longevity. Without this, long-tenure customers would cluster together even if their annual behaviour is unremarkable.</div>
+          <div style='font-size:16px; color:#374151; line-height:1.6;'>A customer who joined 15 years ago will have higher lifetime spend than an identical-behaviour customer who joined 2 years ago, purely because they have had more time to accumulate transactions. Dividing lifetime spend by tenure normalises for relationship length, making the spend features reflect behavioural intensity rather than longevity. Without this, long-tenure customers would cluster together even if their annual behaviour is unremarkable.</div>
         </div>
         <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
           <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#b07060; margin-bottom:6px;'>Dimensionality reduction</div>
           <div style='font-size:16px; font-weight:700; color:#c94f38; margin-bottom:6px;'>Technology spend aggregate</div>
-          <div style='font-size:16px; color:#374151; line-height:1.6;'><code>lifetime_spend_electronics</code> and <code>lifetime_spend_videogames</code> are highly correlated (both driven by tech-oriented customers) and individually sparse — most customers spend zero on each. Aggregating them into a single <code>lifetime_spend_technology</code> feature reduces noise and creates one informative dimension that separates tech-oriented customers cleanly in the clustering space.</div>
+          <div style='font-size:16px; color:#374151; line-height:1.6;'><code>lifetime_spend_electronics</code> and <code>lifetime_spend_videogames</code> are highly correlated (both driven by tech-oriented customers) and individually sparse, as most customers spend zero on each. Aggregating them into a single <code>lifetime_spend_technology</code> feature reduces noise and creates one informative dimension that separates tech-oriented customers cleanly in the clustering space.</div>
         </div>
       </div>
     """, unsafe_allow_html=True)
@@ -1789,16 +1795,16 @@ elif selected_page == "Data Preprocessing":
     st.markdown("""
       <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:16px; margin-bottom:32px;'>
         <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:6px;'>Why export unscaled?</div>
-        <div style='font-size:16px; color:#7a6454; line-height:1.8;'>The final dataset is exported <strong>without scaling</strong>. Scaling is treated as a modelling choice — MinMaxScaler and RobustScaler are both evaluated in Notebook 3 against each other. Keeping the export unscaled ensures that the same raw dataset can be tested against any scaling strategy without re-running preprocessing.</div>
+        <div style='font-size:16px; color:#7a6454; line-height:1.8;'>The final dataset is exported <strong>without scaling</strong>. Scaling is treated as a modelling choice: MinMaxScaler and RobustScaler are both evaluated in Notebook 3 against each other. Keeping the export unscaled ensures that the same raw dataset can be tested against any scaling strategy without re-running preprocessing.</div>
       </div>
     """, unsafe_allow_html=True)
 
     st.markdown("""
         <div style='padding:24px; border-radius:16px; background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); margin-top:12px;'>
-          <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:10px;'>Notebook 1 — Conclusions</div>
-          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>"Before imputing missing values, the most atypical customers are separated into an outlier dataset. The rule is conservative: a customer is only kept aside when it is simultaneously flagged by three methods."</p>
-          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>"After the conservative outlier separation, the regular customer base still contains natural variation, but the most extreme observations are kept aside. This reduces the risk that a small number of atypical customers dominate the clustering distances."</p>
-          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>"In the final exported dataset, <code>year_first_transaction</code> is replaced by <code>tenure</code>, and <code>typical_hour</code> is replaced by its cyclic components. Some high values remain visible in the boxplots after preprocessing. This is expected because lifetime spending variables are naturally skewed."</p>
+          <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:10px;'>Notebook 1: Conclusions</div>
+          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>Before imputing missing values, the most atypical customers are separated into an outlier dataset. The rule is conservative: a customer is only kept aside when it is simultaneously flagged by three methods.</p>
+          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>After the conservative outlier separation, the regular customer base still contains natural variation, but the most extreme observations are kept aside. This reduces the risk that a small number of atypical customers dominate the clustering distances.</p>
+          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>In the final exported dataset, <code>year_first_transaction</code> is replaced by <code>tenure</code>, and <code>typical_hour</code> is replaced by its cyclic components. Some high values remain visible in the boxplots after preprocessing. This is expected because lifetime spending variables are naturally skewed.</p>
         </div>
     """, unsafe_allow_html=True)
     render_footer()
@@ -1814,9 +1820,9 @@ elif selected_page == "Data in Geography":
       <div style='flex:1; min-width:300px;'>
     <div style='margin-bottom:32px;'>
       <div>
-        <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 2 — Geographic Analysis</div>
+        <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 2: Geographic Analysis</div>
         <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0; text-align: justify;'>
-          With the data cleaned, Notebook 2 isolates the two geographic variables — latitude and longitude — to understand the spatial distribution of the customer base. The primary objective is to detect spatial patterns and concentrations that might correlate with distinct spending behaviours or demographics.
+          With the data cleaned, Notebook 2 isolates the two geographic variables, latitude and longitude, to understand the spatial distribution of the customer base. The primary objective is to detect spatial patterns and concentrations that might correlate with distinct spending behaviours or demographics.
         </p>
         <div style='display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:16px; margin-bottom:28px;'>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
@@ -1829,7 +1835,7 @@ elif selected_page == "Data in Geography":
           </div>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:18px 20px;'>
             <div style='font-size:18px; font-weight:700; color:#c94f38; margin-bottom:4px;'>Hotspot radius</div>
-            <div style='font-size:16px; color:#7a6454; line-height:1.6;'><strong>0.006 decimal degrees</strong> — defined programmatically via grid-based analysis.</div>
+            <div style='font-size:16px; color:#7a6454; line-height:1.6;'><strong>0.006 decimal degrees</strong>, defined programmatically via grid-based analysis.</div>
           </div>
         </div>
       </div>
@@ -1868,12 +1874,12 @@ elif selected_page == "Data in Geography":
 
     <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:20px;'>
       <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Behavioural differences: hotspot vs. rest of base</div>
-      <div style='font-size:16px; color:#6b7280; line-height:1.8;'>The hotspot shows a distinct behavioural profile even before clustering labels are applied. The strongest differences are in <strong>age, product diversity, number of complaints, store visits, total spend, and promotion usage</strong>. Hotspot customers are younger, more active, and more variety-seeking — consistent with a younger urban population, though the data does not confirm student status directly.</div>
+      <div style='font-size:16px; color:#6b7280; line-height:1.8;'>The hotspot shows a distinct behavioural profile even before clustering labels are applied. The strongest differences are in <strong>age, product diversity, number of complaints, store visits, total spend, and promotion usage</strong>. Hotspot customers are younger, more active, and more variety-seeking, consistent with a younger urban population, though the data does not confirm student status directly.</div>
     </div>
 
     <div style='border-left:3px solid #111827; padding-left:20px;'>
       <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Why geography is excluded from clustering</div>
-      <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Including geographic coordinates in the clustering distance would create spatially-defined groups — customers near each other in space would be forced into the same cluster regardless of their spending behaviour. The objective is to discover <em>behavioural</em> communities, not geographic ones. Geography is kept as a profiling tool: after clusters are fitted, the geographic distribution of each cluster is inspected as a validation and characterisation layer.</div>
+      <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Including geographic coordinates in the clustering distance would create spatially-defined groups: customers near each other in space would be forced into the same cluster regardless of their spending behaviour. The objective is to discover <em>behavioural</em> communities, not geographic ones. Geography is kept as a profiling tool: after clusters are fitted, the geographic distribution of each cluster is inspected as a validation and characterisation layer.</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1885,7 +1891,7 @@ elif selected_page == "Data in Geography":
     st.markdown("""<div id='nb2-4' style='margin-top:64px; margin-bottom:16px; border-top:2px solid #e5e7eb; padding-top:32px;'><h2 style='font-size:24px; font-weight:800; color:#111827; margin:0;'>4) Customer geographic distribution</h2></div>
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:14px 18px; margin-bottom:20px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#9ca3af; margin-bottom:6px;'>Why this chart?</div>
-  <div style='font-size:16px; color:#374151; line-height:1.7;'>Each dot is one customer, positioned at their coordinates, sized by total lifetime spend and coloured by promotion usage rate. This reveals whether high-spend or promo-heavy customers concentrate in particular zones — a finding that the density map alone cannot show because density aggregates all customers equally regardless of value.</div>
+  <div style='font-size:16px; color:#374151; line-height:1.7;'>Each dot is one customer, positioned at their coordinates, sized by total lifetime spend and coloured by promotion usage rate. This reveals whether high-spend or promo-heavy customers concentrate in particular zones, a finding that the density map alone cannot show because density aggregates all customers equally regardless of value.</div>
 </div>""", unsafe_allow_html=True)
     scatter_map = px.scatter_mapbox(
         customer_info,
@@ -1905,7 +1911,7 @@ elif selected_page == "Data in Geography":
     st.markdown("""
 <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:28px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The scatter map confirms that the customer base is geographically concentrated in the Lisbon Metropolitan Area, with a visible urban core and a sparser suburban periphery. Point size encodes lifetime spend — larger points indicate higher-value customers — while colour encodes promotion sensitivity, revealing that higher promotion usage is not exclusively an urban or suburban phenomenon but is distributed across the full geographic footprint. No distinct geographic cluster of uniformly high- or low-promotion customers is visible, supporting the decision to exclude geography from the clustering feature set.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The scatter map confirms that the customer base is geographically concentrated in the Lisbon Metropolitan Area, with a visible urban core and a sparser suburban periphery. Point size encodes lifetime spend, where larger points indicate higher-value customers, while colour encodes promotion sensitivity, revealing that higher promotion usage is not exclusively an urban or suburban phenomenon but is distributed across the full geographic footprint. No distinct geographic cluster of uniformly high- or low-promotion customers is visible, supporting the decision to exclude geography from the clustering feature set.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1969,7 +1975,7 @@ elif selected_page == "Data in Geography":
     st.markdown("""
 <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:28px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#7a6454; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The hotspot-vs-outside comparison reveals that customers located within the highest-density geographic cell show modestly higher promotion sensitivity and purchase a broader range of distinct products on average. The number of distinct stores visited is also slightly higher in the hotspot, consistent with a more urban, multi-channel shopping pattern. These differences are present but not large enough to constitute a distinct behavioural segment — they reflect geographic concentration effects rather than fundamentally different customer profiles, reinforcing the decision to treat the hotspot as a geographic observation rather than a behavioural cluster.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The hotspot-vs-outside comparison reveals that customers located within the highest-density geographic cell show modestly higher promotion sensitivity and purchase a broader range of distinct products on average. The number of distinct stores visited is also slightly higher in the hotspot, consistent with a more urban, multi-channel shopping pattern. These differences are present but not large enough to constitute a distinct behavioural segment; they reflect geographic concentration effects rather than fundamentally different customer profiles, reinforcing the decision to treat the hotspot as a geographic observation rather than a behavioural cluster.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -2046,9 +2052,9 @@ elif selected_page == "Data in Geography":
 
     st.markdown("""
         <div style='padding:24px; border-radius:16px; background:#f9fafb; border:1px solid #e5e7eb; margin-top:12px;'>
-          <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 2 — Conclusions</div>
-          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>"The hotspot shows a distinct behavioural profile even before using any clustering labels. The strongest differences are age, product diversity, number of complaints, store visits, total spend and promotion usage. This suggests that the dense area is not only a map artefact; it also corresponds to a younger, more active customer profile."</p>
-          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>"Age is the strongest signal supporting the area near the university hypothesis. At this stage, it should not be treated as one of the final customer segments because geography is not part of the clustering distance. However, it is useful as a geographic profiling insight."</p>
+          <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 2: Conclusions</div>
+          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 10px 0;'>The hotspot shows a distinct behavioural profile even before using any clustering labels. The strongest differences are age, product diversity, number of complaints, store visits, total spend and promotion usage. This suggests that the dense area is not only a map artefact; it also corresponds to a younger, more active customer profile.</p>
+          <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Age is the strongest signal supporting the area near the university hypothesis. At this stage, it should not be treated as one of the final customer segments because geography is not part of the clustering distance. However, it is useful as a geographic profiling insight.</p>
         </div>
     """, unsafe_allow_html=True)
     render_footer()
@@ -2063,9 +2069,9 @@ elif selected_page == "NB3 Clustering":
     st.markdown('''
     <div style='margin-bottom:32px;'>
       <div>
-        <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 3 — Clustering</div>
+        <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 3: Clustering</div>
         <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0; text-align: justify;'>
-          Notebook 3 is the core modelling stage. It systematically evaluates combinations of feature sets, scalers, and cluster counts (k=6 to 10) to determine the partition that best captures the underlying behavioural diversity in the customer base. The process is fully transparent: every diagnostic — silhouette, elbow, dendrogram, and PCA/UMAP projection — is documented and benchmarked.
+          Notebook 3 is the core modelling stage. It systematically evaluates combinations of feature sets, scalers, and cluster counts (k=6 to 10) to determine the partition that best captures the underlying behavioural diversity in the customer base. The process is fully transparent: every diagnostic (silhouette, elbow, dendrogram, and PCA/UMAP projection) is documented and benchmarked.
         </p>
         <div style='display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:14px; margin-bottom:28px;'>
           <div style='background:#f7e6e1; border:1px solid rgba(201, 79, 56, 0.25); border-radius:12px; padding:16px 18px; text-align:center;'>
@@ -2127,9 +2133,57 @@ elif selected_page == "NB3 Clustering":
         <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Verifying the impact of the consensus outlier separation from Notebook 1 on the cluster structures. Only customers flagged simultaneously by IQR, DBSCAN, and a third detection method were excluded (982 customers, 3.0%), ensuring extreme multivariate values do not disproportionately pull the centroids.</div>
       </div>
 
-      <div id="nb3-3" style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-bottom:28px;'>
-        <h2 style='font-size:24px; font-weight:800; color:#111827; margin:0 0 8px 0;'>3) Candidate feature sets & scalers</h2>
-        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Different combinations of features (including/excluding groceries, including promotional sensitivity) and scaling techniques (MinMaxScaler vs RobustScaler) are formulated for systematic evaluation.</div>
+      <div id="nb3-3" style='margin-bottom:28px;'>
+        <h2 style='font-size:24px; font-weight:800; color:#111827; margin:0 0 16px 0;'>3) Candidate feature sets & scalers</h2>
+        <p style='font-size:16px; color:#374151; line-height:1.9; margin:0 0 24px 0;'>The dataset contains 40 engineered features. Not all of them are appropriate inputs to a distance-based clustering algorithm. The selection below is the result of a deliberate process: each feature was evaluated on whether it adds discriminative signal between customers or introduces noise, redundancy, or a dimension that confounds behavioural differences with demographic or geographic artefacts. The 13 candidate feature sets tested in the silhouette grid reflect systematic removal and addition of individual features and groups.</p>
+
+        <div style='font-size:18px; font-weight:800; color:#111827; margin-bottom:12px;'>Features included in the final set</div>
+        <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:28px;'>
+          <div style='background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:16px 18px;'>
+            <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#15803d; margin-bottom:6px;'>Spend categories (excl. groceries)</div>
+            <div style='font-size:15px; color:#374151; line-height:1.7;'><code>lifetime_spend_vegetables</code>, <code>lifetime_spend_meat</code>, <code>lifetime_spend_fish</code>, <code>lifetime_spend_hygiene</code>, <code>lifetime_spend_technology</code>, <code>lifetime_spend_petfood</code>, <code>lifetime_spend_nonalcohol_drinks</code>, <code>lifetime_spend_alcohol_drinks</code>. Each of these categories has at least one customer segment that substantially over-indexes on it relative to the global average. They carry genuine discriminative signal: high between-cluster variance and low within-cluster variance, exactly what K-Means optimises for.</div>
+          </div>
+          <div style='background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:16px 18px;'>
+            <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#15803d; margin-bottom:6px;'>Promotional sensitivity</div>
+            <div style='font-size:15px; color:#374151; line-height:1.7;'><code>percentage_of_products_bought_promotion</code> is orthogonal to absolute spend: a customer can spend heavily and never use a promotion, or spend modestly and always seek deals. Without this feature, Promoters and Regulars are nearly indistinguishable in spend-only space — both show moderate, broad-category purchasing. Including promo sensitivity adds a second axis that separates deal-seeking behaviour from spending intensity, recovering Promoters as a distinct segment. The silhouette grid confirms that removing this feature causes a measurable drop in score.</div>
+          </div>
+        </div>
+
+        <div style='font-size:18px; font-weight:800; color:#111827; margin-bottom:12px;'>Features excluded and why</div>
+        <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:24px;'>
+          <div style='background:#fff5f5; border:1px solid #fecaca; border-radius:12px; padding:16px 18px;'>
+            <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#b91c1c; margin-bottom:6px;'>Groceries</div>
+            <div style='font-size:15px; color:#374151; line-height:1.7;'><code>lifetime_spend_groceries</code> is near-universal: virtually every customer in the dataset purchases groceries regularly. Because variation across customers is small relative to the feature's magnitude, including it pulls K-Means centroids toward a groceries axis that separates customers by how long they have been shopping — not by what kind of shopper they are. The normalised heatmap in NB4 confirms this empirically: the groceries column shows nearly uniform shading across all 8 segments. It is retained for profiling but excluded from the distance computation.</div>
+          </div>
+          <div style='background:#fff5f5; border:1px solid #fecaca; border-radius:12px; padding:16px 18px;'>
+            <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#b91c1c; margin-bottom:6px;'>Demographic features</div>
+            <div style='font-size:15px; color:#374151; line-height:1.7;'><code>customer_age</code>, <code>is_male</code>, <code>education_level</code>, <code>kids_home</code>, <code>teens_home</code>, <code>total_children</code>. Including demographic variables would produce demographic segments — clusters defined by age bracket or household size — rather than behavioural segments defined by spending. The goal is to discover communities of similar buyers, then validate against demographics post-hoc. If demographics are cluster inputs, you cannot later use them as independent validation evidence.</div>
+          </div>
+          <div style='background:#fff5f5; border:1px solid #fecaca; border-radius:12px; padding:16px 18px;'>
+            <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#b91c1c; margin-bottom:6px;'>Geographic features</div>
+            <div style='font-size:15px; color:#374151; line-height:1.7;'><code>latitude</code>, <code>longitude</code>. NB2 showed that all spend behaviour types are distributed throughout the Lisbon Metropolitan Area — no geographic zone contains exclusively high- or low-spend customers. Including coordinates would produce geographic clusters (north vs south, urban vs suburban) that do not reflect purchasing behaviour. Geography is used post-hoc in NB4 to validate that segments are not spatially confounded.</div>
+          </div>
+          <div style='background:#fff5f5; border:1px solid #fecaca; border-radius:12px; padding:16px 18px;'>
+            <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#b91c1c; margin-bottom:6px;'>Temporal features</div>
+            <div style='font-size:15px; color:#374151; line-height:1.7;'><code>typical_hour_sin</code>, <code>typical_hour_cos</code>. Shopping hour captures when a customer visits, not what or how much they buy. In preliminary tests, including these features introduced a time-of-day axis that fragmented segments without adding interpretable business meaning. A segment defined by "shops at 08:00" rather than by what they spend is not actionable for product or promotional strategy.</div>
+          </div>
+          <div style='background:#fff5f5; border:1px solid #fecaca; border-radius:12px; padding:16px 18px;'>
+            <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#b91c1c; margin-bottom:6px;'>Aggregate spend totals</div>
+            <div style='font-size:15px; color:#374151; line-height:1.7;'><code>total_spend</code>, <code>log_total_spend</code>. These aggregate all category spend into a single dimension, collapsing the very heterogeneity the model is trying to capture. Including them alongside category-level features creates severe collinearity: total spend is a linear function of the category spends already in the feature set, giving high-spend customers disproportionate weight in the distance calculation regardless of their category mix.</div>
+          </div>
+          <div style='background:#fff5f5; border:1px solid #fecaca; border-radius:12px; padding:16px 18px;'>
+            <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#b91c1c; margin-bottom:6px;'>Spend share features</div>
+            <div style='font-size:15px; color:#374151; line-height:1.7;'><code>electronics_share</code>, <code>vegetables_share</code>, and all other category share variables. Shares normalise each category by total spend, which removes the information about whether a customer is a big or small spender. Two customers with identical spending profiles except one spends 10x more overall would appear identical in share space. The clustering objective requires both dimensions: what a customer buys and how much they spend on it.</div>
+          </div>
+          <div style='background:#fff5f5; border:1px solid #fecaca; border-radius:12px; padding:16px 18px;'>
+            <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#b91c1c; margin-bottom:6px;'>Loyalty flag & complaints</div>
+            <div style='font-size:15px; color:#374151; line-height:1.7;'><code>customer_loyalty_flag</code>, <code>number_complaints</code>. These are outcome variables rather than behavioural inputs. Loyalty flag has 38% missing values (retained as a binary class), making it unreliable as a distance feature. Complaints volume is low and relatively uniform across customers; including it would fragment clusters around complaint history rather than spending behaviour.</div>
+          </div>
+          <div style='background:#fff5f5; border:1px solid #fecaca; border-radius:12px; padding:16px 18px;'>
+            <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#b91c1c; margin-bottom:6px;'>Tenure & distinct products</div>
+            <div style='font-size:15px; color:#374151; line-height:1.7;'><code>tenure</code>, <code>lifetime_total_distinct_products</code>. Tenure is used to normalise lifetime spend into annual rates (spend ÷ tenure); it is an input to feature engineering, not a cluster feature itself. Distinct products is a breadth measure that is strongly collinear with total spend: customers who spend more tend to buy from more categories. Including it would amplify the weight of high-spend customers without adding new behavioural signal.</div>
+          </div>
+        </div>
       </div>
     ''', unsafe_allow_html=True)
 
@@ -2143,7 +2197,7 @@ elif selected_page == "NB3 Clustering":
         st.markdown("""<div style='margin-bottom:8px;'><div style='font-size:18px; font-weight:700; color:#111827;'>Scaler comparison</div></div>
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:12px 16px; margin-bottom:14px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#9ca3af; margin-bottom:5px;'>Why this chart?</div>
-  <div style='font-size:16px; color:#374151; line-height:1.7;'>Shows silhouette score vs. k for both MinMaxScaler and RobustScaler. A higher silhouette score means better-separated, more compact clusters. The comparison reveals whether the choice of scaler materially changes the solution quality — it does, favouring MinMax.</div>
+  <div style='font-size:16px; color:#374151; line-height:1.7;'>Shows silhouette score vs. k for both MinMaxScaler and RobustScaler. A higher silhouette score means better-separated, more compact clusters. The comparison reveals whether the choice of scaler materially changes the solution quality, favouring MinMax.</div>
 </div>""", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 8, 1])
         with col2: st.image(str(_p), use_container_width=True)
@@ -2171,6 +2225,12 @@ elif selected_page == "NB3 Clustering":
         st.markdown("<div style='margin-bottom:12px;'><div style='font-size:18px; font-weight:700; color:#111827;'>Ward Dendrogram</div></div>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 8, 1])
         with col2: st.image(str(_p), use_container_width=True)
+    st.markdown('''
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The Ward linkage dendrogram is computed on a stratified 5,000-customer sample. It provides a hierarchical view of how clusters merge as the distance threshold increases. The dendrogram confirms that k=8 is a natural cut point: a horizontal cut at the appropriate height yields eight well-separated branches with no single branch dominating the structure. The vertical distance between successive merges (the height of each horizontal bar) encodes the within-cluster variance increase at that merge step. The large gap between the merge at k=8 and the next merge at k=7 is the main quantitative justification for choosing eight clusters: merging any two of the eight groups would incur a disproportionate loss of within-cluster homogeneity relative to the gain in parsimony. The Ward criterion also confirms that the chosen feature set produces cohesive, compact groups rather than elongated or chained structures.</p>
+</div>
+''', unsafe_allow_html=True)
 
     _p1 = IMAGENS_DIR / "charts" / "average_dendrogram__sample____spend___promo_no_groceries.png"
     _p2 = IMAGENS_DIR / "charts" / "complete_dendrogram__sample____spend___promo_no_groceries.png"
@@ -2207,12 +2267,24 @@ elif selected_page == "NB3 Clustering":
 </div>""", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 8, 1])
         with col2: st.image(str(_p), use_container_width=True)
+    st.markdown('''
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The silhouette grid evaluates 13 feature sets across k values from 6 to 10. Each cell represents the average silhouette score for that feature set and cluster count combination. Higher values indicate better-separated and more cohesive clusters. The grid reveals that the feature set combining spend categories and promotional sensitivity without groceries consistently achieves the highest scores, and that k=8 is the optimal cluster count within this feature set: the score at k=8 exceeds those at k=7 and k=9 by a non-trivial margin, and the drop from k=8 to k=9 is steeper than the gain from k=7 to k=8, indicating diminishing returns beyond eight clusters. Feature sets that include groceries or exclude promotional sensitivity score systematically lower, providing quantitative support for those design choices.</p>
+</div>
+''', unsafe_allow_html=True)
 
     _p = IMAGENS_DIR / "charts" / "customers_per_cluster.png"
     if _p.exists():
         st.markdown("<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>Customers per Cluster</div>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 8, 1])
         with col2: st.image(str(_p), use_container_width=True)
+    st.markdown('''
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The bar chart shows the number of customers assigned to each of the eight clusters after the outlier reattachment step. The distribution is reasonably balanced: no single cluster absorbs a dominant share of customers, and no cluster is too small to be statistically or commercially actionable. The largest segments (Regulars and Economizers) reflect the broad middle of the behavioural distribution, where spending patterns are moderate and undifferentiated. The smaller segments (Techies, Loyalists, Wellness) represent rarer but highly distinctive behavioural profiles. This balance is an important quality check: severe imbalance would suggest that the chosen k is either too low (merging distinct groups) or too high (fragmenting a homogeneous group). The near-uniform distribution here is consistent with the silhouette diagnostics and confirms that k=8 is a well-calibrated partition.</p>
+</div>
+''', unsafe_allow_html=True)
 
     _p = IMAGENS_DIR / "charts" / "silhouette_blades.png"
     if _p.exists():
@@ -2238,7 +2310,7 @@ elif selected_page == "NB3 Clustering":
         st.markdown('''
 <div style='background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:16px 20px; margin-top:8px; margin-bottom:8px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#0369a1; margin-bottom:6px;'>Why this chart?</div>
-  <p style='font-size:15px; color:#374151; line-height:1.8; margin:0;'>Principal Component Analysis (PCA) projects the scaled feature space onto the two directions of greatest variance. As a linear technique, it is computationally efficient and deterministic, making it a reliable first-pass sanity check: if clusters are separable in PCA space, they are linearly well-defined. Because PCA cannot capture non-linear structure, partial overlap in this view does not invalidate the segmentation — it motivates the subsequent UMAP and t-SNE checks.</p>
+  <p style='font-size:15px; color:#374151; line-height:1.8; margin:0;'>Principal Component Analysis (PCA) projects the scaled feature space onto the two directions of greatest variance. As a linear technique, it is computationally efficient and deterministic, making it a reliable first-pass sanity check: if clusters are separable in PCA space, they are linearly well-defined. Because PCA cannot capture non-linear structure, partial overlap in this view does not invalidate the segmentation; it motivates the subsequent UMAP and t-SNE checks.</p>
 </div>
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
@@ -2258,7 +2330,7 @@ elif selected_page == "NB3 Clustering":
 </div>
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The UMAP projection reveals considerably cleaner cluster separation than the linear PCA view, confirming that the segment boundaries are non-trivially structured in the original feature space. Several clusters form compact, well-bounded islands — most notably the high-spend segments (Loyalists, Techies) which appear as spatially isolated groups. The Promoters cluster, defined primarily by promotional responsiveness rather than absolute spend, occupies a distinct region with limited overlap. Segments with overlapping behavioural profiles (e.g., Regulars and Economizers, both characterised by moderate or low spend) show some proximity in UMAP space, which is consistent with the intuition that these groups lie on a continuum of spend intensity. The overall topology validates the k=8 partition: eight identifiable regions exist in the low-dimensional manifold.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The UMAP projection reveals considerably cleaner cluster separation than the linear PCA view, confirming that the segment boundaries are non-trivially structured in the original feature space. Several clusters form compact, well-bounded islands, most notably the high-spend segments (Loyalists, Techies) which appear as spatially isolated groups. The Promoters cluster, defined primarily by promotional responsiveness rather than absolute spend, occupies a distinct region with limited overlap. Segments with overlapping behavioural profiles (e.g., Regulars and Economizers, both characterised by moderate or low spend) show some proximity in UMAP space, which is consistent with the intuition that these groups lie on a continuum of spend intensity. The overall topology validates the k=8 partition: eight identifiable regions exist in the low-dimensional manifold.</p>
 </div>
 ''', unsafe_allow_html=True)
 
@@ -2295,7 +2367,7 @@ elif selected_page == "NB3 Clustering":
         <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:18px 20px;'>
           <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Algorithm choice</div>
           <div style='font-size:16px; font-weight:700; color:#111827; margin-bottom:6px;'>Why K-Means?</div>
-          <div style='font-size:16px; color:#374151; line-height:1.7;'>K-Means produces hard, non-overlapping assignments that map cleanly to business segments. It is fast enough to iterate over a full grid of k values and feature sets, and its centroids are directly interpretable as average member profiles — making the naming rationale straightforward. Soft-assignment models (GMM) were considered but add complexity without a clear interpretability gain for this use case.</div>
+          <div style='font-size:16px; color:#374151; line-height:1.7;'>K-Means produces hard, non-overlapping assignments that map cleanly to business segments. It is fast enough to iterate over a full grid of k values and feature sets, and its centroids are directly interpretable as average member profiles, making the naming rationale straightforward. Soft-assignment models (GMM) were considered but add complexity without a clear interpretability gain for this use case.</div>
         </div>
 
         <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:18px 20px;'>
@@ -2307,38 +2379,38 @@ elif selected_page == "NB3 Clustering":
         <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:18px 20px;'>
           <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Scaler</div>
           <div style='font-size:16px; font-weight:700; color:#111827; margin-bottom:6px;'>Why MinMaxScaler over RobustScaler?</div>
-          <div style='font-size:16px; color:#374151; line-height:1.7;'>Both scalers were tested across all feature-set × k combinations. MinMaxScaler consistently produced higher silhouette scores at k=8, and a cleaner elbow curve. RobustScaler clips the influence of outliers via the IQR — but since outliers were already separated in NB1, the input to the model is already a clean distribution. MinMaxScaler compresses all features to [0, 1] while preserving their relative order, giving equal weight to each spend dimension without discarding distributional information.</div>
+          <div style='font-size:16px; color:#374151; line-height:1.7;'>Both scalers were tested across all feature-set × k combinations. MinMaxScaler consistently produced higher silhouette scores at k=8, and a cleaner elbow curve. RobustScaler clips the influence of outliers via the IQR; however, since outliers were already separated in NB1, the input to the model is already a clean distribution. MinMaxScaler compresses all features to [0, 1] while preserving their relative order, giving equal weight to each spend dimension without discarding distributional information.</div>
         </div>
 
         <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:18px 20px;'>
           <div style='font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Feature set</div>
           <div style='font-size:16px; font-weight:700; color:#111827; margin-bottom:6px;'>Why spend + promo, no groceries?</div>
-          <div style='font-size:16px; color:#374151; line-height:1.7;'>Grocery spend is near-universal across all customers and contributes noise rather than signal to the clustering distance. Including it pulls centroids toward a groceries dimension that does not differentiate behaviour. Removing groceries from the feature set while retaining it for profiling gives a cleaner signal. Adding <code>percentage_of_products_bought_promotion</code> captures deal-seeking behaviour that is orthogonal to absolute spend — recovering the Promoters segment that would otherwise blend into Regulars.</div>
+          <div style='font-size:16px; color:#374151; line-height:1.7;'>Grocery spend is near-universal across all customers and contributes noise rather than signal to the clustering distance. Including it pulls centroids toward a groceries dimension that does not differentiate behaviour. Removing groceries from the feature set while retaining it for profiling gives a cleaner signal. Adding <code>percentage_of_products_bought_promotion</code> captures deal-seeking behaviour that is orthogonal to absolute spend, thus recovering the Promoters segment that would otherwise blend into Regulars.</div>
         </div>
 
       </div>
 
-      <div id="nb3-8" style='font-size:24px; font-weight:800; color:#111827; margin-bottom:16px;'>8) Method benchmarks — Alternatives tested</div>
+      <div id="nb3-8" style='font-size:24px; font-weight:800; color:#111827; margin-bottom:16px;'>8) Method benchmarks: Alternatives tested</div>
       <div style='display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px;'>
         <div style='background:#fff5f5; border:1px solid #fecaca; border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:16px; font-weight:700; color:#b91c1c; margin-bottom:6px;'>DBSCAN — rejected</div>
+          <div style='font-size:16px; font-weight:700; color:#b91c1c; margin-bottom:6px;'>DBSCAN (rejected)</div>
           <div style='font-size:16px; color:#374151; line-height:1.7;'>DBSCAN requires a radius parameter (ε) that is sensitive to the high-dimensional feature space. With customer spend data it labelled 20–40% of customers as noise, making downstream business use impossible. Density-based boundaries also don't produce stable centroid profiles for profiling.</div>
         </div>
         <div style='background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:16px; font-weight:700; color:#15803d; margin-bottom:6px;'>Hierarchical Ward — validated</div>
+          <div style='font-size:16px; font-weight:700; color:#15803d; margin-bottom:6px;'>Hierarchical Ward (validated)</div>
           <div style='font-size:16px; color:#374151; line-height:1.7;'>Ward linkage on a stratified 5,000-customer sample was run as a cross-check. The dendrogram confirmed that k=8 is a natural cut point. The resulting Ward labels showed high agreement with K-Means assignments (adjusted Rand Index > 0.70), validating the K-Means solution rather than replacing it.</div>
         </div>
         <div style='background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:16px; font-weight:700; color:#15803d; margin-bottom:6px;'>Self-Organising Map — validated</div>
+          <div style='font-size:16px; font-weight:700; color:#15803d; margin-bottom:6px;'>Self-Organising Map (validated)</div>
           <div style='font-size:16px; color:#374151; line-height:1.7;'>A SOM was tested as a topology-preserving alternative. It produced comparable cluster profiles but with higher run-time and harder-to-explain topology for a business audience. K-Means was preferred for its speed, reproducibility (fixed random_state), and direct centroid interpretability.</div>
         </div>
         <div style='background:#fff5f5; border:1px solid #fecaca; border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:16px; font-weight:700; color:#b91c1c; margin-bottom:6px;'>Mean Shift — rejected</div>
-          <div style='font-size:16px; color:#374151; line-height:1.7;'>Mean Shift was evaluated and discarded for three reasons. Its O(n²) time complexity makes it computationally prohibitive at 33,038 customers — K-Means runs in linear time. While it avoids specifying k, it requires a bandwidth parameter that is equally sensitive and lacks an objective selection criterion equivalent to elbow or silhouette analysis. Its kernel density estimation also degrades in higher-dimensional spaces, producing fragmented or heavily imbalanced clusters in mixed retail data distributions.</div>
+          <div style='font-size:16px; font-weight:700; color:#b91c1c; margin-bottom:6px;'>Mean Shift (rejected)</div>
+          <div style='font-size:16px; color:#374151; line-height:1.7;'>Mean Shift was evaluated and discarded for three reasons. Its O(n²) time complexity makes it computationally prohibitive at 33,038 customers: K-Means runs in linear time. While it avoids specifying k, it requires a bandwidth parameter that is equally sensitive and lacks an objective selection criterion equivalent to elbow or silhouette analysis. Its kernel density estimation also degrades in higher-dimensional spaces, producing fragmented or heavily imbalanced clusters in mixed retail data distributions.</div>
         </div>
         <div style='background:#fff5f5; border:1px solid #fecaca; border-radius:12px; padding:18px 20px;'>
-          <div style='font-size:16px; font-weight:700; color:#b91c1c; margin-bottom:6px;'>PCA — rejected</div>
-          <div style='font-size:16px; color:#374151; line-height:1.7;'>PCA was considered and rejected because it destroys the interpretability that is central to this project's value. Principal components are linear combinations of all features, meaning cluster centroids lose their business meaning — instead of this segment spends heavily on electronics, a result would read this segment has high loading on PC2. With only 15 engineered features there is no dimensionality problem that would justify this trade-off. MinMaxScaler already addresses the scale issue without sacrificing feature meaning. The entire value of this segmentation lies in named, explainable segments that a marketing team can act on directly.</div>
+          <div style='font-size:16px; font-weight:700; color:#b91c1c; margin-bottom:6px;'>PCA (rejected)</div>
+          <div style='font-size:16px; color:#374151; line-height:1.7;'>PCA was considered and rejected because it destroys the interpretability that is central to this project's value. Principal components are linear combinations of all features, meaning cluster centroids lose their business meaning: instead of this segment spends heavily on electronics, a result would read this segment has high loading on PC2. With only 15 engineered features there is no dimensionality problem that would justify this trade-off. MinMaxScaler already addresses the scale issue without sacrificing feature meaning. The entire value of this segmentation lies in named, explainable segments that a marketing team can act on directly.</div>
         </div>
       </div>
       
@@ -2348,11 +2420,17 @@ elif selected_page == "NB3 Clustering":
     if _p.exists():
         st.markdown("<div style='font-size:16px; font-weight:700; color:#111827; margin-bottom:12px;'>K-Means vs Hierarchical Ward Labels (UMAP)</div>", unsafe_allow_html=True)
         st.image(str(_p), use_container_width=True)
+    st.markdown('''
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>This UMAP projection overlays two independent sets of cluster labels: those produced by K-Means and those produced by hierarchical Ward linkage on the same feature space. Where the two labellings agree, customers appear in the same colour region under both schemes; where they disagree, colour divergence is visible. The high degree of visual overlap between the two solutions confirms that the eight-cluster structure is not an artefact of the K-Means algorithm but a genuine feature of the data. The adjusted Rand Index between the two solutions exceeds 0.70, indicating substantial label agreement well above chance. This cross-validation is important because K-Means and Ward linkage use fundamentally different optimisation criteria: K-Means minimises within-cluster sum of squares iteratively, while Ward linkage uses a bottom-up agglomerative procedure that minimises variance at each merge step. Agreement between these two approaches on the same partition provides strong evidence that eight distinct behavioural regions exist in the customer feature space.</p>
+</div>
+''', unsafe_allow_html=True)
 
     st.markdown('''
       <div id="nb3-9" style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:18px 20px; margin-bottom:20px;'>
-        <div style='font-size:24px; font-weight:800; color:#111827; margin-bottom:8px;'>9) Segment profiling — Naming rationale</div>
-        <div style='font-size:16px; color:#374151; line-height:1.8;'>Cluster names are assigned <em>after</em> the modelling stage is complete, using z-score deviation profiles from the centroid of each cluster. A name is only accepted if it captures the single most distinctive behavioural trait of that cluster relative to the global average. Names are never imposed before seeing the data — this prevents confirmation bias in centroid interpretation. The full per-cluster evidence table is in Notebook 4, Section 3.</div>
+        <div style='font-size:24px; font-weight:800; color:#111827; margin-bottom:8px;'>9) Segment profiling: Naming rationale</div>
+        <div style='font-size:16px; color:#374151; line-height:1.8;'>Cluster names are assigned <em>after</em> the modelling stage is complete, using z-score deviation profiles from the centroid of each cluster. A name is only accepted if it captures the single most distinctive behavioural trait of that cluster relative to the global average. Names are never imposed before seeing the data; this prevents confirmation bias in centroid interpretation. The full per-cluster evidence table is in Notebook 4, Section 3.</div>
       </div>
 
       <div id="nb3-10" style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:18px 20px; margin-bottom:20px;'>
@@ -2378,7 +2456,7 @@ elif selected_page == "NB4 Characterisation":
     st.markdown("""
     <div style='margin-bottom:32px;'>
       <div>
-        <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 4 — Cluster Characterisation</div>
+        <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 4: Cluster Characterisation</div>
         <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0; text-align: justify;'>
           Notebook 4 operationalises the clustering model by profiling each segment. It identifies the distinct behavioural and spending traits that define the eight communities, assigns data-grounded business names, and validates these labels against demographic and geographic metadata. The goal is to translate abstract cluster assignments into clear, distinct customer personas.
         </p>
@@ -2433,7 +2511,7 @@ elif selected_page == "NB4 Characterisation":
       <div id="nb4-1"></div><div id="nb4-3"></div><div id="nb4-4"></div><div id="nb4-5"></div><div id="nb4-6"></div><div id="nb4-7"></div><div id="nb4-8"></div><div id="nb4-9"></div><div id="nb4-10"></div>
       <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 20px; margin-bottom:28px;'>
         <h2 style='font-size:24px; font-weight:800; color:#111827; margin:0 0 8px 0;'>1) Imports & data loading - Naming protocol</h2>
-        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Business names are assigned only after the modelling stage is complete. A name is only confirmed when the same pattern appears consistently across at least three views: the spend deviation table, the radar plot, the spend profile heatmap, and the demographic/behavioural profile. "The final name of each segment is chosen only when the same pattern appears in more than one view." This prevents confirmation bias and ensures that names reflect stable, data-grounded patterns rather than single-chart impressions.</div>
+        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Business names are assigned only after the modelling stage is complete. A name is only confirmed when the same pattern appears consistently across at least three views: the spend deviation table, the radar plot, the spend profile heatmap, and the demographic/behavioural profile. The final name of each segment is chosen only when the same pattern appears in more than one view. This prevents confirmation bias and ensures that names reflect stable, data-grounded patterns rather than single-chart impressions.</div>
       </div>
     </div>
     """, unsafe_allow_html=True)
@@ -2455,14 +2533,14 @@ elif selected_page == "NB4 Characterisation":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The distribution of customers across the eight communities is free from pathological size imbalance. No single community dominates the dataset and no community is too small to be actionable. This balance is a direct consequence of the outlier separation step in NB1: removing multivariate extremes before clustering produces a more homogeneous input space in which K-Means converges to more evenly populated centroids. The two largest segments (Regulars and Economizers) are also the most behaviourally moderate, which is consistent with a retail customer base where the majority of customers have unremarkable spending patterns. The three smallest segments (Techies, Loyalists, Wellness) are the most behaviourally distinctive — their smaller size reflects how rare those specific patterns are in the population, not a modelling failure. Segment sizes inform campaign prioritisation: larger segments offer higher absolute reach, while smaller but more homogeneous segments offer higher targeting precision.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The distribution of customers across the eight communities is free from pathological size imbalance. No single community dominates the dataset and no community is too small to be actionable. This balance is a direct consequence of the outlier separation step in NB1: removing multivariate extremes before clustering produces a more homogeneous input space in which K-Means converges to more evenly populated centroids. The two largest segments (Regulars and Economizers) are also the most behaviourally moderate, which is consistent with a retail customer base where the majority of customers have unremarkable spending patterns. The three smallest segments (Techies, Loyalists, Wellness) are the most behaviourally distinctive; their smaller size reflects how rare those specific patterns are in the population, not a modelling failure. Segment sizes inform campaign prioritisation: larger segments offer higher absolute reach, while smaller but more homogeneous segments offer higher targeting precision.</p>
 </div>
 """, unsafe_allow_html=True)
 
     st.markdown("""
 <div style='margin-top:48px; margin-bottom:6px;'>
-  <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:6px;'>Notebook 4 — Segment profiling charts</div>
-  <div style='font-size:20px; font-weight:800; color:#111827; margin-bottom:4px;'>Deep-dive characterisation — all charts from NB4</div>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:6px;'>Notebook 4: Segment profiling charts</div>
+  <div style='font-size:20px; font-weight:800; color:#111827; margin-bottom:4px;'>Deep-dive characterisation: all charts from NB4</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -2478,7 +2556,7 @@ elif selected_page == "NB4 Characterisation":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The spend profile heatmap shows raw average lifetime spend in euros per cluster-category pair, with colour normalised across clusters per column so that the darkest cell identifies the highest-spending segment in each category. Cell annotations show the actual euro values. Techies stand out strongly in electronics, technology, and videogames — confirming they are the technology-oriented segment and making them the priority audience for any cross-sell campaign targeting premium devices. Vegetarians dominate vegetables and non-alcoholic drinks, consistent with a health- and diet-conscious profile. Families show elevated spend across groceries and hygiene, reflecting large household purchasing patterns. Loyalists rank highly across multiple categories simultaneously, consistent with a long-tenure, broad-basket profile. Economizers show consistently low raw spend values across all categories, reflecting a restrained purchasing style — importantly, this is not driven by promotion sensitivity (their promo usage is near the median), but by genuinely lower absolute spending levels. This raw-values version of the heatmap complements the normalised plotly version shown above by revealing the actual scale differences between clusters, which the normalised view compresses.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The spend profile heatmap shows raw average lifetime spend in euros per cluster-category pair, with colour normalised across clusters per column so that the darkest cell identifies the highest-spending segment in each category. Cell annotations show the actual euro values. Techies stand out strongly in electronics, technology, and videogames, confirming they are the technology-oriented segment and making them the priority audience for any cross-sell campaign targeting premium devices. Vegetarians dominate vegetables and non-alcoholic drinks, consistent with a health- and diet-conscious profile. Families show elevated spend across groceries and hygiene, reflecting large household purchasing patterns. Loyalists rank highly across multiple categories simultaneously, consistent with a long-tenure, broad-basket profile. Economizers show consistently low raw spend values across all categories, reflecting a restrained purchasing style; importantly, this is not driven by promotion sensitivity (their promo usage is near the median), but by genuinely lower absolute spending levels. This raw-values version of the heatmap complements the normalised plotly version shown above by revealing the actual scale differences between clusters, which the normalised view compresses.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -2494,7 +2572,7 @@ elif selected_page == "NB4 Characterisation":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>This heatmap captures non-spend dimensions: customer age, tenure as a customer, number of children at home, number of teenagers at home, number of complaints, stores visited, and promotional sensitivity. Z-scores allow direct comparison across variables with different units and scales. Families show the strongest positive deviation on the children and teens dimensions, which is the primary naming driver for this segment. Loyalists score highest on tenure, consistent with their long-standing relationship with the retailer. Promoters score by far the strongest positive z-score on promotional sensitivity (percentage of products bought on promotion), confirming that this is their defining and differentiating characteristic. Regulars and Economizers have relatively flat profiles across behavioural dimensions, which contributes to their lower distinctiveness in the z-score space — their differentiation comes from the spend profile rather than demographic or behavioural attributes. Complaints vary modestly across segments; no cluster is systematically dissatisfied, reducing the risk that any identified community represents a cohort at high churn risk due to service quality alone.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>This heatmap captures non-spend dimensions: customer age, tenure as a customer, number of children at home, number of teenagers at home, number of complaints, stores visited, and promotional sensitivity. Z-scores allow direct comparison across variables with different units and scales. Families show the strongest positive deviation on the children and teens dimensions, which is the primary naming driver for this segment. Loyalists score highest on tenure, consistent with their long-standing relationship with the retailer. Promoters score by far the strongest positive z-score on promotional sensitivity (percentage of products bought on promotion), confirming that this is their defining and differentiating characteristic. Regulars and Economizers have relatively flat profiles across behavioural dimensions, which contributes to their lower distinctiveness in the z-score space; their differentiation comes from the spend profile rather than demographic or behavioural attributes. Complaints vary modestly across segments; no cluster is systematically dissatisfied, reducing the risk that any identified community represents a cohort at high churn risk due to service quality alone.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -2509,7 +2587,7 @@ elif selected_page == "NB4 Characterisation":
     # Interactive spend heatmap
     st.markdown("""
 <div id="nb4-6" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">6) Normalised comparison</h2></div>
-<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>6.1) Normalised spend profile per cluster — interactive heatmap</div>
+<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>6.1) Normalised spend profile per cluster: interactive heatmap</div>
 """, unsafe_allow_html=True)
     seg_spend_df = load_csv_data("segment_spend_profile.csv")
     spend_heat_cols = [c for c in seg_spend_df.columns if c.startswith("lifetime_spend_")]
@@ -2529,14 +2607,14 @@ elif selected_page == "NB4 Characterisation":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Each cell is normalised to [0, 1] across segments per column, so the darkest cell identifies the highest-spending segment in that category. Techies concentrate spending in electronics, technology, and videogames. Vegetarians over-index in vegetables and non-alcoholic drinks. Families show elevated spend across groceries and hygiene. Groceries show similar shading across nearly all segments, confirming that its exclusion from the clustering distance was correct — it adds little discriminative power. Alcohol and petfood show very low values across all segments, confirming their niche status in the customer base. Hover over any cell to see the normalised score; compare columns to identify which category most cleanly separates one segment from the rest.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Each cell is normalised to [0, 1] across segments per column, so the darkest cell identifies the highest-spending segment in that category. Techies concentrate spending in electronics, technology, and videogames. Vegetarians over-index in vegetables and non-alcoholic drinks. Families show elevated spend across groceries and hygiene. Groceries show similar shading across nearly all segments, confirming that its exclusion from the clustering distance was correct: it adds little discriminative power. Alcohol and petfood show very low values across all segments, confirming their niche status in the customer base. Hover over any cell to see the normalised score; compare columns to identify which category most cleanly separates one segment from the rest.</p>
 </div>
 """, unsafe_allow_html=True)
 
     # Interactive behavioural heatmap
     st.markdown("""
 <div style="margin-top:36px; margin-bottom:12px; padding-top:24px;">
-<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>6.2) Normalised behavioural profile per cluster — interactive heatmap</div>
+<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>6.2) Normalised behavioural profile per cluster: interactive heatmap</div>
 </div>
 """, unsafe_allow_html=True)
     info_unscaled_comm = load_csv_data("info_clustering_unscaled.csv")
@@ -2558,14 +2636,14 @@ elif selected_page == "NB4 Characterisation":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Promotional sensitivity varies strongly across segments: Promoters register the maximum value on this dimension, confirming that their defining trait is price-driven purchasing. Tenure separates long-term customers (Loyalists, Families) from newer cohorts (Techies, Economizers), supporting differentiated retention versus acquisition strategies. Total children most strongly characterises the Families segment — the highest value on this axis was one of the primary naming criteria. Complaints vary modestly across segments; where elevated, they reflect higher transaction frequency rather than systematic dissatisfaction. Together, these four dimensions provide a multi-axis profile that is more actionable for campaign design than spend data alone.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Promotional sensitivity varies strongly across segments: Promoters register the maximum value on this dimension, confirming that their defining trait is price-driven purchasing. Tenure separates long-term customers (Loyalists, Families) from newer cohorts (Techies, Economizers), supporting differentiated retention versus acquisition strategies. Total children most strongly characterises the Families segment; the highest value on this axis was one of the primary naming criteria. Complaints vary modestly across segments; where elevated, they reflect higher transaction frequency rather than systematic dissatisfaction. Together, these four dimensions provide a multi-axis profile that is more actionable for campaign design than spend data alone.</p>
 </div>
 """, unsafe_allow_html=True)
 
     # Individual radar profiles
     st.markdown("""
 <div id="nb4-7" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">7) Feature plots</h2></div>
-<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>7.1) Individual radar profiles — all 8 clusters (9-axis spider chart)</div>
+<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>7.1) Individual radar profiles: all 8 clusters (9-axis spider chart)</div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "radar_individual.png"
     if _p.exists():
@@ -2581,7 +2659,7 @@ elif selected_page == "NB4 Characterisation":
     # Combined radar
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; padding-top:24px;'>
-  <div style='font-size:18px; font-weight:700; color:#111827;'>7.2) Combined radar — all 8 clusters overlaid</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>7.2) Combined radar: all 8 clusters overlaid</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "radar_combined.png"
@@ -2591,14 +2669,14 @@ elif selected_page == "NB4 Characterisation":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The combined radar overlays all eight cluster profiles in a single chart, enabling direct visual comparison of where each community stands relative to every other on the same axis. The chart reveals the concentration of most profiles near the centre for the majority of axes — confirming that most spending categories are at moderate or low levels for most customers — while a small number of clusters extend significantly outward on specific axes. This visual concentration pattern is the radar equivalent of the z-score heatmap's near-zero cells for moderate segments. The axes where clear separation occurs (electronics for Techies, vegetables for Vegetarians, promotional sensitivity for Promoters) are precisely the axes that carry the highest discriminative power in the clustering distance. The combined radar is particularly useful for campaign planning: any axis where the target segment extends furthest from the centre while others remain near the origin represents an opportunity for category-specific messaging with minimal audience overlap risk.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The combined radar overlays all eight cluster profiles in a single chart, enabling direct visual comparison of where each community stands relative to every other on the same axis. The chart reveals the concentration of most profiles near the centre for the majority of axes, confirming that most spending categories are at moderate or low levels for most customers, while a small number of clusters extend significantly outward on specific axes. This visual concentration pattern is the radar equivalent of the z-score heatmap's near-zero cells for moderate segments. The axes where clear separation occurs (electronics for Techies, vegetables for Vegetarians, promotional sensitivity for Promoters) are precisely the axes that carry the highest discriminative power in the clustering distance. The combined radar is particularly useful for campaign planning: any axis where the target segment extends furthest from the centre while others remain near the origin represents an opportunity for category-specific messaging with minimal audience overlap risk.</p>
 </div>
 """, unsafe_allow_html=True)
 
     # Feature barplots
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; padding-top:24px;'>
-  <div style='font-size:18px; font-weight:700; color:#111827;'>7.3) Average spend per category by cluster — grouped bar charts</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>7.3) Average spend per category by cluster: grouped bar charts</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "feature_barplots.png"
@@ -2608,14 +2686,14 @@ elif selected_page == "NB4 Characterisation":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Each panel shows one product category, with bars coloured by cluster and the y-axis representing the average lifetime spend in euros. This view complements the heatmap by making absolute scale differences explicit: the electronics panel, for example, reveals that Techies spend roughly twice the next-highest cluster on electronics, while the vegetables panel shows a moderate but consistent advantage for Vegetarians. The fish panel shows that Families and Loyalists have the highest fish spend, while Vegetarians and Wellness sit near zero — consistent with plant-based and health-conscious profiles that avoid animal protein. The petfood panel confirms that the petfood feature, while excluded from the clustering distance, does differentiate one cluster (Families) in the profiling stage. The videogames panel shows that Techies dominate this category, while most other segments spend near zero — making videogames the most concentrated single-segment category in the dataset and therefore the most targeted cross-sell opportunity available from any campaign built on these segments.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>Each panel shows one product category, with bars coloured by cluster and the y-axis representing the average lifetime spend in euros. This view complements the heatmap by making absolute scale differences explicit: the electronics panel, for example, reveals that Techies spend roughly twice the next-highest cluster on electronics, while the vegetables panel shows a moderate but consistent advantage for Vegetarians. The fish panel shows that Families and Loyalists have the highest fish spend, while Vegetarians and Wellness sit near zero, consistent with plant-based and health-conscious profiles that avoid animal protein. The petfood panel confirms that the petfood feature, while excluded from the clustering distance, does differentiate one cluster (Families) in the profiling stage. The videogames panel shows that Techies dominate this category, while most other segments spend near zero, making videogames the most concentrated single-segment category in the dataset and therefore the most targeted cross-sell opportunity available from any campaign built on these segments.</p>
 </div>
 """, unsafe_allow_html=True)
 
     # Boxplot grid
     st.markdown("""
 <div style='margin-top:36px; margin-bottom:12px; padding-top:24px;'>
-  <div style='font-size:18px; font-weight:700; color:#111827;'>7.4) Key variable distributions by cluster — boxplot grid</div>
+  <div style='font-size:18px; font-weight:700; color:#111827;'>7.4) Key variable distributions by cluster: boxplot grid</div>
 </div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "boxplot_grid.png"
@@ -2625,7 +2703,7 @@ elif selected_page == "NB4 Characterisation":
     st.markdown("""
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The boxplot grid shows the within-cluster distribution of four key variables: total lifetime spend, promotional purchase ratio, customer age, and tenure. Unlike mean-based heatmaps, boxplots expose the spread and skew within each cluster — information that is essential for assessing how targeted a campaign can realistically be. The total spend panel reveals that Loyalists have the highest median spend and also the widest interquartile range, meaning that this segment contains both very high and moderately high spenders. Promoters show a very narrow promotional sensitivity distribution clustered near 1.0, confirming that their defining characteristic is consistent, not occasional, promotion usage. The age panel reveals that Economizers and Promoters skew notably younger (avg. ~48–50 years) while Loyalists and Vegetarians are older on average (~57–58 years). Tenure follows a complementary pattern: Loyalists and Families have the longest tenure, while Techies and Economizers are newer customers with wider tenure distributions, consistent with a more recently acquired and more heterogeneous cohort. These within-cluster distributions inform the confidence level with which each segment can be targeted: narrow distributions mean higher message precision; wide distributions mean a broader or tiered communication strategy is more appropriate.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The boxplot grid shows the within-cluster distribution of four key variables: total lifetime spend, promotional purchase ratio, customer age, and tenure. Unlike mean-based heatmaps, boxplots expose the spread and skew within each cluster, information that is essential for assessing how targeted a campaign can realistically be. The total spend panel reveals that Loyalists have the highest median spend and also the widest interquartile range, meaning that this segment contains both very high and moderately high spenders. Promoters show a very narrow promotional sensitivity distribution clustered near 1.0, confirming that their defining characteristic is consistent, not occasional, promotion usage. The age panel reveals that Economizers and Promoters skew notably younger (avg. ~48–50 years) while Loyalists and Vegetarians are older on average (~57–58 years). Tenure follows a complementary pattern: Loyalists and Families have the longest tenure, while Techies and Economizers are newer customers with wider tenure distributions, consistent with a more recently acquired and more heterogeneous cohort. These within-cluster distributions inform the confidence level with which each segment can be targeted: narrow distributions mean higher message precision; wide distributions mean a broader or tiered communication strategy is more appropriate.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -2657,7 +2735,7 @@ elif selected_page == "NB4 Characterisation":
     # Geographic scatter by cluster (NB4)
     st.markdown("""
 <div id="nb4-9" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">9) Geographic check</h2></div>
-<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>Geographic distribution by cluster — static scatter</div>
+<div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:12px;'>Geographic distribution by cluster: static scatter</div>
 """, unsafe_allow_html=True)
     _p = IMAGENS_DIR / "charts" / "geo_scatter.png"
     if _p.exists():
@@ -2725,27 +2803,38 @@ elif selected_page == "NB4 Characterisation":
             st.markdown(f'''
 <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
   <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
-  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>This bar chart displays the average lifetime spend per product category for the selected cluster. The categories are sorted in descending order of spend, making the dominant consumption driver immediately visible. Comparing this breakdown across clusters reveals the behavioural specialisation that distinguishes each segment: Loyalists and Families show elevated grocery spend, Techies exhibit disproportionate electronics expenditure, and Vegetarians record near-zero meat and fish categories. This per-cluster decomposition is the primary evidence base for the campaign targeting logic in Notebook 5 — it confirms that product associations discovered by the Apriori algorithm are consistent with the underlying spend structure of each segment.</p>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>This bar chart displays the average lifetime spend per product category for the selected cluster. The categories are sorted in descending order of spend, making the dominant consumption driver immediately visible. Comparing this breakdown across clusters reveals the behavioural specialisation that distinguishes each segment: Loyalists and Families show elevated grocery spend, Techies exhibit disproportionate electronics expenditure, and Vegetarians record near-zero meat and fish categories. This per-cluster decomposition is the primary evidence base for the campaign targeting logic in Notebook 5, confirming that the product associations discovered by the Apriori algorithm are consistent with the underlying spend structure of each segment.</p>
 </div>
 ''', unsafe_allow_html=True)
     except Exception as e:
         st.info("Dynamic cluster files not fully loaded. Displaying static mockup.")
+
+    st.markdown("""
+<div style='padding:24px; border-radius:16px; background:#111827; border:1px solid #374151; margin-top:48px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:12px;'>Notebook 4: Conclusions</div>
+  <p style='font-size:16px; color:#d1d5db; line-height:1.9; margin:0 0 12px 0;'>The eight segments produced by the K-Means model are behaviourally distinct and individually interpretable. Each cluster has a clearly identifiable spending driver: Families and Loyalists are high-value, full-price purchasers; Vegetarians and Wellness customers are produce and hygiene specialists with low promotion sensitivity; Techies dominate electronics; Promoters are price-driven with the highest promotion rate; Economizers are budget-conscious across all categories; and Regulars represent the broad baseline without a dominant specialisation.</p>
+  <p style='font-size:16px; color:#d1d5db; line-height:1.9; margin:0 0 12px 0;'>Demographic and geographic validation confirms that the segments reflect genuine behavioural patterns rather than artefacts of sampling. Gender is balanced across all clusters. Families are identified not by the label but by statistical confirmation of household size. The Loyalists segment is validated by the 13.5-year average tenure and the 77.6% loyalty card rate. Geographic distribution shows that all eight segments exist throughout the Lisbon Metropolitan Area, supporting the decision to exclude location from the clustering feature set.</p>
+  <p style='font-size:16px; color:#d1d5db; line-height:1.9; margin:0;'>Segment names are assigned post-hoc, grounded in the z-score evidence from Section 3 and the normalised spend profiles from Section 6. No name was assigned before examining the data. These named communities are the direct input to Notebook 5, where association rule mining is run per segment to generate targeted campaign recommendations.</p>
+</div>
+""", unsafe_allow_html=True)
     render_footer()
 
 elif selected_page == "Targeter Promotion":
-    st.markdown("""
-    <div style='margin-top: 0px; margin-bottom: 24px;'>
-        <h2 style='font-size: 56px; font-weight: 800; color: #000000; margin: 0; letter-spacing: -0.03em;'>Targeter Promotion</h2>
+    _basket_uri = load_image_as_base64(IMAGENS_DIR / "basket.png")
+    st.markdown(f"""
+    <div style='display:flex; align-items:flex-start; justify-content:space-between; margin-top:0; margin-bottom:24px; gap:32px;'>
+        <div style='flex:1;'>
+          <h2 style='font-size:56px; font-weight:800; color:#000000; margin:0 0 16px 0; letter-spacing:-0.03em;'>Targeter Promotion</h2>
+          <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 5: Association Rules</div>
+          <p style='font-size:18px; color:#374151; line-height:1.9; margin:0;'>The final notebook operationalises the cluster definitions by mining product associations specific to each community. Using the Apriori algorithm on the transaction-level <code>customer_basket</code> dataset, it discovers what products are frequently bought together by each segment. These patterns are then translated into concrete, data-driven cross-selling campaigns.</p>
+        </div>
+        <img src='{_basket_uri}' style='height:420px; width:auto; object-fit:contain; border-radius:16px; flex-shrink:0;' />
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown("""
     <div style='margin-bottom:32px;'>
       <div>
-        <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:10px;'>Notebook 5 — Association Rules</div>
-        <p style='font-size:18px; color:#374151; line-height:1.9; margin:0 0 24px 0; text-align: justify;'>
-          The final notebook operationalises the cluster definitions by mining product associations specific to each community. Using the Apriori algorithm on the transaction-level <code>customer_basket</code> dataset, it discovers what products are frequently bought together by each segment. These patterns are then translated into concrete, data-driven cross-selling campaigns.
-        </p>
         <div style='display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:14px; margin-bottom:28px;'>
           <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px 18px; text-align:center;'>
             <div style='font-size:11px; font-weight:600; color:#9ca3af; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;'>Min Support</div>
@@ -2808,11 +2897,11 @@ elif selected_page == "Targeter Promotion":
 <div style='display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:24px;'>
     <div style='border-left:3px solid #111827; padding-left:20px;'>
         <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Why support is set at 1%</div>
-        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Rules are mined per segment — each sub-population has far fewer transactions than the full dataset. A 1% support threshold ensures enough rules are discovered while still requiring meaningful co-occurrence frequency within each community.</div>
+        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Rules are mined per segment: each sub-population has far fewer transactions than the full dataset. A 1% support threshold ensures enough rules are discovered while still requiring meaningful co-occurrence frequency within each community.</div>
     </div>
     <div style='border-left:3px solid #111827; padding-left:20px;'>
         <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Lift-derived campaign discounts</div>
-        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Suggested campaign discounts are not fixed — they are derived from the lift value of each rule. A higher lift means a stronger-than-random co-purchase signal, which justifies a larger promotional incentive. This ties the commercial decision directly to statistical evidence.</div>
+        <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Suggested campaign discounts are not fixed; they are derived from the lift value of each rule. A higher lift means a stronger-than-random co-purchase signal, which justifies a larger promotional incentive. This ties the commercial decision directly to statistical evidence.</div>
     </div>
 </div>
 ''', unsafe_allow_html=True)
@@ -2872,7 +2961,7 @@ elif selected_page == "Targeter Promotion":
 <div id="nb5-7" style="margin-top:32px; margin-bottom:24px; border-top:1px solid #e5e7eb; padding-top:24px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">7) Campaign suggestions & Creative campaign texts</h2></div>
 <div style='border-left:3px solid #111827; padding-left:20px; margin-bottom:24px;'>
     <div style='font-size:18px; font-weight:700; color:#111827; margin-bottom:6px;'>Excluded recommendations: Vegetarians (cluster 3)</div>
-    <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Chicken, meat, and fish are excluded from recommendations for cluster 3 (Vegetarians). The Apriori rules initially suggested these items, but they contradict the segment's defining behavioural trait. Notebook 4 confirms that this segment's identity is plant-based — the exclusion ensures campaign coherence.</div>
+    <div style='font-size:16px; color:#6b7280; line-height:1.8;'>Chicken, meat, and fish are excluded from recommendations for cluster 3 (Vegetarians). The Apriori rules initially suggested these items, but they contradict the segment's defining behavioural trait. Notebook 4 confirms that this segment's identity is plant-based, and the exclusion ensures campaign coherence.</div>
 </div>
 ''', unsafe_allow_html=True)
     try:
@@ -2922,38 +3011,97 @@ elif selected_page == "Targeter Promotion":
     except Exception as e:
         st.info("No campaign rules CSV found. Add datasets/segment_campaign_rules.csv to enable targeter simulation.")
 
+    st.markdown("""
+<div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:20px 24px; margin-top:8px; margin-bottom:32px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:8px;'>Interpretation</div>
+  <p style='font-size:16px; color:#374151; line-height:1.9; margin:0;'>The per-segment rule cards above show the top association rules discovered by the Apriori algorithm for the selected community. Each rule states a trigger purchase (the antecedent) and a recommended promotional target (the consequent), accompanied by confidence and lift metrics. Confidence quantifies how reliably a customer who buys the trigger item also completes the recommended purchase; lift measures how much stronger that co-purchase is compared to what would be expected by chance. A high-confidence, high-lift rule indicates a commercially robust promotional signal: the intervention is both predictable and non-trivial. Campaign discounts are derived directly from lift: a lift of 1.2 justifies a modest incentive, while a lift above 2.0 supports a more aggressive promotional investment. Rules with lift below 1.2 were filtered out during parameterisation as they do not represent actionable co-purchase patterns above baseline. The creative coupon designs in Section 9 operationalise the top rule for each segment, translating the statistical output into ready-to-deploy campaign assets.</p>
+</div>
+""", unsafe_allow_html=True)
+
     st.markdown('''
 <div id="nb5-9" style="margin-top:64px; margin-bottom:24px; border-top:2px solid #e5e7eb; padding-top:32px;"><h2 style="font-size:24px; font-weight:800; color:#111827; margin:0;">9) Cupons (Campaign Creative)</h2></div>
 <div class="coupons-grid-wrapper">
 ''', unsafe_allow_html=True)
-    import os
+    import os, base64
     cupoes_dir = IMAGENS_DIR / "cupoes"
+
+    # Filename -> (segment label, short description)
+    COUPON_META = {
+        "1.png": (
+            "Promoters",
+            "Bundle salad, tomatoes, asparagus and carrots together for 29% off. Targets high-frequency produce buyers who respond strongly to multi-item bundle promotions."
+        ),
+        "2.png": (
+            "Families",
+            "The Family Breakfast Combo: cereals, chocolate bread, eggs and fresh bread bundled for 10% off the whole basket. Designed for large-household shoppers who prioritise everyday staples."
+        ),
+        "eco.png": (
+            "Economizers",
+            "Stock up on asparagus and spinach and bring avocado home for 23% less. Targets budget-conscious shoppers who seek value on healthy everyday greens."
+        ),
+        "Adobe Express - file.png": (
+            "Regulars",
+            "Your weekly staples for less: avocado, carrots, asparagus and salad at 25% off. Rewards loyal, routine shoppers who consistently fill their basket with fresh produce."
+        ),
+        "Untitled - 09 de junho de 2026 às 00.41.01 (1).png": (
+            "Vegetarians",
+            "Add cooking oil and tomato sauce to your basket and babies food joins at 10% off. Designed for plant-based shoppers who regularly purchase cooking essentials."
+        ),
+        "Untitled - 09 de junho de 2026 às 00.41.01 (1) (1).png": (
+            "Wellness",
+            "Powered up on an energy bar? Treat your ears too: AirPods at 10% off. Targets health-oriented customers who also invest in personal wellbeing and lifestyle products."
+        ),
+        "Untitled - 09 de junho de 2026 às 00.41.01 (1) (4).png": (
+            "Loyalists",
+            "Members who buy an iPhone 10 unlock AirPods at 10% off, exclusively for them. A VIP reward for high-value, brand-loyal customers who purchase premium electronics."
+        ),
+        "Untitled - 09 de junho de 2026 às 00.41.01 (1) (5).png": (
+            "Techies",
+            "Complete the setup: buy bluetooth headphones and an energy drink to unlock AirPods at 24% off. Targets tech-savvy customers who pair digital accessories with high-energy lifestyle purchases."
+        ),
+    }
+
     if cupoes_dir.exists():
-        # Display 8 images
-        st.markdown('<div class="coupons-scroller">', unsafe_allow_html=True)
-        cols = st.columns(4)
         images = [f for f in os.listdir(cupoes_dir) if f.endswith(".png")]
-        for idx, f in enumerate(images):
-            # We want 2 rows, so we can just let them wrap in CSS or use columns
-            pass
-        # Actually it's easier to use raw HTML for the grid to ensure perfect horizontal scrolling and mix-blend-mode
-        import base64
         html_imgs = ""
         for f in images:
             img_path = cupoes_dir / f
             with open(img_path, "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read()).decode()
-            html_imgs += f'<div class="coupon-item"><img src="data:image/png;base64,{encoded_string}" style="width:100%; border-radius:12px; mix-blend-mode: multiply;"></div>'
-        
+            segment, description = COUPON_META.get(f, ("", ""))
+            caption_html = f'<div class="coupon-caption"><div class="coupon-segment">{segment}</div><div class="coupon-desc">{description}</div></div>' if (segment or description) else ""
+            html_imgs += f'<div class="coupon-item"><img src="data:image/png;base64,{encoded_string}" style="width:100%; border-radius:12px; mix-blend-mode: multiply;">{caption_html}</div>'
+
         grid_html = f'''
         <style>
         .coupons-scroller {{
             display: grid;
             grid-template-columns: repeat(4, 300px);
             grid-template-rows: repeat(2, auto);
-            gap: 16px;
+            gap: 24px;
             overflow-x: auto;
             padding-bottom: 16px;
+        }}
+        .coupon-item {{
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }}
+        .coupon-caption {{
+            padding: 0 4px;
+        }}
+        .coupon-segment {{
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }}
+        .coupon-desc {{
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.6;
         }}
         @media (max-width: 800px) {{
             .coupons-scroller {{
@@ -2966,9 +3114,17 @@ elif selected_page == "Targeter Promotion":
         </div>
         '''
         st.markdown(grid_html, unsafe_allow_html=True)
-        
+
     st.markdown("</div>", unsafe_allow_html=True)
 
+    st.markdown("""
+<div style='padding:24px; border-radius:16px; background:#111827; border:1px solid #374151; margin-top:48px;'>
+  <div style='font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:#9ca3af; margin-bottom:12px;'>Notebook 5: Conclusions</div>
+  <p style='font-size:16px; color:#d1d5db; line-height:1.9; margin:0 0 12px 0;'>The Apriori algorithm, applied independently to each of the eight customer segments, identifies co-purchase patterns that are both statistically robust and commercially actionable. The choice to mine rules per segment rather than on the full transaction pool is deliberate: global rules would reflect the aggregate behaviour of all customers and mask the segment-specific associations that make targeted campaigns possible. Segment-level mining recovers patterns that would be invisible at the population level.</p>
+  <p style='font-size:16px; color:#d1d5db; line-height:1.9; margin:0 0 12px 0;'>The parameter choices (minimum support 1%, minimum confidence 20%, minimum lift 1.2) reflect the reduced transaction volumes in per-segment populations. A higher support threshold would suppress too many rules for smaller segments; a lower lift floor would include associations that are statistically marginal and commercially unconvincing. The 80/20 robustness validation confirms that the rules are not artefacts of the training sample.</p>
+  <p style='font-size:16px; color:#d1d5db; line-height:1.9; margin:0;'>The coupon designs in Section 9 translate the top rule per segment into ready-to-deploy campaign assets. The creative direction for each coupon is grounded in the segment's defining behavioural trait: vegetable bundles for produce-focused segments, technology cross-sells for Techies, volume deals for Families, and so on. This alignment between statistical rule and campaign creative ensures that the promotional message reinforces rather than contradicts the segment identity established in Notebook 4.</p>
+</div>
+""", unsafe_allow_html=True)
     render_footer()
 elif selected_page == "Conclusion & Recommendations":
     st.markdown("""
@@ -2982,7 +3138,7 @@ elif selected_page == "Conclusion & Recommendations":
     <div style='background:#111827; border-radius:16px; padding:28px 32px; margin-bottom:32px;'>
       <div style='font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#9ca3af; margin-bottom:12px;'>Executive Summary</div>
       <p style='font-size:16px; color:#d1d5db; line-height:1.9; margin:0;'>
-        This project segmented <strong style="color:#fff;">33,038 supermarket customers</strong> into <strong style="color:#fff;">8 behavioural communities</strong> using K-Means clustering on annual category spend and promotion sensitivity. The pipeline spans five notebooks: data exploration and quality diagnosis (NB0), preprocessing and feature engineering (NB1), geographic analysis (NB2), systematic model selection and validation (NB3), cluster characterisation and naming (NB4), and campaign design via association rule mining (NB5). Every modelling decision — algorithm, k, scaler, feature set, outlier strategy — was made empirically, benchmarked against alternatives, and is documented in this app.
+        This project segmented <strong style="color:#fff;">33,038 supermarket customers</strong> into <strong style="color:#fff;">8 behavioural communities</strong> using K-Means clustering on annual category spend and promotion sensitivity. The pipeline spans five notebooks: data exploration and quality diagnosis (NB0), preprocessing and feature engineering (NB1), geographic analysis (NB2), systematic model selection and validation (NB3), cluster characterisation and naming (NB4), and campaign design via association rule mining (NB5). Every modelling decision (algorithm, k, scaler, feature set, outlier strategy) was made empirically, benchmarked against alternatives, and is documented in this app.
       </p>
     </div>
 
@@ -3081,7 +3237,7 @@ elif selected_page == "Conclusion & Recommendations":
 
       <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:18px 20px;'>
         <div style='font-size:16px; font-weight:700; color:#111827; margin-bottom:6px;'>3. Convert Promoters without training discount dependency</div>
-        <div style='font-size:14px; color:#374151; line-height:1.7;'>Promoters respond strongly to discounts but have the lowest total spend. The campaign objective is to use price-led entry offers to drive basket expansion — not to sustain a permanently discounted relationship. Use time-limited bundles and auto-upgrade mechanisms that surface full-price products once a promotional relationship is established.</div>
+        <div style='font-size:14px; color:#374151; line-height:1.7;'>Promoters respond strongly to discounts but have the lowest total spend. The campaign objective is to use price-led entry offers to drive basket expansion, not to sustain a permanently discounted relationship. Use time-limited bundles and auto-upgrade mechanisms that surface full-price products once a promotional relationship is established.</div>
       </div>
 
       <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:18px 20px;'>
@@ -3096,7 +3252,7 @@ elif selected_page == "Conclusion & Recommendations":
 
       <div style='background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:18px 20px;'>
         <div style='font-size:16px; font-weight:700; color:#111827; margin-bottom:6px;'>6. Use geography to allocate resources, not to define segments</div>
-        <div style='font-size:14px; color:#374151; line-height:1.7;'>Geography was deliberately excluded from the clustering feature set. The geographic overlay in NB4 shows that all 8 segments are distributed across the Lisbon Metropolitan Area — confirming that behaviour, not location, drives segmentation. Geography should inform store-level assortment and staff allocation, but CRM communications should be driven by segment membership.</div>
+        <div style='font-size:14px; color:#374151; line-height:1.7;'>Geography was deliberately excluded from the clustering feature set. The geographic overlay in NB4 shows that all 8 segments are distributed across the Lisbon Metropolitan Area, confirming that behaviour, not location, drives segmentation. Geography should inform store-level assortment and staff allocation, but CRM communications should be driven by segment membership.</div>
       </div>
 
     </div>
@@ -3401,6 +3557,12 @@ elif selected_page == "Customer Simulator":
 
     with _shop_col:
         st.subheader("🏪 Products")
+        st.markdown(f"""
+<div style='display:flex; gap:16px; margin-bottom:16px;'>
+  <img src='{PRODUTOS_TECH_URI}' style='width:50%; border-radius:12px; object-fit:cover;' />
+  <img src='{PRODUTOS_MEAT_URI}' style='width:50%; border-radius:12px; object-fit:cover;' />
+</div>
+""", unsafe_allow_html=True)
         _cs, _cc = st.columns([2, 1])
         _search = _cs.text_input("Search", placeholder="Search…", label_visibility="collapsed", key="shop_search")
         _cat_filter = _cc.selectbox(
