@@ -64,10 +64,7 @@ def diverging_cmap():
 def cluster_cmap():
     return ListedColormap(CLUSTER_PALETTE)
 
-
-# ============================================================
 # Feature selection for the clustering distance
-# ============================================================
 
 def get_profiling_features(df, distance_cols):
     """Return every numeric column NOT used in the distance (for profiling)."""
@@ -75,18 +72,14 @@ def get_profiling_features(df, distance_cols):
     return [c for c in numeric if c not in distance_cols]
 
 
-# ============================================================
 # Scaling (fit once on regular customers, reuse for outliers)
-# ============================================================
 
 def transform_with_scaler(df, feature_cols, scaler):
     """Project new rows (e.g. outliers) using an already-fitted scaler."""
     return scaler.transform(df[feature_cols].astype(float))
 
 
-# ============================================================
 # Choosing the number of clusters
-# ============================================================
 
 def kmeans_elbow(X, k_range=range(1, 11), random_state=0, n_init=30):
     """Compute KMeans inertia across k (the elbow / dispersion curve)."""
@@ -112,9 +105,7 @@ def plot_elbow(k_values, inertia, cutoffs=None):
     plt.show()
 
 
-# ============================================================
 # Fitting the final solutions
-# ============================================================
 
 def fit_kmeans(X, k, random_state=0, n_init=30):
     """Fit and return a KMeans model (use .labels_ / .predict / .cluster_centers_)."""
@@ -419,9 +410,7 @@ def complaint_summary(df, label_col="cluster", complaint_col="number_complaints"
     return out
 
 
-# ============================================================
 # Profiling and visualisation of the final segments
-# ============================================================
 
 def profile_clusters(df, label_col, feature_cols, as_percent=False):
     """Mean profile by cluster, with an OVERALL row as baseline."""
@@ -519,9 +508,7 @@ def plot_boxplot_grid(data, variables, label_col="cluster", max_cols=3,
     plt.show()
 
 
-# ============================================================
 # Re-attaching the held-aside outliers and exporting
-# ============================================================
 
 
 def build_full_assignment(regular_df, regular_labels,
@@ -538,9 +525,7 @@ def build_full_assignment(regular_df, regular_labels,
     return full
 
 
-# ============================================================
 # Scaler comparison (Standard vs MinMax vs Robust)
-# ============================================================
 
 def compare_scalers(df, feature_cols, k_range=range(2, 11),
                     random_state=0, n_init=10, sample_size=8000):
@@ -577,9 +562,7 @@ def plot_scaler_comparison(scaler_df, mark_k=None):
     plt.show()
 
 
-# ============================================================
 # Silhouette "blade" plot (per-sample silhouette by cluster)
-# ============================================================
 
 def plot_silhouette_blades(X, labels, sample_size=10000, random_state=0,
                            title="Silhouette plot - KMeans"):
@@ -617,10 +600,7 @@ def plot_silhouette_blades(X, labels, sample_size=10000, random_state=0,
     plt.show()
     return avg
 
-
-# ============================================================
 # 2-D embeddings for visual inspection (PCA + UMAP)
-# ============================================================
 
 def embed_pca(X, n_components=2, random_state=0):
     """2-D PCA embedding of the scaled clustering matrix."""
@@ -697,9 +677,7 @@ def plot_umap_label_comparison(X_sample, labels_a, labels_b,
     return embedding, method
 
 
-# ============================================================
 # Feature-set comparison (which columns to cluster on)
-# ============================================================
 
 
 def build_candidate_feature_sets(df):
@@ -709,8 +687,6 @@ def build_candidate_feature_sets(df):
     abss_no_groceries = [c for c in abss if c != "lifetime_spend_groceries"]
     abss_granular = [c for c in df.columns if c.startswith("lifetime_spend_")
                      and c != "lifetime_spend_technology" and c not in {"lifetime_spend_groceries"}]
-    annual = [c for c in df.columns if c.startswith("annual_spend_")]
-    annual_no_groceries = [c for c in annual if c != "annual_spend_groceries"]
     shares_no_groceries = [c for c in df.columns if c.endswith("_share")
                            and not c.startswith("grocery")]
     eng = [
@@ -741,11 +717,6 @@ def build_candidate_feature_sets(df):
     }
     if abss_granular and abss_granular != abss_no_groceries:
         sets["spend + promo granular tech"] = (abss_granular + promo, False)
-    # ---- annual spend (lifetime / tenure): only added when columns are present ----
-    if annual:
-        sets["annual_spend"] = (annual, False)
-        sets["annual_spend no groceries"] = (annual_no_groceries, False)
-        sets["annual_spend + promo no groceries"] = (annual_no_groceries + promo, False)
     return sets
 
 
@@ -759,9 +730,7 @@ def subsample(X, labels, n=8000, random_state=0):
     return X[idx], labels[idx]
 
 
-# ============================================================
 # Feature pipelines and model-comparison helpers
-# ============================================================
 
 def get_scaler(name):
     """Return a fresh scaler instance by name."""
@@ -895,11 +864,7 @@ def plot_silhouette_grid(grid_df, title="Silhouette by feature set and k"):
 
 
 # Embedded feature importance, used post-hoc to explain the final labels.
-
-
-# ============================================================
 # Standardised profile views
-# ============================================================
 
 def plot_profile_heatmap_z(profile_df, title="Cluster profile (standardised per feature)"):
     """Heatmap of a profile table with each feature standardised across clusters.
@@ -922,14 +887,10 @@ def plot_profile_heatmap_z(profile_df, title="Cluster profile (standardised per 
     return z.round(2)
 
 
-# ============================================================
 # Granular feature-set search
-# ============================================================
 
 
-# ============================================================
 # Self-Organising Map benchmark
-# ============================================================
 
 def som_quantization_curve(X, grid=(3, 3), iterations=1000, checkpoints=None,
                            sigma=0.5, learning_rate=1.0, sample_size=8000,
@@ -1084,9 +1045,7 @@ def plot_som_feature_maps(som, feature_names, features=None, n_cols=3,
     plt.show()
 
 
-# ============================================================
 # Ensemble / consensus clustering
-# ============================================================
 
 def consensus_kmeans_majority(X, k, n_runs=25, random_state=0, n_init=5):
     """Majority-vote ensemble of KMeans runs; returns (consensus_labels, stability)."""
@@ -1129,9 +1088,7 @@ def plot_stability(stability, title="Consensus stability per customer"):
     plt.show()
 
 
-# ============================================================
 # Notebook workflow helpers
-# ============================================================
 
 def run_method_benchmarks(X, k_range=range(2, 11), random_state=0):
     """Run KMeans, agglomerative and centroid Ward benchmark tables."""
@@ -1599,10 +1556,7 @@ def display_method_benchmarks(method_benchmarks):
     ).head(5))
 
 
-# ─────────────────────────────────────────────────────────────────────────────
 # Consensus KMeans (ensemble)
-# ─────────────────────────────────────────────────────────────────────────────
-
 
 def apply_centroid_ward_macro(data, X, feature_cols, k, micro_k=20, random_state=0):
     """Fit centroid Ward macro clusters, attach labels and display diagnostics."""
@@ -1628,9 +1582,7 @@ def apply_centroid_ward_macro(data, X, feature_cols, k, micro_k=20, random_state
     return micro, centroids, Z
 
 
-# ---------------------------------------------------------------------------
 # Outlier strategy comparison: separation vs IQR capping
-# ---------------------------------------------------------------------------
 
 def compare_outlier_strategies(
     separation_df,

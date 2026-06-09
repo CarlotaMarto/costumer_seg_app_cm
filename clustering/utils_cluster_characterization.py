@@ -44,14 +44,14 @@ def sequential_cmap():
 
 
 CLUSTER_NAMES = {
-    0: "Vegetarians",   # highest vegetable spend, lowest meat
-    1: "Regulars",      # moderate across all features
-    2: "Wellness",      # highest hygiene spend, high vegetables
-    3: "Promoters",     # highest promotion-purchase rate
-    4: "Loyalists",     # highest loyalty flag, highest groceries spend
-    5: "Families",      # highest children count, highest meat spend
-    6: "Economizers",   # fewest store visits, moderate spend
-    7: "Techies",       # highest electronics and videogame spend
+    0: "Regulars",      # moderate across all features; largest segment
+    1: "Families",      # highest children count, highest meat spend
+    2: "Economizers",   # lowest loyalty flag, many stores visited, deal-seekers
+    3: "Vegetarians",   # highest vegetable spend, near-zero meat spend
+    4: "Loyalists",     # highest loyalty flag rate
+    5: "Techies",       # highest electronics and videogame spend
+    6: "Wellness",      # highest hygiene spend, high vegetable spend
+    7: "Promoters",     # highest promotion-purchase rate (86%)
 }
 
 def load_characterization_data(data_dir="../datasets"):
@@ -145,7 +145,7 @@ def _radar_labels(features):
     """Shorten feature names for radar chart axes."""
     subs = {
         "lifetime_spend_": "",
-        "annual_spend_": "",
+        "_share": " share",
         "percentage_of_products_bought_promotion": "promotion_%",
         "log_total_spend": "log_spend",
         "lifetime_total_distinct_products": "distinct_products",
@@ -266,7 +266,6 @@ def plot_radar_combined(
         title="Segment",
         title_fontsize=9,
     )
-    plt.tight_layout()
     plt.show()
     return plot_data.round(2)
 
@@ -464,7 +463,7 @@ def plot_cluster_summary_card(
     cluster_names=None,
     spend_features=None,
     stat_features=None,
-    figsize=(14, 5),
+    figsize=(17, 5),
 ):
     """Three-panel summary card for one cluster: spend radar, key differentiators, stats table."""
     if cluster_names is None:
@@ -474,9 +473,7 @@ def plot_cluster_summary_card(
     color = CLUSTER_PALETTE[int(cluster_id) % len(CLUSTER_PALETTE)]
 
     if spend_features is None:
-        spend_features = [c for c in df.columns if c.startswith("annual_spend_")]
-        if not spend_features:
-            spend_features = [c for c in df.columns if c.startswith("lifetime_spend_")]
+        spend_features = [c for c in df.columns if c.startswith("lifetime_spend_")]
 
     if stat_features is None:
         stat_features = [
@@ -496,7 +493,7 @@ def plot_cluster_summary_card(
         fontsize=13, fontweight="bold", x=0.5, y=1.01,
     )
 
-    gs = fig.add_gridspec(1, 3, wspace=0.45)
+    gs = fig.add_gridspec(1, 3, wspace=0.55, width_ratios=[1, 1.1, 1])
 
     ax_radar = fig.add_subplot(gs[0, 0], projection="polar")
     spend_prof = profile_df.drop(index="OVERALL", errors="ignore")
@@ -520,7 +517,7 @@ def plot_cluster_summary_card(
             ax_radar.set_yticks([0.25, 0.5, 0.75, 1.0])
             ax_radar.set_yticklabels(["", "", "", ""], fontsize=6)
             ax_radar.set_ylim(0, 1)
-    ax_radar.set_title("Spend profile\n(scaled)", fontsize=9, pad=10)
+    ax_radar.set_title("Segment profile\n(scaled)", fontsize=9, pad=10)
 
     ax_bar = fig.add_subplot(gs[0, 1])
     if "OVERALL" in profile_df.index and cluster_id in profile_df.index:
@@ -576,7 +573,8 @@ def plot_cluster_summary_card(
     )
     ax_txt.set_title("Segment statistics", fontsize=9)
 
-    plt.tight_layout()
+    # tight_layout is incompatible with polar axes — use subplots_adjust instead
+    fig.subplots_adjust(top=0.88, left=0.04, right=0.97, bottom=0.12)
     plt.show()
 
 
